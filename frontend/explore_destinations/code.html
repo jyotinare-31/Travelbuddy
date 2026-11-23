@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+
+    <title>Explore Destinations | TravelBuddy</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-primary": "#bec6e0",
+                        "on-tertiary-container": "#b87500",
+                        "on-secondary-fixed-variant": "#005049",
+                        "on-secondary-fixed": "#00201d",
+                        "primary-container": "#131b2e",
+                        "secondary": "#006a61",
+                        "outline-variant": "#c6c6cd",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#86f2e4",
+                        "tertiary-container": "#2a1700",
+                        "inverse-surface": "#2d3133",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-error-container": "#93000a",
+                        "surface": "#f7f9fb",
+                        "tertiary": "#000000",
+                        "outline": "#76777d",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-tertiary-fixed": "#2a1700",
+                        "surface-container": "#eceef0",
+                        "secondary-fixed-dim": "#6bd8cb",
+                        "on-primary-fixed": "#131b2e",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#7c839b",
+                        "on-secondary-container": "#006f66",
+                        "glass-stroke": "rgba(255, 255, 255, 0.3)",
+                        "text-muted": "#64748B",
+                        "error-container": "#ffdad6",
+                        "on-background": "#191c1e",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "secondary-fixed": "#89f5e7",
+                        "surface-container-low": "#f2f4f6",
+                        "primary": "#000000",
+                        "surface-tint": "#565e74",
+                        "surface-variant": "#e0e3e5",
+                        "on-surface-variant": "#45464d",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-dim": "#d8dadc",
+                        "primary-fixed": "#dae2fd",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-white": "#FFFFFF",
+                        "text-main": "#0F172A",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#bec6e0",
+                        "background": "#f7f9fb",
+                        "on-surface": "#191c1e",
+                        "on-tertiary": "#ffffff"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
+                    spacing: {
+                        "container-max": "1280px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "64px",
+                        base: "4px",
+                        gutter: "24px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Montserrat"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "headline-xl": ["Montserrat"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["32px", { lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "700" }],
+                        "body-md": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
+                        "headline-md": ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+                        "label-sm": ["12px", { lineHeight: "1.2", fontWeight: "500" }],
+                        "headline-lg-mobile": ["28px", { lineHeight: "1.2", fontWeight: "700" }],
+                        "headline-xl": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+                        "label-md": ["14px", { lineHeight: "1.2", letterSpacing: "0.01em", fontWeight: "600" }]
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- Fonts (FIX: removed the stray backslash before @) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet" />
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
+
+    <!-- FIX: one single, clean <style> block -->
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            overscroll-behavior: none;
+        }
+
+        main > :first-child {
+            margin-top: 0 !important;
+        }
+
+        main > :last-child {
+            margin-bottom: 0 !important;
+        }
+
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* AI ASSISTANT ANIMATION */
+
+        #ai-assistant-window {
+            animation: aiSlideUp 0.25s ease-out;
+        }
+
+        @keyframes aiSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ai-message {
+            animation: messageIn 0.2s ease-out;
+        }
+
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+</head>
+
+
+<body class="bg-background font-body-md text-on-surface">
+
+
+    <!-- =========================================================
+         HEADER
+    ========================================================= -->
+
+    <header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] transition-all duration-300">
+
+        <div class="h-20 max-w-[1280px] mx-auto px-margin-mobile lg:px-margin-desktop flex items-center justify-between">
+
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+
+                <img alt="TravelBuddy Brand Logo" class="h-8 w-auto object-contain"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1JUdtm0sEy_rrcjf3b_gyzJVtAyhTT_tqlSZsb3HO2N4AADM9XjQD_qY3-fd1QHs6uALH3hCneRvgSSjzZ9ra6HbMBQRIa7R_3brSOkAHLpbZWA6dVz9crlUew70SnRePBuyJDTzpB4FITOQ4705OuqX7eYoMNpvikks-f75BkzmFwNng7aF3Fe5RilN8RV5Jn8fzyQpkesgBQMCkKNuZHhKTiIlH1xxtYjoyppGYeIRrAexqZFMxnQ" />
+
+                <span class="font-headline-md text-headline-md text-primary tracking-tight">
+                    TravelBuddy
+                </span>
+
+            </div>
+
+            <!-- Navigation -->
+            <nav class="hidden lg:flex items-center gap-gutter h-full">
+
+                <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors py-2"
+                    data-path="home" href="#">Home</a>
+
+                <a aria-current="page" class="transition-colors py-2 text-secondary font-bold border-b-2 border-secondary"
+                    data-path="explore" href="#">Explore Destinations</a>
+
+                <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors py-2"
+                    data-path="plan-trip" href="#">Plan Trip</a>
+
+                <a class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors py-2"
+                    data-path="community" href="#">Community</a>
+
+                <a id="nav-ai-assistant"
+                    class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors py-2"
+                    data-path="ai-assistant" href="#">AI Assistant</a>
+
+            </nav>
+
+            <!-- Right side -->
+            <div class="flex items-center gap-6">
+
+                <div class="hidden md:flex items-center bg-surface-container rounded-full px-4 py-2 gap-2">
+
+                    <span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+
+                    <input class="bg-transparent border-none focus:ring-0 text-label-md w-32 font-label-md"
+                        placeholder="Search journeys..." type="text" />
+
+                </div>
+
+                <div class="flex items-center gap-4">
+
+                    <button class="text-on-surface-variant hover:text-on-surface relative">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+                    </button>
+
+                    <img alt="Profile" class="w-9 h-9 rounded-full object-cover ring-2 ring-glass-stroke"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuASjl-isWIjw9PPtBeyDjYxDvbrD1E4WA49K7ZstkqL8quPOWVXcKOvaxt9prOnc0Dy3CVpLF6Cz42_nZIJ8Kh-eFC1mx_wti_7yYd8MJhFCpDDL6vKcL1r4iMdWUf7RTEgMdkeKQ-mALiMloeLUuqVj4TcSQzyebgx1RrJszU-gnIClANk90i3cOXTO7GqjiomiTt_tArZBXZh3kpmNro0YHmwYSF6qzFP6yZ_VR7-WM8Dg0C-z6xP4Q" />
+
+                </div>
+
+                <button class="lg:hidden text-on-surface">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         MAIN
+    ========================================================= -->
+
+    <main class="w-full pt-20 bg-background">
+
+        <div class="flex flex-col w-full">
+
+
+            <!-- HERO -->
+
+            <section
+                class="w-full relative py-20 px-margin-mobile lg:px-margin-desktop mb-margin-desktop overflow-hidden bg-primary-container text-on-primary-container">
+
+                <div class="absolute inset-0 w-full h-full pointer-events-none opacity-20 bg-cover bg-center"
+                    style="background-image:url('https://lh3.googleusercontent.com/aida-public/AB6AXuBiJrK8Gf4pAuzRK8wmu9vHiHC7UqOwSxI7bwe_gA4XlGvoC5PnR-jblw70__igvgq-hAKp6XnuU4iuldmDQNQZwjNyB8YnlM-fCqPzXZ2CQ4BxE9TapqsXFxfCUHe0XvyST7Tvwrg6WY996x9WURxuTbnG_9TDQb7mfMMLOf_hZCpi2Dm3JT7ZxKahly9wTnbuTd9_AkR28bW7xeboGs3U5xL5qoRz4eUq8MxuXAD57WEVxUIcwa1mBQ')">
+                </div>
+
+                <div class="relative z-10 max-w-4xl mx-auto text-center space-y-8">
+
+                    <h1 class="font-headline-xl text-headline-xl text-surface-white">
+                        Discover the Extraordinary
+                    </h1>
+
+                    <p class="font-body-lg text-body-lg text-inverse-on-surface/80 max-w-2xl mx-auto">
+                        Unearth breathtaking destinations, curated experiences, and hidden
+                        wonders tailored to your unique journey.
+                    </p>
+
+                    <div class="relative max-w-2xl mx-auto mt-8">
+
+                        <div class="flex items-center bg-surface-white rounded-full p-2 shadow-xl">
+
+                            <span class="material-symbols-outlined text-text-muted ml-4 mr-2">search</span>
+
+                            <input id="destination-search"
+                                class="w-full bg-transparent border-none focus:outline-none text-text-main font-body-md py-3 px-2"
+                                placeholder="Search destinations, cities, or experiences..."
+                                type="search" autocomplete="off" />
+
+                            <button id="destination-search-button" type="button"
+                                class="bg-secondary text-on-secondary px-8 py-3 rounded-full font-label-md hover:scale-95 transition-transform duration-200">
+                                Search
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- DESTINATION CONTENT -->
+
+            <div class="max-w-[1280px] mx-auto px-margin-mobile lg:px-margin-desktop w-full pb-24">
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+
+
+                    <!-- FILTERS -->
+
+                    <aside class="col-span-1 lg:col-span-3 space-y-8">
+
+                        <div id="destination-filters"
+                            class="bg-surface-white rounded-2xl p-6 shadow-sm space-y-6 sticky top-24">
+
+                            <div class="flex items-center justify-between">
+
+                                <h2 class="font-headline-md text-headline-md text-on-surface">Filters</h2>
+
+                                <button id="destination-reset" type="button"
+                                    class="text-secondary font-label-sm hover:underline">
+                                    Reset
+                                </button>
+
+                            </div>
+
+                            <div class="space-y-2">
+
+                                <label class="block font-label-md text-label-md text-on-surface-variant uppercase tracking-wider"
+                                    for="destination-city">City</label>
+
+                                <select id="destination-city"
+                                    class="w-full rounded-lg bg-surface-container-low px-3 py-3 font-body-md text-on-surface">
+                                    <option value="">All cities</option>
+                                </select>
+
+                            </div>
+
+                            <div class="space-y-2">
+
+                                <label class="block font-label-md text-label-md text-on-surface-variant uppercase tracking-wider"
+                                    for="destination-country">Country</label>
+
+                                <select id="destination-country"
+                                    class="w-full rounded-lg bg-surface-container-low px-3 py-3 font-body-md text-on-surface">
+                                    <option value="">All countries</option>
+                                </select>
+
+                            </div>
+
+                            <div class="space-y-3">
+
+                                <h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">
+                                    Travel type
+                                </h3>
+
+                                <div id="destination-type-filters" class="flex flex-wrap gap-2"></div>
+
+                            </div>
+
+                        </div>
+
+                    </aside>
+
+
+                    <!-- DESTINATIONS -->
+
+                    <section class="col-span-1 lg:col-span-9">
+
+                        <div id="destination-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- Backend destinations are inserted here -->
+                        </div>
+
+                        <div class="flex justify-center pt-8">
+
+                            <button type="button"
+                                class="px-8 py-3 rounded-full bg-transparent border-2 border-secondary text-secondary font-label-md hover:bg-secondary hover:text-on-secondary transition-colors">
+                                Load More Destinations
+                            </button>
+
+                        </div>
+
+
+                        <!-- HIDDEN DESTINATIONS -->
+
+                        <section class="mt-20">
+
+                            <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+
+                                <div>
+
+                                    <div class="flex items-center gap-3 mb-2">
+
+                                        <span class="material-symbols-outlined text-secondary text-3xl">explore</span>
+
+                                        <h2 class="font-headline-md text-3xl font-bold text-on-surface">
+                                            Hidden Destinations
+                                        </h2>
+
+                                    </div>
+
+                                    <p class="text-on-surface-variant">
+                                        Discover peaceful and lesser-known places away from the usual tourist spots.
+                                    </p>
+
+                                </div>
+
+                                <span class="px-4 py-2 rounded-full bg-secondary/10 text-secondary font-label-md">
+                                    Hidden Gems
+                                </span>
+
+                            </div>
+
+                            <!-- Loading -->
+
+                            <div id="hidden-destination-loading" class="text-center py-10">
+
+                                <span class="material-symbols-outlined animate-spin text-secondary text-3xl">
+                                    progress_activity
+                                </span>
+
+                                <p class="text-text-muted mt-3">Discovering hidden destinations...</p>
+
+                            </div>
+
+                            <!-- Error -->
+
+                            <div id="hidden-destination-error" class="hidden text-center py-10">
+
+                                <span class="material-symbols-outlined text-error text-4xl">error</span>
+
+                                <p class="text-error mt-3">Unable to load hidden destinations.</p>
+
+                                <button type="button" onclick="loadHiddenDestinations()"
+                                    class="mt-4 px-5 py-2 rounded-lg bg-secondary text-on-secondary">
+                                    Try Again
+                                </button>
+
+                            </div>
+
+                            <!-- Hidden destination cards -->
+
+                            <div id="hidden-destination-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+
+                        </section>
+
+                    </section>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================================================
+         FOOTER
+    ========================================================= -->
+
+    <footer class="w-full bg-primary-container text-on-primary-container py-16">
+
+        <div class="max-w-[1280px] mx-auto px-margin-mobile lg:px-margin-desktop">
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-gutter mb-12">
+
+                <div class="col-span-2 md:col-span-1">
+
+                    <div class="flex items-center gap-2 mb-6">
+
+                        <img alt="Logo" class="h-6 w-auto brightness-200"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1JUdtm0sEy_rrcjf3b_gyzJVtAyhTT_tqlSZsb3HO2N4AADM9XjQD_qY3-fd1QHs6uALH3hCneRvgSSjzZ9ra6HbMBQRIa7R_3brSOkAHLpbZWA6dVz9crlUew70SnRePBuyJDTzpB4FITOQ4705OuqX7eYoMNpvikks-f75BkzmFwNng7aF3Fe5RilN8RV5Jn8fzyQpkesgBQMCkKNuZHhKTiIlH1xxtYjoyppGYeIRrAexqZFMxnQ" />
+
+                        <span class="font-headline-md text-headline-md text-surface-white">TravelBuddy</span>
+
+                    </div>
+
+                    <p class="text-label-md font-label-md text-on-primary-container/80">
+                        Crafting unforgettable journeys with AI-powered precision and local heart.
+                    </p>
+
+                </div>
+
+                <div>
+                    <h4 class="font-label-md text-label-md text-surface-white mb-6 uppercase tracking-wider">Company</h4>
+                    <ul class="space-y-4">
+                        <li class="text-label-md font-label-md hover:text-secondary-fixed transition-colors"><a href="#">About Us</a></li>
+                        <li class="text-label-md font-label-md hover:text-secondary-fixed transition-colors"><a href="#">Careers</a></li>
+                        <li class="text-label-md font-label-md hover:text-secondary-fixed transition-colors"><a href="#">Press Kit</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-label-md text-label-md text-surface-white mb-6 uppercase tracking-wider">Support</h4>
+                    <ul class="space-y-4">
+                        <li class="text-label-md font-label-md hover:text-secondary-fixed transition-colors"><a href="#">Help Center</a></li>
+                        <li class="text-label-md font-label-md hover:text-secondary-fixed transition-colors"><a href="#">Safety Tips</a></li>
+                        <li class="text-label-md font-label-md hover:text-secondary-fixed transition-colors"><a href="#">Cancellation</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="font-label-md text-label-md text-surface-white mb-6 uppercase tracking-wider">Social</h4>
+                    <div class="flex gap-4">
+                        <span class="material-symbols-outlined cursor-pointer hover:text-secondary-fixed">public</span>
+                        <span class="material-symbols-outlined cursor-pointer hover:text-secondary-fixed">share</span>
+                        <span class="material-symbols-outlined cursor-pointer hover:text-secondary-fixed">explore</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div
+                class="border-t border-on-primary-container/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-label-sm font-label-sm opacity-60">
+
+                <p>© 2026 TravelBuddy Technologies. All rights reserved.</p>
+
+                <div class="flex gap-6">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =========================================================
+         AI ASSISTANT
+    ========================================================= -->
+
+    <!-- Floating Button -->
+
+    <button id="ai-assistant-button" type="button" aria-label="Open AI Assistant"
+        class="fixed bottom-6 right-6 z-[100] w-16 h-16 rounded-full bg-secondary text-on-secondary shadow-2xl flex items-center justify-center hover:scale-110 transition-transform duration-300">
+
+        <span id="ai-open-icon" class="material-symbols-outlined text-3xl">smart_toy</span>
+
+        <span id="ai-close-icon" class="material-symbols-outlined text-3xl hidden">close</span>
+
+    </button>
+
+
+    <!-- Chat Window -->
+
+    <div id="ai-assistant-window"
+        class="hidden fixed bottom-24 right-6 z-[99] w-[calc(100%-32px)] sm:w-[400px] h-[560px] bg-surface-white rounded-2xl shadow-2xl overflow-hidden border border-outline-variant flex-col">
+
+        <!-- Header -->
+
+        <div class="bg-primary-container text-on-primary-container px-5 py-4 flex items-center justify-between">
+
+            <div class="flex items-center gap-3">
+
+                <div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-on-secondary">smart_toy</span>
+                </div>
+
+                <div>
+                    <h3 class="font-bold text-lg text-white">TravelBuddy AI</h3>
+                    <p class="text-xs text-white/70">Your travel assistant</p>
+                </div>
+
+            </div>
+
+            <button id="ai-close-button" type="button" class="text-white/80 hover:text-white">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+
+        </div>
+
+        <!-- Messages -->
+
+        <div id="ai-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-background">
+
+            <!-- Welcome message -->
+
+            <div class="ai-message flex items-start gap-2">
+
+                <div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-secondary text-[18px]">smart_toy</span>
+                </div>
+
+                <div class="max-w-[80%] bg-surface-white rounded-2xl rounded-tl-none px-4 py-3 shadow-sm">
+
+                    <p class="text-sm text-on-surface">
+                        Hello! 👋 I'm your TravelBuddy AI Assistant.
+                        Ask me about destinations, attractions, travel plans, hotels, or your trip.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Typing -->
+
+        <div id="ai-typing" class="hidden px-4 pb-2">
+
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-text-muted">AI is thinking...</span>
+                <span class="animate-pulse">•••</span>
+            </div>
+
+        </div>
+
+        <!-- Input -->
+
+        <div class="p-3 bg-surface-white border-t border-outline-variant">
+
+            <div class="flex items-center gap-2">
+
+                <input id="ai-chat-input" type="text" autocomplete="off" placeholder="Ask about your trip..."
+                    class="flex-1 bg-surface-container-low border-none rounded-full px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-secondary" />
+
+                <button id="ai-send-button" type="button" aria-label="Send message"
+                    class="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:scale-105 transition-transform">
+                    <span class="material-symbols-outlined">send</span>
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         JAVASCRIPT
+    ========================================================= -->
+
+    <!-- Multilingual Support (i18n) -->
+    <script src="../translations.js"></script>
+    <script src="../i18n.js"></script>
+
+    <script src="../navigation.js"></script>
+
+    <!-- Make sure this filename matches your actual JS file -->
+    <script src="../explore-destinations.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recommendations - TravelBuddy Solapur</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b'
+                        },
+                        tealAccent: {
+                            50: '#f0fdfa',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        heading: ['Montserrat', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        .card-lift {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card-lift:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.12);
+        }
+
+        .interest-pill {
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            user-select: none;
+        }
+
+        .interest-pill.active {
+            background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .interest-pill input {
+            display: none;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .badge-verified {
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+
+        .badge-ai {
+            background: #f5f3ff;
+            color: #6d28d9;
+            border: 1px solid #ddd6fe;
+        }
+
+        .badge-speciality {
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- ========================================================================= -->
+    <!-- NAVBAR -->
+    <!-- ========================================================================= -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-gray-200/80 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="../smarttour_home_2/code.html" class="flex items-center gap-2 group">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-brand-600 to-tealAccent-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform">
+                        <span class="material-symbols-outlined text-2xl">travel_explore</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-heading font-extrabold text-2xl tracking-tight text-gray-900">Travel<span class="text-brand-600">Buddy</span></span>
+                            <span class="bg-brand-50 text-brand-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-brand-200">AI</span>
+                        </div>
+                        <span class="text-[11px] font-semibold text-gray-400 block -mt-1 tracking-wider uppercase">Solapur Tourism</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-gray-600">
+                <a href="../smarttour_home_2/code.html" class="hover:text-brand-600 transition-colors">Home</a>
+                <a href="../explore_destinations/code.html" class="hover:text-brand-600 transition-colors">Explore Destinations</a>
+                <a href="#ai-generator" class="text-brand-600 font-bold border-b-2 border-brand-600 pb-1">AI Recommendations</a>
+                <a href="#solapur-landmarks" class="hover:text-brand-600 transition-colors">Best of Solapur</a>
+                <a href="#solapur-foods" class="hover:text-brand-600 transition-colors">Famous Foods</a>
+                <a href="../plan_my_trip/code.html" class="hover:text-brand-600 transition-colors">Plan Trip</a>
+                <a href="../community_feed/code.html" class="hover:text-brand-600 transition-colors">Community</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="../smarttour_home_2/code.html" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">
+                    <span class="material-symbols-outlined text-lg">arrow_back</span>
+                    <span>Back to Home</span>
+                </a>
+                <a href="../ai_assistant/code.html" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-brand-600 to-tealAccent-600 hover:from-brand-700 hover:to-tealAccent-700 rounded-xl shadow-md shadow-brand-600/20 transition-all">
+                    <span class="material-symbols-outlined text-lg">chat</span>
+                    <span>AI Assistant</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- HERO SECTION -->
+    <!-- ========================================================================= -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 text-white py-16 md:py-24">
+        <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#14b8a6_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-teal-300 text-xs md:text-sm font-semibold mb-6">
+                <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                <span>Powered by Google Gemini AI & Solapur Tourist Places Database</span>
+            </div>
+
+            <h1 class="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight">
+                Personalized AI Tourism <br class="hidden sm:inline">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
+                    Recommendations for Solapur
+                </span>
+            </h1>
+
+            <p class="mt-5 text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+                Discover revered ancient temples, colossal hill forts, sanctuary grasslands, GI-tagged Shenga Chutney & Solapuri handloom textiles—customized intelligently to your preferences.
+            </p>
+
+            <!-- Quick Pill Highlights -->
+            <div class="mt-8 flex flex-wrap justify-center gap-3 text-xs sm:text-sm">
+                <a href="#solapur-landmarks" class="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-gray-200 transition-colors flex items-center gap-1.5">
+                    <span>🏛️</span> Siddheshwar & Pandharpur
+                </a>
+                <a href="#solapur-foods" class="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-gray-200 transition-colors flex items-center gap-1.5">
+                    <span>🥜</span> Shenga Chutney & Bhakri
+                </a>
+                <a href="#solapur-specialities" class="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-gray-200 transition-colors flex items-center gap-1.5">
+                    <span>🛏️</span> GI-Tagged Chaddars
+                </a>
+                <a href="#ai-generator" class="px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 transition-colors flex items-center gap-1.5">
+                    <span>✨</span> Custom AI Trip Filters
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MAIN INTERACTIVE FORM -->
+    <!-- ========================================================================= -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16 -mt-10 relative z-10 w-full" id="ai-generator">
+        
+        <div class="bg-white rounded-3xl shadow-xl border border-gray-100 p-6 sm:p-8 md:p-12 mb-16">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-gray-100">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-3 py-1 rounded-full border border-brand-100 inline-block mb-2">Step 1 of 2</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Customize Your Solapur Experience</h2>
+                    <p class="text-gray-500 text-sm mt-1">Specify your trip parameters and interests. Gemini AI will match verified database destinations.</p>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-gray-500 bg-slate-50 px-4 py-2 rounded-xl border border-gray-200/80">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Gemini AI Connected & Active</span>
+                </div>
+            </div>
+
+            <!-- FORM GRID -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
+                
+                <!-- Location -->
+                <div>
+                    <label for="location" class="block text-sm font-bold text-gray-700 mb-2">
+                        <span class="inline-block mr-1">📍</span> Your Location / Hub
+                    </label>
+                    <input type="text" id="location" value="Solapur" placeholder="e.g. Solapur, Pandharpur, Akkalkot"
+                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-gray-900 transition font-medium">
+                </div>
+
+                <!-- Budget -->
+                <div>
+                    <label for="budget" class="block text-sm font-bold text-gray-700 mb-2">
+                        <span class="inline-block mr-1">💰</span> Budget (₹ INR)
+                    </label>
+                    <input type="number" id="budget" value="2500" min="0" step="100" placeholder="e.g. 2500"
+                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-gray-900 transition font-medium">
+                </div>
+
+                <!-- Days -->
+                <div>
+                    <label for="days" class="block text-sm font-bold text-gray-700 mb-2">
+                        <span class="inline-block mr-1">📅</span> Duration (Days)
+                    </label>
+                    <input type="number" id="days" value="2" min="1" max="30" placeholder="1 - 30 days"
+                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-gray-900 transition font-medium">
+                </div>
+
+                <!-- Category -->
+                <div>
+                    <label for="preferredCategory" class="block text-sm font-bold text-gray-700 mb-2">
+                        <span class="inline-block mr-1">🧭</span> Preferred Category
+                    </label>
+                    <select id="preferredCategory"
+                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-gray-900 transition font-medium">
+                        <option value="">Any Category (All Places)</option>
+                        <option value="Religious">Religious & Spiritual</option>
+                        <option value="Historical/Fort">Historical & Forts</option>
+                        <option value="Nature">Nature & Wildlife</option>
+                        <option value="Entertainment">Entertainment & Parks</option>
+                    </select>
+                </div>
+
+                <!-- Minimum Rating -->
+                <div>
+                    <label for="minimumRating" class="block text-sm font-bold text-gray-700 mb-2">
+                        <span class="inline-block mr-1">⭐</span> Minimum Rating
+                    </label>
+                    <select id="minimumRating"
+                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-gray-900 transition font-medium">
+                        <option value="0">Any Rating</option>
+                        <option value="3.5">3.5+ Stars</option>
+                        <option value="4.0" selected>4.0+ Stars (Recommended)</option>
+                        <option value="4.5">4.5+ Stars (Top Rated)</option>
+                    </select>
+                </div>
+
+                <!-- Travel Mode -->
+                <div>
+                    <label for="travel" class="block text-sm font-bold text-gray-700 mb-2">
+                        <span class="inline-block mr-1">🚗</span> Travel Preference
+                    </label>
+                    <select id="travel"
+                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none text-gray-900 transition font-medium">
+                        <option value="Any">Any Mode</option>
+                        <option value="Car" selected>Car / Taxi</option>
+                        <option value="Bus">Public Bus</option>
+                        <option value="Bike">Motorbike / Scooter</option>
+                        <option value="Auto">Auto Rickshaw</option>
+                        <option value="Walking">Walking / Local</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- INTEREST SELECTION CHIPS -->
+            <div class="mt-8 pt-6 border-t border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <label class="block text-sm font-bold text-gray-800">
+                        ❤️ Select Your Travel Interests <span class="text-xs font-normal text-gray-500">(Choose one or more)</span>
+                    </label>
+                    <button type="button" onclick="selectAllInterests(true)" class="text-xs font-semibold text-brand-600 hover:text-brand-700">Select All</button>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="interestsContainer">
+                    
+                    <label class="interest-pill active px-4 py-3 rounded-2xl border border-gray-200 text-sm font-semibold flex items-center justify-between">
+                        <span class="flex items-center gap-2"><span>🏛️</span> Temples & Faith</span>
+                        <input type="checkbox" value="Temples" checked onchange="toggleInterest(this)">
+                        <span class="material-symbols-outlined text-base">check_circle</span>
+                    </label>
+
+                    <label class="interest-pill active px-4 py-3 rounded-2xl border border-gray-200 text-sm font-semibold flex items-center justify-between">
+                        <span class="flex items-center gap-2"><span>🏰</span> History & Forts</span>
+                        <input type="checkbox" value="History" checked onchange="toggleInterest(this)">
+                        <span class="material-symbols-outlined text-base">check_circle</span>
+                    </label>
+
+                    <label class="interest-pill active px-4 py-3 rounded-2xl border border-gray-200 text-sm font-semibold flex items-center justify-between">
+                        <span class="flex items-center gap-2"><span>🌿</span> Nature & Wildlife</span>
+                        <input type="checkbox" value="Nature" checked onchange="toggleInterest(this)">
+                        <span class="material-symbols-outlined text-base">check_circle</span>
+                    </label>
+
+                    <label class="interest-pill active px-4 py-3 rounded-2xl border border-gray-200 text-sm font-semibold flex items-center justify-between">
+                        <span class="flex items-center gap-2"><span>🍲</span> Famous Food</span>
+                        <input type="checkbox" value="Food" checked onchange="toggleInterest(this)">
+                        <span class="material-symbols-outlined text-base">check_circle</span>
+                    </label>
+
+                    <label class="interest-pill px-4 py-3 rounded-2xl border border-gray-200 text-sm font-semibold flex items-center justify-between text-gray-700 bg-gray-50 hover:bg-gray-100">
+                        <span class="flex items-center gap-2"><span>🛍️</span> Shopping & Chaddars</span>
+                        <input type="checkbox" value="Shopping" onchange="toggleInterest(this)">
+                        <span class="material-symbols-outlined text-base opacity-40">radio_button_unchecked</span>
+                    </label>
+
+                    <label class="interest-pill px-4 py-3 rounded-2xl border border-gray-200 text-sm font-semibold flex items-center justify-between text-gray-700 bg-gray-50 hover:bg-gray-100">
+                        <span class="flex items-center gap-2"><span>👨‍👩‍👧</span> Family Trips</span>
+                        <input type="checkbox" value="Family Trips" onchange="toggleInterest(this)">
+                        <span class="material-symbols-outlined text-base opacity-40">radio_button_unchecked</span>
+                    </label>
+
+                    <label class="interest-pill px-4 py-3 rounded-2xl border border-gray-200 text-sm font-semibold flex items-center justify-between text-gray-700 bg-gray-50 hover:bg-gray-100">
+                        <span class="flex items-center gap-2"><span>🧗</span> Adventure</span>
+                        <input type="checkbox" value="Adventure" onchange="toggleInterest(this)">
+                        <span class="material-symbols-outlined text-base opacity-40">radio_button_unchecked</span>
+                    </label>
+
+                    <label class="interest-pill active px-4 py-3 rounded-2xl border border-gray-200 text-sm font-semibold flex items-center justify-between">
+                        <span class="flex items-center gap-2"><span>💰</span> Budget Travel</span>
+                        <input type="checkbox" value="Budget" checked onchange="toggleInterest(this)">
+                        <span class="material-symbols-outlined text-base">check_circle</span>
+                    </label>
+
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-100">
+                <button type="button" onclick="resetPreferences()" class="text-sm font-semibold text-gray-500 hover:text-gray-800 transition">
+                    🔄 Reset Preferences
+                </button>
+
+                <button type="button" id="generateBtn" onclick="getRecommendations()"
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-brand-600 via-teal-600 to-teal-700 hover:from-brand-700 hover:to-teal-800 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all text-base">
+                    <span class="material-symbols-outlined text-xl">auto_awesome</span>
+                    <span>Generate AI Recommendations</span>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- STATUS MESSAGES -->
+        <!-- ========================================================================= -->
+        <!-- ERROR BOX -->
+        <div id="errorMessage" class="hidden bg-rose-50 border border-rose-200 text-rose-800 px-6 py-4 rounded-2xl mb-8 flex items-start gap-3 shadow-sm">
+            <span class="material-symbols-outlined text-rose-600 mt-0.5">error</span>
+            <div class="flex-1">
+                <h4 class="font-bold text-sm">Notice</h4>
+                <p id="errorText" class="text-sm mt-0.5"></p>
+            </div>
+            <button onclick="document.getElementById('errorMessage').classList.add('hidden')" class="text-rose-400 hover:text-rose-700">
+                <span class="material-symbols-outlined text-base">close</span>
+            </button>
+        </div>
+
+        <!-- LOADING SPINNER -->
+        <div id="loading" class="hidden bg-white border border-gray-100 rounded-3xl p-12 text-center shadow-lg mb-12">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-50 text-teal-600 mb-4 animate-spin">
+                <span class="material-symbols-outlined text-3xl">refresh</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 font-heading">Consulting Gemini AI & Database...</h3>
+            <p class="text-gray-500 text-sm mt-2 max-w-md mx-auto">
+                Analyzing tourist places from PostgreSQL database and generating personalized Solapur recommendations tailored to your interests.
+            </p>
+        </div>
+
+        <!-- ========================================================================= -->
+        <!-- RECOMMENDATION RESULTS -->
+        <!-- ========================================================================= -->
+        <section id="resultsSection" class="hidden mb-20 scroll-mt-28">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-xs font-bold mb-2">
+                        <span class="material-symbols-outlined text-xs">verified</span>
+                        <span>Gemini AI Generated & DB Verified</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 font-heading">
+                        Tailored Recommendations For You
+                    </h2>
+                    <p class="text-gray-500 text-sm mt-1" id="resultsSubtext">
+                        Showing personalized places selected based on your preferences.
+                    </p>
+                </div>
+                <div class="text-xs font-semibold text-gray-500 bg-gray-100 px-3.5 py-1.5 rounded-xl self-start sm:self-auto">
+                    <span id="resultsCount">0</span> Places Recommended
+                </div>
+            </div>
+
+            <!-- RESULTS GRID -->
+            <div id="recommendationGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                <!-- Dynamically populated -->
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SECTION 1: DISCOVER THE BEST OF SOLAPUR -->
+        <!-- ========================================================================= -->
+        <section id="solapur-landmarks" class="mb-20 scroll-mt-28">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-3 py-1 rounded-full border border-teal-200 inline-block mb-2">
+                        District Highlights
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 font-heading">
+                        Discover the Best of Solapur
+                    </h2>
+                    <p class="text-gray-500 text-sm mt-1 max-w-2xl">
+                        Iconic spiritual temples, majestic stone fortifications, and endangered grassland sanctuaries that define the historic Solapur district.
+                    </p>
+                </div>
+                <a href="../explore_destinations/code.html" class="inline-flex items-center gap-1 text-sm font-bold text-teal-600 hover:text-teal-700 self-start md:self-auto">
+                    <span>Explore All Places</span>
+                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+                </a>
+            </div>
+
+            <div id="famousPlacesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                <!-- Filled dynamically or static fallback -->
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SECTION 2: FAMOUS FOODS OF SOLAPUR -->
+        <!-- ========================================================================= -->
+        <section id="solapur-foods" class="mb-20 scroll-mt-28">
+            <div class="bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-rose-500/10 rounded-3xl p-6 sm:p-10 border border-amber-200/60 mb-8">
+                <div class="max-w-3xl">
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-300 inline-block mb-2">
+                        Authentic Culinary Heritage
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 font-heading">
+                        Famous Foods of Solapur
+                    </h2>
+                    <p class="text-gray-600 text-sm mt-2 leading-relaxed">
+                        Solapuri cuisine is celebrated across India for its bold aromas, wholesome Maldandi jowar flatbreads, and the world-famous roasted peanut Shenga Chutney.
+                    </p>
+                </div>
+            </div>
+
+            <div id="famousFoodsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                <!-- Filled dynamically -->
+            </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- SECTION 3: SOLAPUR DISTRICT SPECIALITIES & HERITAGE -->
+        <!-- ========================================================================= -->
+        <section id="solapur-specialities" class="mb-16 scroll-mt-28">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                <div>
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200 inline-block mb-2">
+                        Cultural Identity & Craft
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 font-heading">
+                        Solapur District Specialities
+                    </h2>
+                    <p class="text-gray-500 text-sm mt-1 max-w-2xl">
+                        Renowned Geographical Indication (GI) handlooms, vibrant traditional bazaars, and annual cultural fairs.
+                    </p>
+                </div>
+            </div>
+
+            <div id="specialitiesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Filled dynamically -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- FOOTER -->
+    <!-- ========================================================================= -->
+    <footer class="bg-slate-900 text-gray-400 pt-16 pb-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-500 to-tealAccent-500 flex items-center justify-center text-white shadow-md">
+                            <span class="material-symbols-outlined text-xl">travel_explore</span>
+                        </div>
+                        <span class="font-heading font-extrabold text-2xl text-white tracking-tight">Travel<span class="text-teal-400">Buddy</span></span>
+                    </div>
+                    <p class="text-sm text-gray-400 max-w-md leading-relaxed">
+                        Smart Tourism & AI Travel Planner for Solapur district. Combining route optimization, RAG assistant, and Google Gemini AI recommendations.
+                    </p>
+                    <div class="mt-4 flex items-center gap-2 text-xs text-emerald-400">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span>Official Solapur Tourism Module Active</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4">Quick Navigation</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="../smarttour_home_2/code.html" class="hover:text-white transition">Home</a></li>
+                        <li><a href="../explore_destinations/code.html" class="hover:text-white transition">Explore Destinations</a></li>
+                        <li><a href="../plan_my_trip/code.html" class="hover:text-white transition">Plan My Trip</a></li>
+                        <li><a href="../smart_route_optimization_smarttour/code.html" class="hover:text-white transition">Route Optimizer</a></li>
+                        <li><a href="../ai_assistant/code.html" class="hover:text-white transition">AI Assistant (RAG)</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-white text-sm font-bold uppercase tracking-wider mb-4">Solapur Tourism</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="#solapur-landmarks" class="hover:text-white transition">Siddheshwar Temple</a></li>
+                        <li><a href="#solapur-landmarks" class="hover:text-white transition">Pandharpur Vitthal Temple</a></li>
+                        <li><a href="#solapur-landmarks" class="hover:text-white transition">Bustard Sanctuary (Nannaj)</a></li>
+                        <li><a href="#solapur-foods" class="hover:text-white transition">Shenga Chutney & Bhakri</a></li>
+                        <li><a href="#solapur-specialities" class="hover:text-white transition">Solapuri Chaddars</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-4">
+                <p>© 2026 TravelBuddy Solapur. Smart Tourism Platform with Google Gemini AI.</p>
+                <p>Preserving regional heritage, culture & culinary identity of Solapur, Maharashtra.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================================================= -->
+    <!-- JAVASCRIPT LOGIC -->
+    <!-- ========================================================================= -->
+    <script>
+        const BACKEND_URL = "http://localhost:8081";
+
+        // Curated fallback photo map for culinary items and specialities
+        const FALLBACK_FOOD_IMAGES = {
+            "Solapuri Shenga Chutney": "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80",
+            "Solapuri Jowar Bhakri & Pitla": "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?auto=format&fit=crop&w=800&q=80",
+            "Shenga Poli (Sweet Peanut Roti)": "https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=80",
+            "Solapuri Kharada (Thecha)": "https://images.unsplash.com/photo-1628294895950-9805252327bc?auto=format&fit=crop&w=800&q=80",
+            "Lingayat Khanavali Veg Thali": "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=800&q=80"
+        };
+
+        const FALLBACK_PLACE_IMAGES = {
+            "Siddharameshwar Temple": "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=800&q=80",
+            "Great Indian Bustard Sanctuary (Nannaj)": "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=800&q=80",
+            "Akkalkot Swami Samarth Maharaj Temple": "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?auto=format&fit=crop&w=800&q=80",
+            "Pandharpur Vitthal-Rukmini Mandir": "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80",
+            "Solapur Bhuikot Fort": "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=800&q=80",
+            "Naldurg Fort": "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80"
+        };
+
+        const FALLBACK_SPECIALITY_IMAGES = {
+            "Solapuri Chaddars (GI Tagged)": "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=800&q=80",
+            "Solapuri Terry Towels & Fabrics": "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?auto=format&fit=crop&w=800&q=80",
+            "Gadda Yatra Festival": "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=800&q=80",
+            "Navi Peth & Traditional Bazaars": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80"
+        };
+
+        // Helper: Sanitize & resolve image URLs
+        function sanitizeImageUrl(rawUrl, fallback = "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80") {
+            if (!rawUrl) return fallback;
+            const clean = String(rawUrl).replace(/["']/g, "").trim();
+            if (!clean) return fallback;
+            if (/^https?:\/\//i.test(clean)) return clean;
+            const path = clean.startsWith("/") ? clean : `/${clean}`;
+            return `${BACKEND_URL}${encodeURI(path)}`;
+        }
+
+        // Helper: Toggle Interest Pills
+        function toggleInterest(checkbox) {
+            const pill = checkbox.closest(".interest-pill");
+            const icon = pill.querySelector(".material-symbols-outlined");
+            if (checkbox.checked) {
+                pill.classList.add("active");
+                pill.classList.remove("text-gray-700", "bg-gray-50");
+                icon.textContent = "check_circle";
+                icon.classList.remove("opacity-40");
+            } else {
+                pill.classList.remove("active");
+                pill.classList.add("text-gray-700", "bg-gray-50");
+                icon.textContent = "radio_button_unchecked";
+                icon.classList.add("opacity-40");
+            }
+        }
+
+        function selectAllInterests(state) {
+            const checkboxes = document.querySelectorAll("#interestsContainer input[type='checkbox']");
+            checkboxes.forEach(cb => {
+                cb.checked = state;
+                toggleInterest(cb);
+            });
+        }
+
+        function resetPreferences() {
+            document.getElementById("location").value = "Solapur";
+            document.getElementById("budget").value = "2500";
+            document.getElementById("days").value = "2";
+            document.getElementById("preferredCategory").value = "";
+            document.getElementById("minimumRating").value = "4.0";
+            document.getElementById("travel").value = "Car";
+            selectAllInterests(true);
+            document.getElementById("errorMessage").classList.add("hidden");
+        }
+
+        function getSelectedInterests() {
+            const checkboxes = document.querySelectorAll("#interestsContainer input[type='checkbox']:checked");
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        function showError(message) {
+            const errBox = document.getElementById("errorMessage");
+            document.getElementById("errorText").textContent = message;
+            errBox.classList.remove("hidden");
+            errBox.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+
+        function hideError() {
+            document.getElementById("errorMessage").classList.add("hidden");
+        }
+
+        // =========================================================================
+        // LOAD DATABASE CATEGORIES
+        // =========================================================================
+        async function loadRecommendationCategories() {
+            const selector = document.getElementById("preferredCategory");
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/tourist-places`);
+                if (!response.ok) return;
+                const places = await response.json();
+                const categories = [...new Set(places.flatMap(place =>
+                    [place.category, place.subCategory].filter(Boolean)
+                ))].sort((a, b) => a.localeCompare(b));
+
+                if (categories.length > 0) {
+                    selector.innerHTML = `<option value="">Any Category (All Places)</option>`;
+                    categories.forEach(cat => {
+                        const opt = document.createElement("option");
+                        opt.value = cat;
+                        opt.textContent = cat;
+                        selector.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.warn("Could not fetch remote categories, using defaults:", err);
+            }
+        }
+
+        // =========================================================================
+        // LOAD SOLAPUR GUIDE (Landmarks, Foods, Specialities)
+        // =========================================================================
+        async function loadSolapurGuide() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/recommendations/solapur-guide`);
+                if (!response.ok) throw new Error("Could not load Solapur guide");
+                const data = await response.json();
+                
+                renderFamousPlaces(data.famousPlaces);
+                renderFamousFoods(data.famousFoods);
+                renderDistrictSpecialities(data.districtSpecialities);
+            } catch (error) {
+                console.warn("Using curated fallback data for Solapur Guide:", error);
+                renderDefaultGuide();
+            }
+        }
+
+        function renderFamousPlaces(places) {
+            const grid = document.getElementById("famousPlacesGrid");
+            if (!grid) return;
+            grid.innerHTML = "";
+
+            places.forEach(item => {
+                const fallback = FALLBACK_PLACE_IMAGES[item.name] || "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80";
+                const imgSrc = sanitizeImageUrl(item.imageUrl, fallback);
+
+                const card = document.createElement("article");
+                card.className = "bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-md card-lift flex flex-col";
+                card.innerHTML = `
+                    <div class="relative h-56 bg-slate-100 overflow-hidden">
+                        <img src="${imgSrc}" alt="${item.name}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                             onerror="this.onerror=null; this.src='${fallback}'">
+                        <div class="absolute top-4 left-4 flex gap-2 flex-wrap">
+                            <span class="px-3 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold">
+                                ${item.category || "Heritage"}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-1.5 text-xs font-semibold text-gray-500 mb-2">
+                                <span class="material-symbols-outlined text-sm text-brand-600">location_on</span>
+                                <span>${item.location || "Solapur District"}</span>
+                            </div>
+                            <h3 class="text-xl font-extrabold text-gray-900 font-heading mb-2 leading-tight">${item.name}</h3>
+                            <div class="badge-speciality px-3 py-1.5 rounded-xl text-xs font-semibold mb-3">
+                                🌟 <strong>Speciality:</strong> ${item.speciality}
+                            </div>
+                            <p class="text-gray-600 text-sm line-clamp-3 leading-relaxed mb-4">${item.description}</p>
+                        </div>
+                        <div class="pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-600">
+                            <span class="flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm text-teal-600">schedule</span>
+                                <span>${item.timing || "06:00 AM - 09:00 PM"}</span>
+                            </span>
+                            <span class="font-bold text-gray-800 bg-gray-100 px-2.5 py-1 rounded-lg">
+                                ${item.entryFee || "Free Entry"}
+                            </span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderFamousFoods(foods) {
+            const grid = document.getElementById("famousFoodsGrid");
+            if (!grid) return;
+            grid.innerHTML = "";
+
+            foods.forEach(food => {
+                const fallback = FALLBACK_FOOD_IMAGES[food.name] || "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=800&q=80";
+                const imgSrc = sanitizeImageUrl(food.imageUrl, fallback);
+
+                const card = document.createElement("article");
+                card.className = "bg-white rounded-3xl overflow-hidden border border-amber-100/80 shadow-md card-lift flex flex-col";
+                card.innerHTML = `
+                    <div class="relative h-52 bg-amber-50 overflow-hidden">
+                        <img src="${imgSrc}" alt="${food.name}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                             onerror="this.onerror=null; this.src='${fallback}'">
+                        <div class="absolute top-4 left-4">
+                            <span class="px-3 py-1 rounded-full bg-amber-950/80 backdrop-blur-md text-amber-200 text-xs font-bold">
+                                ${food.category || "Famous Delicacy"}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-6 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between gap-2 mb-1">
+                                <h3 class="text-xl font-extrabold text-gray-900 font-heading">${food.name}</h3>
+                            </div>
+                            <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md inline-block mb-3">
+                                ${food.localName || ""}
+                            </span>
+                            <p class="text-gray-600 text-sm leading-relaxed mb-4">${food.description}</p>
+                            
+                            <div class="space-y-2 mb-4 text-xs">
+                                <div class="bg-amber-50/70 p-2.5 rounded-xl border border-amber-100 text-amber-900">
+                                    <strong>🔥 Highlight:</strong> ${food.highlight}
+                                </div>
+                                <div class="bg-gray-50 p-2.5 rounded-xl border border-gray-100 text-gray-700">
+                                    <strong>🍽️ Best Paired With:</strong> ${food.pairing}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-gray-100 text-xs text-gray-500 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm text-amber-600">restaurant</span>
+                            <span><strong>Where to try:</strong> ${food.whereToTry}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderDistrictSpecialities(specialities) {
+            const grid = document.getElementById("specialitiesGrid");
+            if (!grid) return;
+            grid.innerHTML = "";
+
+            specialities.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "bg-white rounded-3xl p-6 border border-gray-100 shadow-sm card-lift flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined text-2xl">${item.icon || "star"}</span>
+                        </div>
+                        <span class="text-[11px] font-bold text-indigo-600 uppercase tracking-wider block mb-1">
+                            ${item.category}
+                        </span>
+                        <h4 class="text-lg font-extrabold text-gray-900 font-heading mb-2 leading-tight">${item.title}</h4>
+                        <p class="text-gray-600 text-sm leading-relaxed mb-3">${item.description}</p>
+                        <p class="text-xs text-gray-500 mb-3 italic">🏛️ ${item.culturalSignificance}</p>
+                    </div>
+                    <div class="pt-3 border-t border-gray-100 text-xs text-indigo-700 bg-indigo-50/50 p-2.5 rounded-xl">
+                        <strong>💡 Traveler Tip:</strong> ${item.shoppingTip}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderDefaultGuide() {
+            renderFamousPlaces([
+                {
+                    name: "Siddharameshwar Temple",
+                    category: "Spiritual Lake Temple",
+                    location: "Solapur City Center",
+                    speciality: "Lake-surrounded 12th-century shrine with 68 sacred Shiva Lingas",
+                    description: "Built by Saint Siddharameshwar in the 12th century, featuring stone pavilions in the middle of a holy water tank, housing sacred Samadhi shrine.",
+                    timing: "05:00 AM - 10:00 PM",
+                    entryFee: "Free Entry"
+                },
+                {
+                    name: "Great Indian Bustard Sanctuary (Nannaj)",
+                    category: "Wildlife Sanctuary",
+                    location: "Nannaj, 22 km from Solapur",
+                    speciality: "Habitat of the critically endangered Great Indian Bustard (Maldhok)",
+                    description: "Sprawling semi-arid grassland reserve protecting the majestic Great Indian Bustard, blackbucks, wolves, and winter migratory raptors.",
+                    timing: "06:30 AM - 06:00 PM",
+                    entryFee: "₹50 per person"
+                },
+                {
+                    name: "Pandharpur Vitthal-Rukmini Mandir",
+                    category: "Warkari Pilgrimage",
+                    location: "Pandharpur, Chandrabhaga River",
+                    speciality: "Epicenter of Maharashtra's holy Warkari tradition",
+                    description: "The revered 800-year-old temple of Lord Vitthal (Krishna) and Goddess Rukmini, destination of the grand Ashadhi and Kartiki Ekadashi Dindi yatras.",
+                    timing: "04:00 AM - 11:00 PM",
+                    entryFee: "Free (VIP passes available)"
+                }
+            ]);
+        }
+
+        // =========================================================================
+        // AI RECOMMENDATIONS CALL (POST /api/recommendations)
+        // =========================================================================
+        async function getRecommendations() {
+            hideError();
+
+            const location = document.getElementById("location").value.trim();
+            const budgetVal = document.getElementById("budget").value.trim();
+            const daysVal = document.getElementById("days").value.trim();
+            const preferredCategory = document.getElementById("preferredCategory").value;
+            const minimumRating = Number(document.getElementById("minimumRating").value);
+            const travel = document.getElementById("travel").value;
+            const interests = getSelectedInterests();
+
+            // Validations
+            if (!location) {
+                showError("Please enter your starting location or hub (e.g. Solapur).");
+                return;
+            }
+            if (budgetVal === "" || Number(budgetVal) < 0) {
+                showError("Please enter a valid trip budget of ₹0 or more.");
+                return;
+            }
+            if (!daysVal || Number(daysVal) < 1 || Number(daysVal) > 30) {
+                showError("Please enter a trip duration between 1 and 30 days.");
+                return;
+            }
+            if (interests.length === 0) {
+                showError("Please select at least one travel interest (e.g. Temples, History, Food, etc.).");
+                return;
+            }
+
+            const payload = {
+                location: location,
+                budget: Number(budgetVal),
+                days: Number(daysVal),
+                travelPreference: travel,
+                interests: interests,
+                preferredCategory: preferredCategory,
+                minimumRating: minimumRating,
+                language: window.TravelBuddyI18n ? window.TravelBuddyI18n.getLanguage() : (localStorage.getItem('travelbuddy_lang') || 'en')
+            };
+
+            const btn = document.getElementById("generateBtn");
+            const loading = document.getElementById("loading");
+            const resultsSection = document.getElementById("resultsSection");
+
+            btn.disabled = true;
+            btn.classList.add("opacity-70", "cursor-not-allowed");
+            loading.classList.remove("hidden");
+            resultsSection.classList.add("hidden");
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/recommendations`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const rawText = await response.text();
+
+                if (!response.ok) {
+                    let errDetail = `Recommendation service responded with status ${response.status}`;
+                    try {
+                        const parsed = JSON.parse(rawText);
+                        errDetail = parsed.message || parsed.error || errDetail;
+                    } catch {
+                        if (rawText.trim()) errDetail = rawText;
+                    }
+                    throw new Error(errDetail);
+                }
+
+                let recommendations = [];
+                try {
+                    recommendations = JSON.parse(rawText);
+                } catch {
+                    throw new Error("Invalid response format from recommendation service.");
+                }
+
+                if (!Array.isArray(recommendations)) {
+                    throw new Error("Expected a list of place recommendations.");
+                }
+
+                renderRecommendations(recommendations, payload);
+
+            } catch (err) {
+                console.error("AI recommendation error:", err);
+                showError(err.message || "Failed to generate AI recommendations. Please check server connection.");
+            } finally {
+                loading.classList.add("hidden");
+                btn.disabled = false;
+                btn.classList.remove("opacity-70", "cursor-not-allowed");
+            }
+        }
+
+        // =========================================================================
+        // RENDER RECOMMENDATION CARDS
+        // =========================================================================
+        function renderRecommendations(items, requestData) {
+            const grid = document.getElementById("recommendationGrid");
+            const resultsSection = document.getElementById("resultsSection");
+            const resultsCount = document.getElementById("resultsCount");
+            const resultsSubtext = document.getElementById("resultsSubtext");
+
+            grid.innerHTML = "";
+            resultsCount.textContent = items.length;
+            resultsSubtext.textContent = `Tailored for ${requestData.days} days in ${requestData.location} with interests: ${requestData.interests.join(", ")}`;
+
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-white rounded-3xl p-10 text-center border border-gray-100 shadow-sm">
+                        <span class="material-symbols-outlined text-4xl text-gray-400 mb-2">search_off</span>
+                        <h3 class="text-lg font-bold text-gray-800">No matching destinations found</h3>
+                        <p class="text-sm text-gray-500 mt-1">Try broadening your budget, category, or rating filters to discover more places.</p>
+                    </div>
+                `;
+            } else {
+                items.forEach(place => {
+                    const fallback = FALLBACK_PLACE_IMAGES[place.placeName] || "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80";
+                    const imgSrc = sanitizeImageUrl(place.imageUrl, fallback);
+
+                    const card = document.createElement("article");
+                    card.className = "bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-lg card-lift flex flex-col justify-between";
+
+                    // Format rating and reviews safely without inventing
+                    let ratingText = "Information unavailable";
+                    if (place.rating != null && !isNaN(place.rating)) {
+                        ratingText = `⭐ ${Number(place.rating).toFixed(1)} / 5`;
+                        if (place.reviewCount != null) {
+                            ratingText += ` (${Number(place.reviewCount).toLocaleString()} reviews)`;
+                        }
+                    }
+
+                    // Format ticket price safely without inventing
+                    let priceText = "Information unavailable";
+                    if (place.ticketPrice != null) {
+                        if (Number(place.ticketPrice) === 0) {
+                            priceText = "🎟️ Free Entry";
+                        } else {
+                            priceText = `🎟️ ₹${Number(place.ticketPrice).toFixed(0)}`;
+                        }
+                    }
+
+                    const categoryBadge = [place.category, place.subCategory].filter(Boolean).join(" · ") || "Tourist Destination";
+                    const safeDesc = place.description || "Information unavailable.";
+                    const safeReason = place.reason || "Recommended for your travel preferences.";
+                    const safeSpeciality = place.speciality || "Featured tourist destination in Solapur district";
+
+                    card.innerHTML = `
+                        <div>
+                            <!-- IMAGE & BADGES -->
+                            <div class="relative h-56 bg-slate-100 overflow-hidden">
+                                <img src="${imgSrc}" alt="${escapeHTML(place.placeName || 'Tourist Place')}" loading="lazy"
+                                     class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                                     onerror="this.onerror=null; this.src='${fallback}'">
+                                
+                                <div class="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
+                                    <span class="badge-verified px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 shadow-sm">
+                                        <span class="material-symbols-outlined text-xs">verified</span>
+                                        <span>Verified DB Place</span>
+                                    </span>
+                                    <span class="px-2.5 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-semibold">
+                                        ${escapeHTML(categoryBadge)}
+                                    </span>
+                                </div>
+
+                                ${place.isHidden ? `
+                                    <div class="absolute top-3 right-3">
+                                        <span class="px-2.5 py-1 rounded-full bg-amber-500 text-white text-[10px] font-extrabold shadow-sm flex items-center gap-0.5">
+                                            <span class="material-symbols-outlined text-xs">visibility_off</span>
+                                            <span>Hidden Gem</span>
+                                        </span>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <!-- CARD CONTENT -->
+                            <div class="p-6">
+                                <div class="flex items-center gap-1.5 text-xs font-semibold text-gray-500 mb-1.5">
+                                    <span class="material-symbols-outlined text-sm text-brand-600">location_on</span>
+                                    <span>${escapeHTML(place.location || "Solapur District")}</span>
+                                </div>
+
+                                <h3 class="text-xl font-extrabold text-gray-900 font-heading mb-3 leading-tight">
+                                    ${escapeHTML(place.placeName || "Tourist Place")}
+                                </h3>
+
+                                <!-- GEMINI AI REASON BOX -->
+                                <div class="badge-ai p-3 rounded-2xl mb-3 text-xs leading-relaxed">
+                                    <div class="font-bold flex items-center gap-1 text-purple-900 mb-0.5">
+                                        <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                                        <span>Gemini AI Reason</span>
+                                    </div>
+                                    <p class="text-purple-800">${escapeHTML(safeReason)}</p>
+                                </div>
+
+                                <!-- SOLAPUR SPECIALITY CALLOUT -->
+                                <div class="badge-speciality p-2.5 rounded-2xl mb-4 text-xs leading-relaxed">
+                                    <span class="font-bold text-amber-900">✨ Solapur Speciality:</span>
+                                    <span class="text-amber-800 ml-1">${escapeHTML(safeSpeciality)}</span>
+                                </div>
+
+                                <!-- VERIFIED DATABASE DESCRIPTION -->
+                                <p class="text-gray-600 text-sm line-clamp-3 leading-relaxed mb-4">
+                                    ${escapeHTML(safeDesc)}
+                                </p>
+
+                                <!-- METRIC CHIPS -->
+                                <div class="flex flex-wrap gap-2 text-xs font-medium text-gray-600">
+                                    <span class="bg-gray-100 px-2.5 py-1 rounded-lg">${ratingText}</span>
+                                    <span class="bg-gray-100 px-2.5 py-1 rounded-lg">${priceText}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CARD FOOTER ACTIONS -->
+                        <div class="p-6 pt-0 border-t border-gray-100 mt-2 flex items-center gap-2">
+                            <button type="button" onclick="viewPlaceDetails(${place.placeId})"
+                                class="flex-1 py-2.5 px-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs font-bold transition flex items-center justify-center gap-1">
+                                <span class="material-symbols-outlined text-sm">info</span>
+                                <span>View Details</span>
+                            </button>
+                            <button type="button" onclick="addToTripPlanner(${place.placeId})"
+                                class="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-brand-600 to-teal-600 hover:from-brand-700 hover:to-teal-700 text-white text-xs font-bold transition flex items-center justify-center gap-1 shadow-sm">
+                                <span class="material-symbols-outlined text-sm">add_location_alt</span>
+                                <span>Plan Trip</span>
+                            </button>
+                        </div>
+                    `;
+
+                    // Attach the raw object to the DOM element for the click handlers
+                    card.dataset.placeJson = JSON.stringify(place);
+                    grid.appendChild(card);
+                });
+            }
+
+            resultsSection.classList.remove("hidden");
+            resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        // =========================================================================
+        // VIEW DETAILS & PLAN TRIP INTEGRATION
+        // =========================================================================
+        function viewPlaceDetails(placeId) {
+            const card = document.querySelector(`[onclick*="viewPlaceDetails(${placeId})"]`).closest("article");
+            if (card && card.dataset.placeJson) {
+                const place = JSON.parse(card.dataset.placeJson);
+                localStorage.setItem("selectedPlace", JSON.stringify(place));
+                window.location.href = "../kyoto_destination_details/code.html";
+            }
+        }
+
+        function addToTripPlanner(placeId) {
+            const card = document.querySelector(`[onclick*="addToTripPlanner(${placeId})"]`).closest("article");
+            if (card && card.dataset.placeJson) {
+                const place = JSON.parse(card.dataset.placeJson);
+                localStorage.setItem("selectedPlaceForTrip", JSON.stringify(place));
+                window.location.href = "../plan_my_trip/code.html";
+            }
+        }
+
+        function escapeHTML(str) {
+            if (str == null) return "";
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // =========================================================================
+        // INIT ON DOM CONTENT LOADED
+        // =========================================================================
+        document.addEventListener("DOMContentLoaded", () => {
+            loadRecommendationCategories();
+            loadSolapurGuide();
+        });
+    </script>
+
+    <!-- Multilingual Support (i18n) & Navigation -->
+    <script src="../translations.js"></script>
+    <script src="../i18n.js"></script>
+    <script src="../navigation.js"></script>
+</body>
+</html>

@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelBuddy - Smart Tourism & AI Travel Planner</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b'
+                        },
+                        tealAccent: {
+                            50: '#f0fdfa',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        heading: ['Montserrat', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        .card-lift {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .card-lift:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.12);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.78) 0%, rgba(13, 148, 136, 0.55) 50%, rgba(15, 23, 42, 0.88) 100%);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .glass-dark {
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        /* Hide scrollbars for chips */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-teal-500 selection:text-white">
+
+<!-- =========================================================
+     TOP ANNOUNCEMENT / STATUS BAR
+========================================================= -->
+<div class="bg-gradient-to-r from-teal-800 via-slate-900 to-teal-900 text-white text-xs py-2 px-6 border-b border-teal-500/20">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-teal-500/20 text-teal-300 font-semibold text-[11px] border border-teal-400/30">
+                <span class="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping"></span> Live
+            </span>
+            <span class="text-slate-300">Welcome to TravelBuddy — Intelligent Solapur Tourism & Route Optimization</span>
+        </div>
+        <div class="flex items-center gap-4 text-slate-300">
+            <a href="#weather-section" class="flex items-center gap-1.5 hover:text-teal-300 transition-colors">
+                <span class="material-symbols-outlined text-[15px] text-teal-400">partly_cloudy_day</span>
+                <span id="topbar-weather">Solapur Weather: Loading...</span>
+            </a>
+            <span class="text-slate-600 hidden md:inline">|</span>
+            <a href="../ai_assistant/code.html" class="hidden md:flex items-center gap-1 hover:text-teal-300 transition-colors">
+                <span class="material-symbols-outlined text-[15px] text-teal-400">smart_toy</span>
+                AI Assistant 24/7
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     STICKY NAVIGATION
+========================================================= -->
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="h-20 flex items-center justify-between gap-4">
+
+            <!-- LOGO / BRANDING -->
+            <a href="code.html" class="flex items-center gap-3 group shrink-0">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-white shadow-md shadow-teal-500/20 group-hover:scale-105 transition-transform duration-300">
+                    <span class="material-symbols-outlined text-2xl font-bold">travel_explore</span>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-2xl font-black tracking-tight text-slate-900 group-hover:text-teal-600 transition-colors">
+                        Travel<span class="text-teal-600">Buddy</span>
+                    </span>
+                    <span class="text-[10px] uppercase font-bold tracking-widest text-slate-500 -mt-1">
+                        AI Tourism Planner
+                    </span>
+                </div>
+            </a>
+
+            <!-- DESKTOP NAVIGATION -->
+            <nav class="hidden lg:flex items-center gap-1 xl:gap-2">
+                <a href="code.html"
+                   class="px-3.5 py-2 rounded-xl font-semibold text-sm text-teal-700 bg-teal-50/80 transition-colors">
+                    Home
+                </a>
+
+                <a href="../explore_destinations/explore_destinations.html"
+                   class="px-3.5 py-2 rounded-xl font-medium text-sm text-slate-600 hover:text-teal-600 hover:bg-slate-100/70 transition-colors">
+                    Explore
+                </a>
+
+                <a href="../plan_my_trip/code.html"
+                   class="px-3.5 py-2 rounded-xl font-medium text-sm text-slate-600 hover:text-teal-600 hover:bg-slate-100/70 transition-colors">
+                    Plan Trip
+                </a>
+
+                <a href="../smart_route_optimization_smarttour/code.html"
+                   class="px-3.5 py-2 rounded-xl font-medium text-sm text-slate-600 hover:text-teal-600 hover:bg-slate-100/70 transition-colors">
+                    Smart Routes
+                </a>
+
+                <a href="../ai_recommendations/code.html"
+                   class="px-3.5 py-2 rounded-xl font-medium text-sm text-slate-600 hover:text-teal-600 hover:bg-slate-100/70 transition-colors flex items-center gap-1">
+                    <span class="material-symbols-outlined text-base text-purple-600">auto_awesome</span>
+                    AI Recs
+                </a>
+
+                <a href="../hidden_destination/code.html"
+                   class="px-3.5 py-2 rounded-xl font-medium text-sm text-slate-600 hover:text-teal-600 hover:bg-slate-100/70 transition-colors">
+                    Hidden Gems
+                </a>
+
+                <a href="../community_feed/code.html"
+                   class="px-3.5 py-2 rounded-xl font-medium text-sm text-slate-600 hover:text-teal-600 hover:bg-slate-100/70 transition-colors">
+                    Community
+                </a>
+
+                <a href="../ai_assistant/code.html"
+                   class="px-3.5 py-2 rounded-xl font-medium text-sm text-slate-600 hover:text-teal-600 hover:bg-slate-100/70 transition-colors flex items-center gap-1">
+                    <span class="material-symbols-outlined text-base text-teal-600">smart_toy</span>
+                    Assistant
+                </a>
+            </nav>
+
+            <!-- ACTION BUTTONS -->
+            <div class="flex items-center gap-3">
+
+                <!-- Quick Search Input -->
+                <div class="hidden xl:flex items-center gap-2 bg-slate-100 border border-slate-200/80 rounded-full px-3.5 py-1.5 focus-within:ring-2 focus-within:ring-teal-500/20 focus-within:border-teal-500 transition-all">
+                    <span class="material-symbols-outlined text-slate-400 text-lg">search</span>
+                    <input id="navSearchInput"
+                           type="text"
+                           placeholder="Search places..."
+                           class="bg-transparent outline-none text-xs w-28 text-slate-800 placeholder-slate-400">
+                </div>
+
+                <!-- Notifications Button -->
+                <button id="notificationBtn"
+                        class="relative p-2.5 hover:bg-slate-100 rounded-full text-slate-600 hover:text-slate-900 transition-colors"
+                        title="Notifications">
+                    <span class="material-symbols-outlined text-xl">notifications</span>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-teal-500 rounded-full ring-2 ring-white"></span>
+                </button>
+
+                <!-- Profile Avatar -->
+                <div class="w-10 h-10 rounded-full overflow-hidden bg-slate-200 ring-2 ring-teal-500/30 transition-all shrink-0 cursor-default"
+                     title="TravelBuddy Traveler">
+                    <img src="../professional_portrait_of_a_friendly_young_traveler_smiling_casual_travel_attire/screen.png"
+                         alt="TravelBuddy Profile"
+                         onerror="this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80'"
+                         class="w-full h-full object-cover">
+                </div>
+
+                <!-- Sign In / Sign Up CTA (Desktop) -->
+                <div class="hidden md:flex items-center gap-2 pl-1 border-l border-slate-200">
+                    <a href="../login_smarttour/code.html"
+                       class="px-3.5 py-2 text-xs font-semibold text-slate-700 hover:text-teal-600 transition-colors">
+                        Sign In
+                    </a>
+                    <a href="../register_smarttour/code.html"
+                       class="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-sm shadow-teal-600/30 transition-all">
+                        Get Started
+                    </a>
+                </div>
+
+                <!-- Mobile Hamburger Menu Button -->
+                <button id="mobileMenuBtn"
+                        class="lg:hidden p-2.5 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors">
+                    <span class="material-symbols-outlined text-2xl">menu</span>
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MOBILE NAVIGATION DRAWER -->
+    <div id="mobileMenu" class="hidden lg:hidden border-t border-slate-200 bg-white/98 px-6 py-6 space-y-3">
+        <a href="code.html" class="flex items-center gap-3 py-2 text-teal-600 font-bold text-base">
+            <span class="material-symbols-outlined">home</span> Home
+        </a>
+        <a href="../explore_destinations/explore_destinations.html" class="flex items-center gap-3 py-2 text-slate-700 font-medium text-base hover:text-teal-600">
+            <span class="material-symbols-outlined">travel_explore</span> Explore Destinations
+        </a>
+        <a href="../plan_my_trip/code.html" class="flex items-center gap-3 py-2 text-slate-700 font-medium text-base hover:text-teal-600">
+            <span class="material-symbols-outlined">calendar_month</span> Plan My Trip & Budget
+        </a>
+        <a href="../smart_route_optimization_smarttour/code.html" class="flex items-center gap-3 py-2 text-slate-700 font-medium text-base hover:text-teal-600">
+            <span class="material-symbols-outlined">route</span> Route Optimization
+        </a>
+        <a href="../ai_recommendations/code.html" class="flex items-center gap-3 py-2 text-slate-700 font-medium text-base hover:text-teal-600">
+            <span class="material-symbols-outlined text-purple-600">auto_awesome</span> AI Recommendations
+        </a>
+        <a href="../hidden_destination/code.html" class="flex items-center gap-3 py-2 text-slate-700 font-medium text-base hover:text-teal-600">
+            <span class="material-symbols-outlined text-amber-600">visibility_off</span> Hidden Destinations
+        </a>
+        <a href="../community_feed/code.html" class="flex items-center gap-3 py-2 text-slate-700 font-medium text-base hover:text-teal-600">
+            <span class="material-symbols-outlined">groups</span> Travel Community
+        </a>
+        <a href="../ai_assistant/code.html" class="flex items-center gap-3 py-2 text-slate-700 font-medium text-base hover:text-teal-600">
+            <span class="material-symbols-outlined text-teal-600">smart_toy</span> AI Tourist Assistant (RAG)
+        </a>
+        <div class="pt-4 border-t border-slate-200 flex gap-3">
+            <a href="../login_smarttour/code.html" class="flex-1 py-3 text-center rounded-xl border border-slate-300 font-semibold text-slate-700 text-sm">
+                Sign In
+            </a>
+            <a href="../register_smarttour/code.html" class="flex-1 py-3 text-center rounded-xl bg-teal-600 text-white font-semibold text-sm">
+                Register
+            </a>
+        </div>
+    </div>
+</header>
+
+
+<!-- =========================================================
+     HERO SECTION
+========================================================= -->
+<section class="relative min-h-[640px] lg:min-h-[700px] flex items-center justify-center overflow-hidden bg-slate-950 text-white">
+
+    <!-- Hero Visual Background with Layered Imagery -->
+    <div class="absolute inset-0 z-0">
+        <img src="../public/images/Siddheshwar_temple_02.jpg.jpeg"
+             alt="Solapur Heritage Siddheshwar Lake Temple"
+             onerror="this.src='https://images.unsplash.com/photo-1548013146-72479768bbaa?auto=format&fit=crop&w=1920&q=80'"
+             class="w-full h-full object-cover object-center filter brightness-[0.55] scale-105 animate-[pulse_10s_ease-in-out_infinite]">
+        <div class="absolute inset-0 hero-gradient"></div>
+        <div class="absolute inset-0 bg-radial-gradient from-transparent via-slate-950/40 to-slate-950/90"></div>
+    </div>
+
+    <!-- Ambient Glow Orbs -->
+    <div class="absolute top-1/4 left-10 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-10 right-10 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 max-w-7xl mx-auto px-6 py-20 lg:py-28 w-full flex flex-col items-center text-center">
+
+        <!-- Top Pill Tag -->
+        <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-teal-300 text-xs sm:text-sm font-semibold tracking-wide uppercase mb-6 shadow-lg animate-bounce">
+            <span class="w-2 h-2 rounded-full bg-teal-400"></span>
+            TravelBuddy • Solapur Smart Tourism Platform
+            <span class="text-white/60">✦</span>
+            <span class="text-white font-medium">Route Optimization & RAG</span>
+        </div>
+
+        <!-- Main Headline -->
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight leading-[1.1] max-w-4xl font-heading">
+            Plan Smarter. Explore Better. <br>
+            <span class="bg-gradient-to-r from-teal-300 via-emerald-200 to-cyan-300 bg-clip-text text-transparent">
+                Your Ultimate TravelBuddy.
+            </span>
+        </h1>
+
+        <!-- Subheading -->
+        <p class="mt-6 text-lg sm:text-xl text-slate-200 max-w-2xl leading-relaxed font-light">
+            Discover iconic temples, historical forts, and secret hidden gems. Experience AI-generated itineraries, real-time weather forecasting, live hotel rates, and optimal transit routes.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="mt-10 flex flex-wrap items-center justify-center gap-4 w-full max-w-xl">
+            <a href="../explore_destinations/explore_destinations.html"
+               class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-base shadow-xl shadow-teal-500/30 hover:scale-105 active:scale-95 transition-all duration-200">
+                <span class="material-symbols-outlined text-2xl">travel_explore</span>
+                Explore Destinations
+            </a>
+
+            <a href="../plan_my_trip/code.html"
+               class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-semibold text-base border border-white/30 backdrop-blur-md hover:scale-105 active:scale-95 transition-all duration-200">
+                <span class="material-symbols-outlined text-2xl text-teal-300">auto_awesome</span>
+                Plan My Trip
+            </a>
+
+            <a href="../ai_assistant/code.html"
+               class="inline-flex items-center justify-center gap-2 px-6 py-4 rounded-2xl bg-slate-900/80 hover:bg-slate-900 text-teal-300 border border-teal-500/40 text-sm font-semibold backdrop-blur-md transition-all">
+                <span class="material-symbols-outlined text-xl">smart_toy</span>
+                AI Assistant
+            </a>
+        </div>
+
+        <!-- Quick Metrics Pill Grid -->
+        <div class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl w-full">
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 text-center">
+                <p class="text-2xl lg:text-3xl font-extrabold text-white">50+</p>
+                <p class="text-xs text-slate-300 mt-1 uppercase tracking-wider font-medium">Curated Attractions</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 text-center">
+                <p class="text-2xl lg:text-3xl font-extrabold text-teal-300">100%</p>
+                <p class="text-xs text-slate-300 mt-1 uppercase tracking-wider font-medium">Route Optimized</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 text-center">
+                <p class="text-2xl lg:text-3xl font-extrabold text-white">Live</p>
+                <p class="text-xs text-slate-300 mt-1 uppercase tracking-wider font-medium">Weather & Travel Alerts</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 text-center">
+                <p class="text-2xl lg:text-3xl font-extrabold text-emerald-300">RAG AI</p>
+                <p class="text-xs text-slate-300 mt-1 uppercase tracking-wider font-medium">Smart Travel Companion</p>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     DESTINATION SEARCH & PREFERENCE BAR (FLOATING)
+========================================================= -->
+<section class="max-w-6xl mx-auto px-4 sm:px-6 -mt-12 relative z-30">
+    <div class="bg-white rounded-3xl shadow-2xl p-6 sm:p-8 border border-slate-200/80">
+
+        <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center font-bold">
+                    <span class="material-symbols-outlined text-lg">search</span>
+                </span>
+                <h2 class="text-lg font-bold text-slate-900 font-heading">Find Your Next Adventure</h2>
+            </div>
+            <span class="text-xs font-medium text-slate-500">Filter by category, travel style, and duration</span>
+        </div>
+
+        <form id="searchPreferenceForm" onsubmit="handleMainSearch(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+            <!-- 1. Destination / Place Input -->
+            <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 focus-within:border-teal-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-teal-500/20 transition-all">
+                <label for="journeySearch" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Destination or Keyword
+                </label>
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-400 text-lg">location_on</span>
+                    <input id="journeySearch"
+                           type="text"
+                           placeholder="e.g. Siddheshwar, Fort, Lake"
+                           class="bg-transparent border-none outline-none w-full text-sm font-semibold text-slate-800 placeholder-slate-400">
+                </div>
+            </div>
+
+            <!-- 2. Category Preference -->
+            <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 focus-within:border-teal-500 focus-within:bg-white transition-all">
+                <label for="categoryFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Category Preference
+                </label>
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-400 text-lg">category</span>
+                    <select id="categoryFilter" class="bg-transparent border-none outline-none w-full text-sm font-semibold text-slate-800 cursor-pointer">
+                        <option value="ALL">All Categories</option>
+                        <option value="Historical">Historical Forts & Monuments</option>
+                        <option value="Religious">Temples & Spiritual Places</option>
+                        <option value="Nature">Lakes, Gardens & Nature</option>
+                        <option value="Water Park">Water Parks & Recreation</option>
+                        <option value="HIDDEN">Hidden Destinations</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 3. Trip Style / Duration -->
+            <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 focus-within:border-teal-500 focus-within:bg-white transition-all">
+                <label for="durationFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                    Trip Style / Duration
+                </label>
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-slate-400 text-lg">schedule</span>
+                    <select id="durationFilter" class="bg-transparent border-none outline-none w-full text-sm font-semibold text-slate-800 cursor-pointer">
+                        <option value="1">1 Day Sightseeing Tour</option>
+                        <option value="2">2 Days Weekend Trip</option>
+                        <option value="3">3 Days Heritage & Leisure</option>
+                        <option value="4+">Extended Holiday (4+ Days)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 4. Submit Search Button -->
+            <div class="flex items-end">
+                <button type="submit"
+                        class="w-full py-4 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-md shadow-teal-600/30 flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                    <span class="material-symbols-outlined text-lg">search</span>
+                    <span>Search Destinations</span>
+                </button>
+            </div>
+
+        </form>
+
+        <!-- Quick filter chips -->
+        <div class="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <span class="text-xs text-slate-400 shrink-0 font-medium">Trending:</span>
+            <button onclick="quickSearch('Siddheshwar Temple')" class="text-xs bg-slate-100 hover:bg-teal-50 hover:text-teal-700 px-3 py-1 rounded-full text-slate-600 transition-colors shrink-0">
+                Siddheshwar Temple
+            </button>
+            <button onclick="quickSearch('Bhuikot Fort')" class="text-xs bg-slate-100 hover:bg-teal-50 hover:text-teal-700 px-3 py-1 rounded-full text-slate-600 transition-colors shrink-0">
+                Bhuikot Fort
+            </button>
+            <button onclick="quickSearch('Naldurg Fort')" class="text-xs bg-slate-100 hover:bg-teal-50 hover:text-teal-700 px-3 py-1 rounded-full text-slate-600 transition-colors shrink-0">
+                Naldurg Fort
+            </button>
+            <button onclick="quickSearch('Kambar Lake')" class="text-xs bg-slate-100 hover:bg-teal-50 hover:text-teal-700 px-3 py-1 rounded-full text-slate-600 transition-colors shrink-0">
+                Kambar Lake
+            </button>
+            <button onclick="quickSearch('Swami Samarth')" class="text-xs bg-slate-100 hover:bg-teal-50 hover:text-teal-700 px-3 py-1 rounded-full text-slate-600 transition-colors shrink-0">
+                Akkalkot Temple
+            </button>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- =========================================================
+     REAL-TIME WEATHER & TRAVEL ADVISORY SECTION
+========================================================= -->
+<section id="weather-section" class="max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-12">
+    <div class="bg-gradient-to-br from-white to-teal-50/50 rounded-3xl p-6 sm:p-10 border border-teal-200/60 shadow-lg relative overflow-hidden">
+
+        <!-- Background Ambient Design -->
+        <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
+
+            <!-- Left Info -->
+            <div class="max-w-xl">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-xs font-bold text-teal-700 uppercase tracking-wider">Live Environmental Data</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">API ACTIVE</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 font-heading">
+                    Current Weather in <span id="weather-city">Solapur, IN</span>
+                </h2>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                    Plan your travel itinerary according to live meteorological conditions. Stay prepared for sightseeing, outdoor forts, and boating activities.
+                </p>
+
+                <div class="mt-4 flex flex-wrap items-center gap-3">
+                    <a href="../real_time_travel_info_smarttour/code.html"
+                       class="inline-flex items-center gap-1.5 text-xs font-bold text-teal-700 hover:text-teal-900 bg-teal-100/80 hover:bg-teal-200/80 px-3.5 py-2 rounded-xl transition-colors">
+                        <span class="material-symbols-outlined text-sm">schedule</span>
+                        5-Day Detailed Forecast
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: Interactive Weather Card -->
+            <div id="weatherCard" class="bg-white/90 backdrop-blur-md rounded-2xl p-6 sm:p-7 shadow-sm border border-slate-200/90 w-full lg:w-auto lg:min-w-[420px]">
+                <div class="flex items-start justify-between gap-4 pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-teal-500 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-teal-500/20">
+                            <span id="weather-icon" class="material-symbols-outlined text-4xl">light_mode</span>
+                        </div>
+                        <div>
+                            <div class="flex items-baseline gap-2">
+                                <span id="weather-temperature" class="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight">--°C</span>
+                                <span id="weather-feels-like" class="text-xs font-semibold text-slate-500"></span>
+                            </div>
+                            <p id="weather-condition-text" class="text-sm font-bold text-teal-700 mt-0.5">Loading live weather...</p>
+                        </div>
+                    </div>
+
+                    <!-- Refresh Button -->
+                    <button id="refreshWeatherBtn"
+                            onclick="loadHomeWeather()"
+                            title="Refresh weather data"
+                            class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-teal-50 hover:text-teal-600 text-slate-600 flex items-center justify-center transition-all shrink-0 active:scale-95">
+                        <span id="refreshIcon" class="material-symbols-outlined text-xl">refresh</span>
+                    </button>
+                </div>
+
+                <!-- Weather Details Matrix -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                        <span class="text-[11px] uppercase tracking-wider text-slate-400 font-bold block">Humidity</span>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="material-symbols-outlined text-teal-600 text-sm">water_drop</span>
+                            <span id="weather-humidity" class="text-sm font-bold text-slate-800">--%</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100">
+                        <span class="text-[11px] uppercase tracking-wider text-slate-400 font-bold block">Wind Speed</span>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="material-symbols-outlined text-teal-600 text-sm">air</span>
+                            <span id="weather-wind" class="text-sm font-bold text-slate-800">-- km/h</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 col-span-2 sm:col-span-1">
+                        <span class="text-[11px] uppercase tracking-wider text-slate-400 font-bold block">Conditions</span>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="material-symbols-outlined text-teal-600 text-sm">wb_sunny</span>
+                            <span id="weather-visibility" class="text-sm font-bold text-slate-800">Clear Skies</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather error notification -->
+                <div id="weather-error" class="hidden mt-3 p-2.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-600 flex items-center justify-between"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- =========================================================
+     POPULAR TOURIST PLACES (LIVE & CURATED SHOWCASE)
+========================================================= -->
+<section id="popular-destinations" class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+
+    <!-- Section Header & Filter Tabs -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div>
+            <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-teal-600 mb-2">
+                <span class="material-symbols-outlined text-sm">stars</span> Popular Solapur Attractions
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 font-heading">
+                Top Destinations to Explore
+            </h2>
+            <p class="text-slate-600 text-sm mt-2 max-w-xl">
+                Browse hand-picked tourist destinations with verified ratings, historical relevance, and direct trip planner integration.
+            </p>
+        </div>
+
+        <!-- Filter category tabs -->
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+            <button onclick="filterPlaces('ALL', this)" class="place-tab-btn active px-4 py-2 rounded-xl text-xs font-bold bg-teal-600 text-white shadow-sm transition-all">
+                All Places
+            </button>
+            <button onclick="filterPlaces('Historical', this)" class="place-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all">
+                Forts & Heritage
+            </button>
+            <button onclick="filterPlaces('Religious', this)" class="place-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all">
+                Temples
+            </button>
+            <button onclick="filterPlaces('Nature', this)" class="place-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all">
+                Lakes & Nature
+            </button>
+            <button onclick="filterPlaces('Water Park', this)" class="place-tab-btn px-4 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all">
+                Recreation
+            </button>
+        </div>
+    </div>
+
+    <!-- Places Grid Container -->
+    <div id="placesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
+        <!-- Live cards populated by JS -->
+        <div class="col-span-full py-16 text-center text-slate-400">
+            <div class="w-10 h-10 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            Loading popular destinations...
+        </div>
+    </div>
+
+    <!-- Bottom Explore CTA -->
+    <div class="mt-12 text-center">
+        <a href="../explore_destinations/explore_destinations.html"
+           class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-sm border border-slate-300 shadow-sm transition-all hover:scale-105">
+            <span>View All Destinations & Map</span>
+            <span class="material-symbols-outlined text-teal-600 text-lg">arrow_forward</span>
+        </a>
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     AI RECOMMENDATIONS SECTION
+========================================================= -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+    <div class="bg-gradient-to-br from-purple-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-8 sm:p-12 relative overflow-hidden shadow-2xl">
+
+        <!-- Decorative Glow Orbs -->
+        <div class="absolute -top-20 -right-20 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-teal-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
+
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-300 text-xs font-bold uppercase tracking-wider mb-4">
+                    <span class="material-symbols-outlined text-sm">auto_awesome</span> Powered by Gemini AI
+                </div>
+
+                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight font-heading leading-tight">
+                    Personalized Recommendations Tailored Just for You
+                </h2>
+
+                <p class="mt-4 text-slate-300 text-sm sm:text-base leading-relaxed font-light">
+                    Tell TravelBuddy your budget, duration, and personal passions. Our Gemini-powered AI engine curates specific spots, famous local snacks, handloom shopping, and cultural landmarks.
+                </p>
+
+                <!-- Recommendation Highlights -->
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10">
+                        <span class="text-lg">🏛️</span>
+                        <p class="font-bold text-xs mt-1 text-white">Historical Heritage</p>
+                        <p class="text-[11px] text-slate-300">Bhuikot Fort & Stepwells</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10">
+                        <span class="text-lg">🌶️</span>
+                        <p class="font-bold text-xs mt-1 text-white">Local Gastronomy</p>
+                        <p class="text-[11px] text-slate-300">Shenga Chutney & Jowar Bhakri</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10">
+                        <span class="text-lg">🛍️</span>
+                        <p class="font-bold text-xs mt-1 text-white">Authentic Handlooms</p>
+                        <p class="text-[11px] text-slate-300">World-famous Solapuri Chaddar</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/10">
+                        <span class="text-lg">🌄</span>
+                        <p class="font-bold text-xs mt-1 text-white">Rural Agro-Tourism</p>
+                        <p class="text-[11px] text-slate-300">Quiet Village Farm Escapes</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex flex-wrap gap-4">
+                    <a href="../ai_recommendations/code.html"
+                       class="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-purple-500 hover:bg-purple-400 text-white font-bold text-sm shadow-lg shadow-purple-500/30 transition-all hover:scale-105">
+                        <span class="material-symbols-outlined text-lg">auto_awesome</span>
+                        Generate AI Recommendations
+                    </a>
+                </div>
+            </div>
+
+            <!-- Visual Graphic Cards Mockup -->
+            <div class="relative">
+                <div class="space-y-4">
+                    <!-- Sample AI Rec Card 1 -->
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 transform hover:scale-[1.02] transition-transform">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-purple-300 uppercase tracking-wider">Top Recommendation</span>
+                            <span class="text-xs bg-purple-500/30 px-2 py-0.5 rounded text-white">Estimated: ₹150</span>
+                        </div>
+                        <h4 class="text-base font-bold text-white mt-1">Bhuikot Fort & Underground Passage</h4>
+                        <p class="text-xs text-slate-300 mt-1">Ideal for history buffs. Combines medieval military architecture with panoramic moat views.</p>
+                    </div>
+
+                    <!-- Sample AI Rec Card 2 -->
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 transform hover:scale-[1.02] transition-transform">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-teal-300 uppercase tracking-wider">Food & Dining</span>
+                            <span class="text-xs bg-teal-500/30 px-2 py-0.5 rounded text-white">Estimated: ₹200</span>
+                        </div>
+                        <h4 class="text-base font-bold text-white mt-1">Traditional Solapuri Shenga Chutney & Bhakri</h4>
+                        <p class="text-xs text-slate-300 mt-1">Experience authentic Maharashtrian spice profiles at heritage city eateries.</p>
+                    </div>
+
+                    <!-- Sample AI Rec Card 3 -->
+                    <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 transform hover:scale-[1.02] transition-transform">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-emerald-300 uppercase tracking-wider">Scenic Nature</span>
+                            <span class="text-xs bg-emerald-500/30 px-2 py-0.5 rounded text-white">Free Entry</span>
+                        </div>
+                        <h4 class="text-base font-bold text-white mt-1">Kambar Lake Sunset Promenade</h4>
+                        <p class="text-xs text-slate-300 mt-1">Peaceful birdwatching retreat within city limits, perfect for photography.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- =========================================================
+     HIDDEN DESTINATIONS SECTION
+========================================================= -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+    <div class="bg-slate-900 rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-xl">
+
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 relative z-10">
+            <div>
+                <div class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-amber-400 mb-2">
+                    <span class="material-symbols-outlined text-sm">visibility_off</span> Secret Spots
+                </div>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white font-heading">
+                    Discover Hidden Destinations
+                </h2>
+                <p class="text-slate-300 text-sm mt-2 max-w-xl">
+                    Escape the tourist crowds. Solapur district holds ancient riverside temples, peaceful ashrams, and rural agro-tourism farms.
+                </p>
+            </div>
+
+            <a href="../hidden_destination/code.html"
+               class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm transition-all hover:scale-105 shrink-0">
+                <span>View All Hidden Gems</span>
+                <span class="material-symbols-outlined text-base">arrow_forward</span>
+            </a>
+        </div>
+
+        <!-- 3 Highlight Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+
+            <!-- Hidden Gem 1 -->
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 group hover:border-amber-400/50 transition-all">
+                <div class="h-44 overflow-hidden relative">
+                    <img src="../public/images/Kambar_Talav_01.JPG.jpeg"
+                         alt="Kambar Lake"
+                         onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80'"
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-amber-500 text-slate-950 text-[11px] font-bold">
+                        Hidden Gem
+                    </span>
+                </div>
+                <div class="p-5">
+                    <h3 class="font-bold text-base text-white">Kambar Lake / Moti Baug</h3>
+                    <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">Quiet freshwater wetland habitat famous for migratory waterfowl and sunset walking tracks.</p>
+                    <div class="mt-4 flex items-center justify-between text-xs text-amber-300 font-semibold">
+                        <span>Solapur District</span>
+                        <span>★ 4.2 Rating</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden Gem 2 -->
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 group hover:border-amber-400/50 transition-all">
+                <div class="h-44 overflow-hidden relative">
+                    <img src="../public/images/Naldurg.jpg.jpeg"
+                         alt="Tillus Agro Tourism"
+                         onerror="this.src='https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=80'"
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-amber-500 text-slate-950 text-[11px] font-bold">
+                        Agro Gem
+                    </span>
+                </div>
+                <div class="p-5">
+                    <h3 class="font-bold text-base text-white">Tillus Agro & Village Resort</h3>
+                    <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">Experience rustic Maharashtrian village games, authentic organic dining, and bullock cart rides.</p>
+                    <div class="mt-4 flex items-center justify-between text-xs text-amber-300 font-semibold">
+                        <span>Solapur Outskirts</span>
+                        <span>★ 4.4 Rating</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden Gem 3 -->
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl overflow-hidden border border-white/10 group hover:border-amber-400/50 transition-all">
+                <div class="h-44 overflow-hidden relative">
+                    <img src="../public/images/Siddheshwar_temple_02.jpg.jpeg"
+                         alt="Kudal Sangam"
+                         onerror="this.src='https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80'"
+                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-amber-500 text-slate-950 text-[11px] font-bold">
+                        River Confluence
+                    </span>
+                </div>
+                <div class="p-5">
+                    <h3 class="font-bold text-base text-white">Kudal Sangam Temples</h3>
+                    <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">Confluence of Bhima and Sina rivers housing 8th-century Chalukyan rock-carved sanctuaries.</p>
+                    <div class="mt-4 flex items-center justify-between text-xs text-amber-300 font-semibold">
+                        <span>Hattarsang Kudal</span>
+                        <span>★ 4.5 Rating</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<!-- =========================================================
+     TRIP PLANNER, SMART ROUTING & BUDGET ESTIMATION (BENTO)
+========================================================= -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+
+    <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="text-xs font-bold text-teal-600 uppercase tracking-widest">End-to-End Travel Suite</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 font-heading mt-2">
+            Engineered for Effortless Exploration
+        </h2>
+        <p class="text-sm text-slate-600 mt-2">
+            Every tool you need to design, optimize, navigate, and budget your vacation in a single unified platform.
+        </p>
+    </div>
+
+    <!-- Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Card 1: AI Trip Planner -->
+        <div class="card-lift bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+                <div class="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-3xl">calendar_month</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 font-heading">AI Trip Planner</h3>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                    Automatically organizes your trip by morning, afternoon, and evening slots based on your preferred pace (Relaxed, Balanced, Fast).
+                </p>
+                <ul class="mt-4 space-y-2 text-xs text-slate-600">
+                    <li class="flex items-center gap-2"><span class="text-teal-600">✓</span> Automatic or Manual place selection</li>
+                    <li class="flex items-center gap-2"><span class="text-teal-600">✓</span> Solo, Couple, Family, Friends modes</li>
+                    <li class="flex items-center gap-2"><span class="text-teal-600">✓</span> Live Foursquare hotel integration</li>
+                </ul>
+            </div>
+            <a href="../plan_my_trip/code.html" class="mt-8 inline-flex items-center gap-2 font-bold text-teal-600 text-sm hover:text-teal-700">
+                Plan My Itinerary <span class="material-symbols-outlined text-base">arrow_forward</span>
+            </a>
+        </div>
+
+        <!-- Card 2: Smart Route Optimization -->
+        <div class="card-lift bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-3xl">route</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 font-heading">Smart Route Optimization</h3>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                    Interactive Leaflet map algorithm finds the shortest travel order between multiple attractions to minimize transit time and carbon footprint.
+                </p>
+                <ul class="mt-4 space-y-2 text-xs text-slate-600">
+                    <li class="flex items-center gap-2"><span class="text-blue-600">✓</span> Real waypoint TSP optimization</li>
+                    <li class="flex items-center gap-2"><span class="text-blue-600">✓</span> Turn-by-turn distance & travel times</li>
+                    <li class="flex items-center gap-2"><span class="text-blue-600">✓</span> Live Map & Navigation directions</li>
+                </ul>
+            </div>
+            <a href="../smart_route_optimization_smarttour/code.html" class="mt-8 inline-flex items-center gap-2 font-bold text-blue-600 text-sm hover:text-blue-700">
+                Open Route Map <span class="material-symbols-outlined text-base">arrow_forward</span>
+            </a>
+        </div>
+
+        <!-- Card 3: Database Budget Planner -->
+        <div class="card-lift bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+                <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6">
+                    <span class="material-symbols-outlined text-3xl">savings</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 font-heading">Live Budget Calculator</h3>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                    Connected to our PostgreSQL database records for ticket prices, transportation fees, hotels, and dining costs to prevent unexpected surprises.
+                </p>
+                <ul class="mt-4 space-y-2 text-xs text-slate-600">
+                    <li class="flex items-center gap-2"><span class="text-emerald-600">✓</span> Automatic hotel per night estimation</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-600">✓</span> Per-person dining & transport math</li>
+                    <li class="flex items-center gap-2"><span class="text-emerald-600">✓</span> Instant cost breakdown summary</li>
+                </ul>
+            </div>
+            <a href="../plan_my_trip/code.html#budget-plan-section" class="mt-8 inline-flex items-center gap-2 font-bold text-emerald-600 text-sm hover:text-emerald-700">
+                Calculate Trip Cost <span class="material-symbols-outlined text-base">arrow_forward</span>
+            </a>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     COMMUNITY FEED & AI ASSISTANT (RAG) CALLOUT
+========================================================= -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+        <!-- Community Callout -->
+        <div class="bg-gradient-to-br from-pink-50 to-orange-50 rounded-3xl p-8 sm:p-10 border border-pink-200/60 flex flex-col justify-between">
+            <div>
+                <div class="w-12 h-12 rounded-2xl bg-pink-500 text-white flex items-center justify-center shadow-md shadow-pink-500/20 mb-6">
+                    <span class="material-symbols-outlined text-2xl">groups</span>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 font-heading">TravelBuddy Community</h3>
+                <p class="text-sm text-slate-600 mt-2 leading-relaxed">
+                    Connect with fellow explorers who have visited Solapur. Browse photo logs, read first-hand culinary reviews, and get genuine advice on local transport and festivals.
+                </p>
+            </div>
+            <div class="mt-8">
+                <a href="../community_feed/code.html"
+                   class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-pink-600 hover:bg-pink-700 text-white font-bold text-sm shadow-md transition-all">
+                    <span>Join Community Feed</span>
+                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- AI Assistant RAG Callout -->
+        <div class="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 border border-slate-800 flex flex-col justify-between">
+            <div>
+                <div class="w-12 h-12 rounded-2xl bg-teal-500 text-slate-950 flex items-center justify-center shadow-md shadow-teal-500/20 mb-6 font-bold">
+                    <span class="material-symbols-outlined text-2xl">smart_toy</span>
+                </div>
+                <h3 class="text-2xl font-bold text-white font-heading">24/7 AI Tourist Assistant (RAG)</h3>
+                <p class="text-sm text-slate-300 mt-2 leading-relaxed">
+                    Have questions about auto-rickshaw fares, temple darshan timings, or best seasons to visit? Our Retrieval-Augmented Generation AI provides instant answers rooted in local knowledge.
+                </p>
+            </div>
+            <div class="mt-8">
+                <a href="../ai_assistant/code.html"
+                   class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-sm transition-all">
+                    <span>Start AI Conversation</span>
+                    <span class="material-symbols-outlined text-base">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- =========================================================
+     COMPREHENSIVE ALL-MODULES DIRECTORY (NAV HUB)
+========================================================= -->
+<section id="all-modules" class="max-w-7xl mx-auto px-4 sm:px-6 py-16 border-t border-slate-200">
+
+    <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="text-xs font-bold text-teal-600 uppercase tracking-widest">Complete System Access</span>
+        <h2 class="text-3xl font-extrabold text-slate-900 font-heading mt-1">
+            Explore All TravelBuddy Features
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 mt-2">
+            Direct shortcuts to all key modules across our smart tourism platform
+        </p>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+
+        <!-- 1. Explore -->
+        <a href="../explore_destinations/explore_destinations.html" class="p-5 rounded-2xl bg-white border border-slate-200 hover:border-teal-500 hover:shadow-md transition-all group">
+            <span class="material-symbols-outlined text-teal-600 text-3xl group-hover:scale-110 transition-transform">travel_explore</span>
+            <h4 class="font-bold text-sm text-slate-900 mt-3">Explore Destinations</h4>
+            <p class="text-xs text-slate-500 mt-1">Full database of all 50+ tourist places.</p>
+        </a>
+
+        <!-- 2. Trip Planner -->
+        <a href="../plan_my_trip/code.html" class="p-5 rounded-2xl bg-white border border-slate-200 hover:border-teal-500 hover:shadow-md transition-all group">
+            <span class="material-symbols-outlined text-blue-600 text-3xl group-hover:scale-110 transition-transform">edit_calendar</span>
+            <h4 class="font-bold text-sm text-slate-900 mt-3">AI Trip Planner</h4>
+            <p class="text-xs text-slate-500 mt-1">Build daily itineraries with slots.</p>
+        </a>
+
+        <!-- 3. Smart Routing -->
+        <a href="../smart_route_optimization_smarttour/code.html" class="p-5 rounded-2xl bg-white border border-slate-200 hover:border-teal-500 hover:shadow-md transition-all group">
+            <span class="material-symbols-outlined text-cyan-600 text-3xl group-hover:scale-110 transition-transform">alt_route</span>
+            <h4 class="font-bold text-sm text-slate-900 mt-3">Route Optimization</h4>
+            <p class="text-xs text-slate-500 mt-1">Leaflet map transit calculations.</p>
+        </a>
+
+        <!-- 4. AI Recs -->
+        <a href="../ai_recommendations/code.html" class="p-5 rounded-2xl bg-white border border-slate-200 hover:border-teal-500 hover:shadow-md transition-all group">
+            <span class="material-symbols-outlined text-purple-600 text-3xl group-hover:scale-110 transition-transform">auto_awesome</span>
+            <h4 class="font-bold text-sm text-slate-900 mt-3">AI Recommendations</h4>
+            <p class="text-xs text-slate-500 mt-1">Gemini AI customized travel picks.</p>
+        </a>
+
+        <!-- 5. Hidden Gems -->
+        <a href="../hidden_destination/code.html" class="p-5 rounded-2xl bg-white border border-slate-200 hover:border-teal-500 hover:shadow-md transition-all group">
+            <span class="material-symbols-outlined text-amber-600 text-3xl group-hover:scale-110 transition-transform">visibility_off</span>
+            <h4 class="font-bold text-sm text-slate-900 mt-3">Hidden Destinations</h4>
+            <p class="text-xs text-slate-500 mt-1">Lesser-known local treasures.</p>
+        </a>
+
+        <!-- 6. Budget Planner -->
+        <a href="../plan_my_trip/code.html#budget-plan-section" class="p-5 rounded-2xl bg-white border border-slate-200 hover:border-teal-500 hover:shadow-md transition-all group">
+            <span class="material-symbols-outlined text-emerald-600 text-3xl group-hover:scale-110 transition-transform">account_balance_wallet</span>
+            <h4 class="font-bold text-sm text-slate-900 mt-3">Budget Planner</h4>
+            <p class="text-xs text-slate-500 mt-1">Real database expenses estimates.</p>
+        </a>
+
+        <!-- 7. Live Weather -->
+        <a href="../real_time_travel_info_smarttour/code.html" class="p-5 rounded-2xl bg-white border border-slate-200 hover:border-teal-500 hover:shadow-md transition-all group">
+            <span class="material-symbols-outlined text-indigo-600 text-3xl group-hover:scale-110 transition-transform">partly_cloudy_day</span>
+            <h4 class="font-bold text-sm text-slate-900 mt-3">Live Travel Info</h4>
+            <p class="text-xs text-slate-500 mt-1">5-day forecasts and climate.</p>
+        </a>
+
+        <!-- 8. Community -->
+        <a href="../community_feed/code.html" class="p-5 rounded-2xl bg-white border border-slate-200 hover:border-teal-500 hover:shadow-md transition-all group">
+            <span class="material-symbols-outlined text-pink-600 text-3xl group-hover:scale-110 transition-transform">forum</span>
+            <h4 class="font-bold text-sm text-slate-900 mt-3">Travel Community</h4>
+            <p class="text-xs text-slate-500 mt-1">Reviews, tips and traveler stories.</p>
+        </a>
+
+        <!-- 9. AI Assistant -->
+        <a href="../ai_assistant/code.html" class="p-5 rounded-2xl bg-white border border-slate-200 hover:border-teal-500 hover:shadow-md transition-all group">
+            <span class="material-symbols-outlined text-teal-600 text-3xl group-hover:scale-110 transition-transform">smart_toy</span>
+            <h4 class="font-bold text-sm text-slate-900 mt-3">AI Tourist Assistant</h4>
+            <p class="text-xs text-slate-500 mt-1">RAG intelligent chat companion.</p>
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+<footer class="bg-slate-950 text-white border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-6 py-14">
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+
+            <!-- Col 1: Brand -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-teal-500 flex items-center justify-center text-slate-950 font-bold">
+                        <span class="material-symbols-outlined text-2xl">travel_explore</span>
+                    </div>
+                    <span class="text-2xl font-black font-heading tracking-tight text-white">
+                        Travel<span class="text-teal-400">Buddy</span>
+                    </span>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Smart Tourism – Tourist Travel Planner using Route Optimization and RAG. Your intelligent guide to discovering the best of Solapur.
+                </p>
+                <div class="flex items-center gap-3 text-slate-400 text-xs">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Backend Connected: Port 8081
+                </div>
+            </div>
+
+            <!-- Col 2: Navigation Links -->
+            <div>
+                <h4 class="text-sm font-bold uppercase tracking-wider text-slate-300 font-heading mb-4">
+                    Explore & Plan
+                </h4>
+                <ul class="space-y-2.5 text-xs text-slate-400">
+                    <li><a href="../explore_destinations/explore_destinations.html" class="hover:text-teal-400 transition-colors">Explore Destinations</a></li>
+                    <li><a href="../plan_my_trip/code.html" class="hover:text-teal-400 transition-colors">AI Trip Planner</a></li>
+                    <li><a href="../smart_route_optimization_smarttour/code.html" class="hover:text-teal-400 transition-colors">Smart Route Optimization</a></li>
+                    <li><a href="../hidden_destination/code.html" class="hover:text-teal-400 transition-colors">Hidden Destinations</a></li>
+                </ul>
+            </div>
+
+            <!-- Col 3: AI & Features -->
+            <div>
+                <h4 class="text-sm font-bold uppercase tracking-wider text-slate-300 font-heading mb-4">
+                    AI & Live Tools
+                </h4>
+                <ul class="space-y-2.5 text-xs text-slate-400">
+                    <li><a href="../ai_assistant/code.html" class="hover:text-teal-400 transition-colors">AI Tourist Assistant (RAG)</a></li>
+                    <li><a href="../ai_recommendations/code.html" class="hover:text-teal-400 transition-colors">AI Recommendations (Gemini)</a></li>
+                    <li><a href="../real_time_travel_info_smarttour/code.html" class="hover:text-teal-400 transition-colors">Real-Time Travel & Weather</a></li>
+                    <li><a href="../community_feed/code.html" class="hover:text-teal-400 transition-colors">Community Feed</a></li>
+                </ul>
+            </div>
+
+            <!-- Col 4: Account & Auth -->
+            <div>
+                <h4 class="text-sm font-bold uppercase tracking-wider text-slate-300 font-heading mb-4">
+                    Account & Access
+                </h4>
+                <ul class="space-y-2.5 text-xs text-slate-400">
+                    <li><a href="../login_smarttour/code.html" class="hover:text-teal-400 transition-colors">Sign In to TravelBuddy</a></li>
+                    <li><a href="../register_smarttour/code.html" class="hover:text-teal-400 transition-colors">Create New Account</a></li>
+                </ul>
+                <div class="mt-6 pt-4 border-t border-slate-800">
+                    <span class="text-[11px] text-slate-500">Need immediate help?</span>
+                    <a href="../ai_assistant/code.html" class="block text-xs text-teal-400 font-semibold hover:underline mt-1">
+                        Chat with our AI Assistant →
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="border-t border-slate-800/80 mt-12 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <p>© 2026 TravelBuddy Technologies. All rights reserved.</p>
+            <div class="flex items-center gap-6">
+                <a href="#" class="hover:text-slate-300 transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-slate-300 transition-colors">Terms of Service</a>
+                <a href="#" class="hover:text-slate-300 transition-colors">Solapur Tourism Board</a>
+            </div>
+        </div>
+
+    </div>
+</footer>
+
+
+<!-- =========================================================
+     PAGE SCRIPTS
+========================================================= -->
+<script>
+/* =========================================================
+   GLOBAL STATE & CONSTANTS
+========================================================= */
+const BACKEND_URL = "http://localhost:8081";
+let allLoadedPlaces = [];
+let activeCategory = "ALL";
+
+// Curated high-res default places for instant visual excellence
+const defaultCuratedPlaces = [
+    {
+        placeId: 1,
+        placeName: "Shri Siddheshwar Temple",
+        category: "Religious",
+        subCategory: "Temple & Lake",
+        location: "Solapur City",
+        rating: 4.8,
+        reviewCount: 3200,
+        ticketPrice: 0,
+        description: "The historical heart of Solapur, dedicated to Lord Siddharameshwar, set serenely amidst the Siddheshwar Lake.",
+        imageUrl: "../public/images/Siddheshwar_temple_02.jpg.jpeg"
+    },
+    {
+        placeId: 2,
+        placeName: "Solapur Bhuikot Fort",
+        category: "Historical",
+        subCategory: "Fort",
+        location: "Killa, Solapur",
+        rating: 4.6,
+        reviewCount: 1800,
+        ticketPrice: 25,
+        description: "Medieval Bahmani & Adil Shahi ground-level fortification encircled by a massive double-walled moat.",
+        imageUrl: "../public/images/bhuikot.webp"
+    },
+    {
+        placeId: 3,
+        placeName: "Naldurg Fort & Pani Mahal",
+        category: "Historical",
+        subCategory: "Fort",
+        location: "Naldurg",
+        rating: 4.5,
+        reviewCount: 1450,
+        ticketPrice: 20,
+        description: "Famous for its fortified water dam architecture connecting two bastions across the scenic Bori River.",
+        imageUrl: "../public/images/Naldurg.jpg.jpeg"
+    },
+    {
+        placeId: 4,
+        placeName: "Akkalkot Swami Samarth Maharaj",
+        category: "Religious",
+        subCategory: "Pilgrimage",
+        location: "Akkalkot",
+        rating: 4.9,
+        reviewCount: 6200,
+        ticketPrice: 0,
+        description: "Spiritual pilgrimage center venerated by millions, dedicated to the 19th-century saint Shri Swami Samarth.",
+        imageUrl: "../public/images/SwamiSamarthTemple.avif"
+    },
+    {
+        placeId: 5,
+        placeName: "Kambar Lake & Bird Habitat",
+        category: "Nature",
+        subCategory: "Lake",
+        location: "Solapur",
+        rating: 4.2,
+        reviewCount: 640,
+        ticketPrice: 0,
+        description: "Tranquil freshwater wetland sanctuary popular for winter migratory birdwatching and morning nature walks.",
+        imageUrl: "../public/images/Kambar_Talav_01.JPG.jpeg"
+    },
+    {
+        placeId: 6,
+        placeName: "Gol Gumbad (Gol Gumbaz)",
+        category: "Historical",
+        subCategory: "Monument",
+        location: "Near Solapur Border",
+        rating: 4.7,
+        reviewCount: 2900,
+        ticketPrice: 25,
+        description: "World-renowned Adil Shahi mausoleum featuring one of the largest unsupported acoustic whispering domes.",
+        imageUrl: "../public/images/Gol_Gumat.JPG"
+    }
+];
+
+
+/* =========================================================
+   ESCAPE HTML UTILITY
+========================================================= */
+function escapeHtml(text) {
+    if (text == null) return "";
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================================
+   CLEAN & NORMALIZE IMAGE URL
+========================================================= */
+function sanitizeImageUrl(rawUrl, defaultFallback) {
+    if (!rawUrl) return defaultFallback;
+    let url = String(rawUrl).trim().replace(/["']/g, '');
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('/images/')) return `${BACKEND_URL}${url}`;
+    if (url.startsWith('../') || url.startsWith('./')) return url;
+    return `${BACKEND_URL}/${url.replace(/^\/+/, '')}`;
+}
+
+
+/* =========================================================
+   LOAD POPULAR PLACES FROM BACKEND (WITH FALLBACK)
+========================================================= */
+async function loadPopularPlaces() {
+    const grid = document.getElementById("placesGrid");
+    if (!grid) return;
+
+    try {
+        const response = await fetch(`${BACKEND_URL}/api/tourist-places`, {
+            cache: "no-store",
+            signal: AbortSignal.timeout(6000)
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (Array.isArray(data) && data.length > 0) {
+                // Filter out hidden places for popular section
+                const visiblePlaces = data.filter(p => !p.isHidden);
+                allLoadedPlaces = visiblePlaces.length > 0 ? visiblePlaces : data;
+            } else {
+                allLoadedPlaces = defaultCuratedPlaces;
+            }
+        } else {
+            allLoadedPlaces = defaultCuratedPlaces;
+        }
+    } catch (err) {
+        console.warn("Using curated fallback places:", err);
+        allLoadedPlaces = defaultCuratedPlaces;
+    }
+
+    renderPlacesCards(allLoadedPlaces);
+}
+
+
+/* =========================================================
+   RENDER PLACES CARDS
+========================================================= */
+function renderPlacesCards(placesToRender) {
+    const grid = document.getElementById("placesGrid");
+    if (!grid) return;
+
+    let filtered = placesToRender;
+    if (activeCategory !== "ALL") {
+        filtered = placesToRender.filter(p => {
+            const cat = (p.category || "").toLowerCase();
+            const sub = (p.subCategory || "").toLowerCase();
+            const target = activeCategory.toLowerCase();
+            return cat.includes(target) || sub.includes(target);
+        });
+    }
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full py-12 text-center text-slate-500">
+                <span class="material-symbols-outlined text-4xl text-slate-400">explore_off</span>
+                <p class="font-semibold text-base mt-2">No attractions found in this category.</p>
+                <button onclick="filterPlaces('ALL', document.querySelector('.place-tab-btn'))"
+                        class="mt-3 px-4 py-2 rounded-xl bg-teal-600 text-white text-xs font-bold">
+                    View All Attractions
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    // Render up to 6 top places
+    const displayList = filtered.slice(0, 6);
+
+    grid.innerHTML = displayList.map((place, index) => {
+        const placeName = place.placeName || place.name || "Attraction";
+        const category = place.category || "Sightseeing";
+        const location = place.location || "Solapur District";
+        const rating = Number(place.rating || 4.5).toFixed(1);
+        const reviewCount = place.reviewCount || 350;
+        const ticketPrice = place.ticketPrice != null ? (place.ticketPrice === 0 ? "Free Entry" : `₹${place.ticketPrice}`) : "Free";
+
+        const fallbackImg = defaultCuratedPlaces[index % defaultCuratedPlaces.length].imageUrl;
+        const imageUrl = sanitizeImageUrl(place.imageUrl, fallbackImg);
+
+        return `
+            <div class="card-lift bg-white rounded-3xl overflow-hidden border border-slate-200/90 shadow-sm flex flex-col group">
+                <!-- Image Box -->
+                <div class="relative h-56 overflow-hidden bg-slate-100">
+                    <img src="${imageUrl}"
+                         alt="${escapeHtml(placeName)}"
+                         onerror="this.src='${fallbackImg}'"
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+
+                    <!-- Category Badge -->
+                    <span class="absolute top-4 left-4 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-teal-300 font-bold text-xs shadow-sm">
+                        ${escapeHtml(category)}
+                    </span>
+
+                    <!-- Rating Pill -->
+                    <div class="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-md text-slate-900 font-extrabold text-xs shadow-sm flex items-center gap-1">
+                        <span class="text-amber-500">★</span>
+                        <span>${rating}</span>
+                        <span class="text-slate-400 text-[10px]">(${reviewCount})</span>
+                    </div>
+
+                    <div class="absolute bottom-3 right-3 px-2.5 py-0.5 rounded-lg bg-teal-600/90 backdrop-blur-md text-white font-bold text-xs shadow">
+                        ${ticketPrice}
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 flex-1 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-1.5 text-xs text-slate-500 mb-1.5">
+                            <span class="material-symbols-outlined text-sm text-teal-600">location_on</span>
+                            <span>${escapeHtml(location)}</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 font-heading group-hover:text-teal-600 transition-colors">
+                            ${escapeHtml(placeName)}
+                        </h3>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-2 line-clamp-2 leading-relaxed">
+                            ${escapeHtml(place.description || "Discover this signature destination in Solapur with rich history, sightseeing, and scenic vistas.")}
+                        </p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center gap-2">
+                        <button onclick="handleViewPlace(${place.placeId || index})"
+                                class="flex-1 py-3 rounded-xl bg-teal-50 hover:bg-teal-600 text-teal-700 hover:text-white font-bold text-xs text-center transition-all">
+                            View Details
+                        </button>
+                        <button onclick="handleAddToTrip(${place.placeId || index})"
+                                title="Add to Trip Planner"
+                                class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors shrink-0">
+                            <span class="material-symbols-outlined text-lg">bookmark_add</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+
+/* =========================================================
+   FILTER PLACES BY CATEGORY TAB
+========================================================= */
+function filterPlaces(category, buttonEl) {
+    activeCategory = category;
+    document.querySelectorAll('.place-tab-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-teal-600', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-700');
+    });
+
+    if (buttonEl) {
+        buttonEl.classList.remove('bg-white', 'text-slate-700');
+        buttonEl.classList.add('active', 'bg-teal-600', 'text-white');
+    }
+
+    renderPlacesCards(allLoadedPlaces);
+}
+
+
+/* =========================================================
+   HANDLE VIEW PLACE (NAVIGATE TO DETAILS)
+========================================================= */
+function handleViewPlace(placeId) {
+    const place = allLoadedPlaces.find(p => (p.placeId || p.id) == placeId) || defaultCuratedPlaces[0];
+    localStorage.setItem("selectedPlace", JSON.stringify(place));
+    window.location.href = "../kyoto_destination_details/kyoto_destination_details.html";
+}
+
+
+/* =========================================================
+   HANDLE ADD TO TRIP (NAVIGATE TO PLANNER)
+========================================================= */
+function handleAddToTrip(placeId) {
+    const place = allLoadedPlaces.find(p => (p.placeId || p.id) == placeId) || defaultCuratedPlaces[0];
+    localStorage.setItem("selectedPlace", JSON.stringify(place));
+    window.location.href = "../plan_my_trip/code.html";
+}
+
+
+/* =========================================================
+   MAIN SEARCH HANDLER
+========================================================= */
+function handleMainSearch(event) {
+    if (event) event.preventDefault();
+    const query = document.getElementById("journeySearch")?.value.trim() || "";
+    const category = document.getElementById("categoryFilter")?.value || "ALL";
+
+    let url = "../explore_destinations/explore_destinations.html";
+    const params = new URLSearchParams();
+    if (query) params.append("search", query);
+    if (category !== "ALL") params.append("category", category);
+
+    const queryString = params.toString();
+    if (queryString) url += "?" + queryString;
+
+    window.location.href = url;
+}
+
+
+/* Quick search helper */
+function quickSearch(term) {
+    const input = document.getElementById("journeySearch");
+    if (input) input.value = term;
+    handleMainSearch(null);
+}
+
+
+/* =========================================================
+   REAL-TIME WEATHER SERVICE (ROBUST FALLBACK ENGINE)
+========================================================= */
+async function loadHomeWeather() {
+    const refreshIcon = document.getElementById("refreshIcon");
+    const tempEl = document.getElementById("weather-temperature");
+    const feelsLikeEl = document.getElementById("weather-feels-like");
+    const condEl = document.getElementById("weather-condition-text");
+    const cityEl = document.getElementById("weather-city");
+    const humidityEl = document.getElementById("weather-humidity");
+    const windEl = document.getElementById("weather-wind");
+    const iconEl = document.getElementById("weather-icon");
+    const topbarWeather = document.getElementById("topbar-weather");
+    const errorEl = document.getElementById("weather-error");
+
+    if (refreshIcon) refreshIcon.classList.add("animate-spin");
+    if (tempEl) tempEl.textContent = "--°C";
+    if (condEl) condEl.textContent = "Updating live weather...";
+    if (errorEl) errorEl.classList.add("hidden");
+
+    let weatherData = null;
+
+    // 1. Try Spring Boot Backend on Port 8081
+    try {
+        const res = await fetch("http://localhost:8081/api/weather?city=Solapur", {
+            cache: "no-store",
+            signal: AbortSignal.timeout(4000)
+        });
+        if (res.ok) weatherData = await res.json();
+    } catch (e1) {
+        console.warn("Backend 8081 weather not reachable, trying Node server proxy...", e1);
+    }
+
+    // 2. Try Node weather proxy on /api/weather
+    if (!weatherData) {
+        try {
+            const res = await fetch("/api/weather?city=Solapur", {
+                cache: "no-store",
+                signal: AbortSignal.timeout(3000)
+            });
+            if (res.ok) weatherData = await res.json();
+        } catch (e2) {
+            console.warn("Node weather proxy not reachable, falling back to Open-Meteo...", e2);
+        }
+    }
+
+    // 3. Resilient Direct Weather Fallback (Open-Meteo Solapur coordinates)
+    if (!weatherData) {
+        try {
+            const res = await fetch("https://api.open-meteo.com/v1/forecast?latitude=17.6833&longitude=75.9167&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code,is_day&timezone=auto", {
+                signal: AbortSignal.timeout(5000)
+            });
+            if (res.ok) {
+                const om = await res.json();
+                weatherData = {
+                    name: "Solapur",
+                    sys: { country: "IN" },
+                    main: {
+                        temp: om.current?.temperature_2m,
+                        feels_like: om.current?.apparent_temperature,
+                        humidity: om.current?.relative_humidity_2m
+                    },
+                    wind: {
+                        speed: (om.current?.wind_speed_10m || 10) / 3.6
+                    },
+                    weather: [{
+                        main: om.current?.weather_code <= 2 ? "Clear" : (om.current?.weather_code <= 48 ? "Clouds" : "Rain"),
+                        description: om.current?.weather_code <= 2 ? "Clear Sky" : (om.current?.weather_code <= 48 ? "Partly Cloudy" : "Occasional Showers")
+                    }]
+                };
+            }
+        } catch (e3) {
+            console.error("All weather endpoints failed:", e3);
+        }
+    }
+
+    if (weatherData) {
+        const city = weatherData.name || weatherData.location?.city || "Solapur";
+        const country = weatherData.sys?.country || weatherData.location?.country || "IN";
+        const temp = weatherData.main?.temp ?? weatherData.current?.temperature ?? 30;
+        const feelsLike = weatherData.main?.feels_like ?? weatherData.current?.feelsLike;
+        const condition = weatherData.weather?.[0]?.main || weatherData.current?.description || "Clouds";
+        const description = weatherData.weather?.[0]?.description || weatherData.current?.description || condition;
+        const humidity = weatherData.main?.humidity ?? weatherData.current?.humidity ?? 45;
+        const rawWind = weatherData.wind?.speed ?? weatherData.current?.windKph ?? 4;
+        const windKmh = (weatherData.wind ? Number(rawWind) * 3.6 : Number(rawWind)).toFixed(1);
+
+        if (cityEl) cityEl.textContent = `${city}, ${country}`;
+        if (tempEl) tempEl.textContent = `${Math.round(Number(temp))}°C`;
+        if (feelsLikeEl && feelsLike != null) feelsLikeEl.textContent = `Feels like ${Math.round(Number(feelsLike))}°C`;
+        if (condEl) condEl.textContent = description.charAt(0).toUpperCase() + description.slice(1);
+        if (humidityEl) humidityEl.textContent = `${humidity}%`;
+        if (windEl) windEl.textContent = `${windKmh} km/h`;
+        if (topbarWeather) topbarWeather.textContent = `${Math.round(Number(temp))}°C · ${condition}`;
+
+        // Set Icon
+        if (iconEl) {
+            const condLower = condition.toLowerCase();
+            if (condLower.includes('rain')) iconEl.textContent = 'rainy';
+            else if (condLower.includes('cloud')) iconEl.textContent = 'cloud';
+            else if (condLower.includes('thunder')) iconEl.textContent = 'thunderstorm';
+            else iconEl.textContent = 'wb_sunny';
+        }
+    } else {
+        if (tempEl) tempEl.textContent = "32°C";
+        if (condEl) condEl.textContent = "Sunny & Warm";
+        if (topbarWeather) topbarWeather.textContent = "32°C · Sunny";
+        if (humidityEl) humidityEl.textContent = "42%";
+        if (windEl) windEl.textContent = "12 km/h";
+    }
+
+    if (refreshIcon) {
+        setTimeout(() => refreshIcon.classList.remove("animate-spin"), 600);
+    }
+}
+
+
+/* =========================================================
+   EVENT LISTENERS & STARTUP
+========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+    loadHomeWeather();
+    loadPopularPlaces();
+
+    // Mobile Menu Toggle
+    const mobileBtn = document.getElementById("mobileMenuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+    if (mobileBtn && mobileMenu) {
+        mobileBtn.addEventListener("click", () => {
+            mobileMenu.classList.toggle("hidden");
+        });
+    }
+
+    // Nav Search input Enter handler
+    document.getElementById("navSearchInput")?.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            const val = e.target.value.trim();
+            if (val) window.location.href = `../explore_destinations/explore_destinations.html?search=${encodeURIComponent(val)}`;
+        }
+    });
+
+    // Notification click
+    document.getElementById("notificationBtn")?.addEventListener("click", () => {
+        alert("TravelBuddy Alert:\n\nAll tourism systems, route maps, and weather proxies are operational!");
+    });
+});
+</script>
+
+<!-- Multilingual Support (i18n) -->
+<script src="../translations.js"></script>
+<script src="../i18n.js"></script>
+
+<!-- Shared Navigation System -->
+<script src="../navigation.js"></script>
+
+</body>
+</html>

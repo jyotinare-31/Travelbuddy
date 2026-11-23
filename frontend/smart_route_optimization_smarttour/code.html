@@ -1,0 +1,2653 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>TravelBuddy - Solapur Shortcut Route Optimization</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b'
+                        },
+                        tealAccent: {
+                            50: '#f0fdfa',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e'
+                        },
+                        origBlue: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8'
+                        },
+                        optGreen: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        heading: ['Montserrat', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+
+    <!-- Google Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+    <!-- Leaflet Map CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, .font-heading { font-family: 'Montserrat', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        #route-map {
+            width: 100%;
+            height: 100%;
+            min-height: 520px;
+            border-radius: 1.5rem;
+            z-index: 1;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        /* Custom Leaflet popup */
+        .leaflet-popup-content-wrapper {
+            border-radius: 1rem;
+            padding: 4px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.18);
+        }
+        .leaflet-popup-content {
+            font-family: 'Inter', sans-serif;
+            margin: 12px 14px;
+        }
+        /* Legend Swatches */
+        .legend-line-orig {
+            display: inline-block;
+            width: 28px;
+            height: 5px;
+            background-color: #2563eb;
+            border-radius: 2px;
+        }
+        .legend-line-opt {
+            display: inline-block;
+            width: 28px;
+            height: 5px;
+            background: repeating-linear-gradient(90deg, #059669 0px, #059669 6px, transparent 6px, transparent 10px);
+            border-radius: 2px;
+        }
+        /* Autocomplete dropdown styling */
+        .autocomplete-dropdown {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            max-height: 240px;
+            overflow-y: auto;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            z-index: 50;
+            margin-top: 4px;
+        }
+        .autocomplete-item {
+            padding: 8px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background 0.15s ease;
+        }
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+        .autocomplete-item:hover, .autocomplete-item.selected {
+            background: #f0fdf4;
+            color: #047857;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- ========================================================================= -->
+    <!-- NAVBAR -->
+    <!-- ========================================================================= -->
+    <header class="sticky top-0 z-50 glass-panel border-b border-slate-200/80 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="../smarttour_home_2/code.html" data-path="home" class="flex items-center gap-2 group">
+                    <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-brand-600 to-tealAccent-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20 group-hover:scale-105 transition-transform">
+                        <span class="material-symbols-outlined text-2xl">route</span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-heading font-extrabold text-2xl tracking-tight text-gray-900">Travel<span class="text-brand-600">Buddy</span></span>
+                            <span class="bg-tealAccent-50 text-tealAccent-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-tealAccent-200">ROUTES</span>
+                        </div>
+                        <span class="text-[11px] font-semibold text-gray-400 block -mt-1 tracking-wider uppercase">Solapur Tourism</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="hidden lg:flex items-center gap-6 text-sm font-semibold text-gray-600">
+                <a href="../smarttour_home_2/code.html" data-path="home" class="hover:text-brand-600 transition-colors">Home</a>
+                <a href="../explore_destinations/code.html" data-path="explore" class="hover:text-brand-600 transition-colors">Explore Destinations</a>
+                <a href="../ai_recommendations/code.html" data-path="ai-recommendations" class="hover:text-brand-600 transition-colors">AI Recommendations</a>
+                <a href="#" class="text-brand-600 font-bold border-b-2 border-brand-600 pb-1">Route Optimizer</a>
+                <a href="../plan_my_trip/code.html" data-path="plan-trip" class="hover:text-brand-600 transition-colors">Plan Trip</a>
+                <a href="../community_feed/code.html" data-path="community" class="hover:text-brand-600 transition-colors">Community</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <a href="../smarttour_home_2/code.html" data-path="home" class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">
+                    <span class="material-symbols-outlined text-lg">arrow_back</span>
+                    <span>Back to Home</span>
+                </a>
+                <a href="../ai_assistant/code.html" data-path="ai-assistant" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-brand-600 to-tealAccent-600 hover:from-brand-700 hover:to-tealAccent-700 rounded-xl shadow-md shadow-brand-600/20 transition-all">
+                    <span class="material-symbols-outlined text-lg">chat</span>
+                    <span>AI Assistant</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- HERO HEADER -->
+    <!-- ========================================================================= -->
+    <section class="bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white py-10 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-teal-300 text-xs font-semibold mb-3">
+                    <span class="material-symbols-outlined text-xs">compare_arrows</span>
+                    <span id="hero-badge-text">Single & Multiple Destination Modes • Solapur Regional Navigation</span>
+                </div>
+                <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight font-heading">
+                    Shortcut Route Optimization & Comparison
+                </h1>
+                <p class="mt-2 text-gray-300 text-sm sm:text-base max-w-2xl leading-relaxed" id="hero-desc-text">
+                    Choose <strong class="text-emerald-300">Single Destination</strong> for direct shortcut comparisons, or <strong class="text-amber-300">Multiple Destinations</strong> to organize and optimize multi-stop tourist circuits with the <strong class="text-emerald-300">Optimized Route (Green Dashed)</strong> vs <strong class="text-blue-300">Original Route (Blue Solid)</strong>.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+                <button type="button" id="save-route-btn" onclick="saveCurrentRoute()"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl text-sm font-bold backdrop-blur-md transition">
+                    <span class="material-symbols-outlined text-lg">bookmark</span>
+                    <span>Save Route</span>
+                </button>
+                <a id="ext-nav-btn" href="#" target="_blank" rel="noopener noreferrer"
+                    class="hidden inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-md shadow-emerald-500/20 transition">
+                    <span class="material-symbols-outlined text-lg">map</span>
+                    <span>Open in Google Maps</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- MAIN INTERACTIVE SECTION -->
+    <!-- ========================================================================= -->
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- STATUS / ALERT BOX -->
+        <div id="statusAlert" class="hidden mb-6 px-5 py-4 rounded-2xl flex items-start gap-3 text-sm shadow-sm">
+            <span class="material-symbols-outlined mt-0.5" id="statusAlertIcon">info</span>
+            <div class="flex-1">
+                <h4 class="font-bold" id="statusAlertTitle">Notice</h4>
+                <p class="mt-0.5" id="statusAlertMessage"></p>
+            </div>
+            <button onclick="hideAlert()" class="opacity-60 hover:opacity-100">
+                <span class="material-symbols-outlined text-base">close</span>
+            </button>
+        </div>
+
+        <!-- MAIN GRID: Route Inputs + Map + Summary -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- ============================================================= -->
+            <!-- LEFT PANEL: START & DESTINATION CONTROLS (5 cols) -->
+            <!-- ============================================================= -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+
+                <!-- Route Configurator Card -->
+                <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-100">
+                    <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                        <div>
+                            <span class="text-[11px] font-bold text-brand-600 uppercase tracking-wider block">Route Plan</span>
+                            <h2 class="text-xl font-extrabold text-slate-900 font-heading" id="panel-heading-text">Route Planner</h2>
+                        </div>
+                        <span id="route-ready-badge" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
+                            Select Points
+                        </span>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- 1. ROUTE PLANNING MODE SELECTOR (Single vs Multiple) -->
+                    <!-- ========================================================= -->
+                    <div class="mb-5 pb-4 border-b border-slate-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-sm text-brand-600">tune</span>
+                                <span>Route Planning Option:</span>
+                            </label>
+                            <span id="active-mode-label" class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                                Single Destination
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl">
+                            <!-- Option 1: Single Destination -->
+                            <button type="button" id="tab-mode-single" onclick="setRoutePlanningMode('single')"
+                                class="py-2.5 px-3 rounded-xl bg-white text-emerald-800 shadow-sm border border-emerald-300 font-bold text-xs flex flex-col items-start gap-0.5 transition-all">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-base text-emerald-600">arrow_forward</span>
+                                    <span class="font-extrabold text-slate-900">Single Destination</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500 font-normal">Start → Final Destination</span>
+                            </button>
+
+                            <!-- Option 2: Multiple Destinations -->
+                            <button type="button" id="tab-mode-multi" onclick="setRoutePlanningMode('multi')"
+                                class="py-2.5 px-3 rounded-xl text-slate-600 hover:text-slate-900 font-bold text-xs flex flex-col items-start gap-0.5 transition-all">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-base text-slate-500">alt_route</span>
+                                    <span class="font-extrabold text-slate-700">Multiple Destinations</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500 font-normal">Start → Multiple Stops → End</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- 2. STARTING DESTINATION -->
+                    <!-- ========================================================= -->
+                    <div class="space-y-2 relative">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shadow-sm"></span>
+                                <span>Starting Location:</span>
+                            </label>
+                            <span id="start-coords-display" class="text-[10px] font-mono font-medium text-slate-500">
+                                Not selected
+                            </span>
+                        </div>
+
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3 top-2.5 text-emerald-600 text-lg">trip_origin</span>
+                            <input type="text" id="start-search-input"
+                                placeholder="Search tourist place or enter city/address..."
+                                autocomplete="off"
+                                oninput="onLocationInput('start')"
+                                onfocus="onLocationFocus('start')"
+                                onkeydown="onLocationKeydown(event, 'start')"
+                                class="w-full pl-9 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 placeholder-slate-400"/>
+                            <button type="button" onclick="clearLocation('start')" id="start-clear-btn"
+                                class="hidden absolute right-3 top-2.5 text-slate-400 hover:text-slate-600">
+                                <span class="material-symbols-outlined text-base">close</span>
+                            </button>
+                            <!-- Autocomplete Dropdown -->
+                            <div id="start-autocomplete-dropdown" class="autocomplete-dropdown hidden"></div>
+                        </div>
+
+                        <!-- Start Quick Chips -->
+                        <div class="flex flex-wrap gap-1.5 items-center pt-1 text-[11px]">
+                            <span class="text-[10px] text-slate-400 font-semibold">Quick:</span>
+                            <button type="button" onclick="quickSelectLocation('start', 'Solapur Railway Station', 17.6698, 75.9178)"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-md border border-slate-200 transition">
+                                Solapur Station
+                            </button>
+                            <button type="button" onclick="quickSelectLocation('start', 'Siddharameshwar Temple', 17.6599, 75.9064)"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-md border border-slate-200 transition">
+                                Siddheshwar Temple
+                            </button>
+                            <button type="button" onclick="quickSelectLocation('start', 'Pune', 18.5204, 73.8567)"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-md border border-slate-200 transition">
+                                Pune
+                            </button>
+                            <button type="button" onclick="quickSelectLocation('start', 'Mumbai', 19.0760, 72.8777)"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 rounded-md border border-slate-200 transition">
+                                Mumbai
+                            </button>
+                            <button type="button" onclick="useDeviceGpsForStart()"
+                                class="px-2 py-0.5 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 rounded-md border border-emerald-300 font-semibold transition flex items-center gap-0.5">
+                                <span class="material-symbols-outlined text-[13px]">my_location</span>
+                                <span>Use GPS</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- 3. INTERMEDIATE DESTINATIONS (Multiple Destinations Mode) -->
+                    <!-- ========================================================= -->
+                    <div id="intermediate-destinations-section" class="hidden mt-4 pt-4 border-t border-slate-100 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-sm"></span>
+                                <span>Intermediate Destinations / Stops:</span>
+                            </label>
+                            <span id="intermediate-count-badge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+                                0 stops added
+                            </span>
+                        </div>
+
+                        <!-- Search & Add Intermediate Stop Input -->
+                        <div class="relative">
+                            <div class="flex gap-2">
+                                <div class="relative flex-1">
+                                    <span class="material-symbols-outlined absolute left-3 top-2.5 text-amber-600 text-lg">add_location_alt</span>
+                                    <input type="text" id="intermediate-search-input"
+                                        placeholder="Search tourist place or enter address to add..."
+                                        autocomplete="off"
+                                        oninput="onLocationInput('intermediate')"
+                                        onfocus="onLocationFocus('intermediate')"
+                                        onkeydown="onLocationKeydown(event, 'intermediate')"
+                                        class="w-full pl-9 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 placeholder-slate-400"/>
+                                    <button type="button" onclick="clearLocation('intermediate')" id="intermediate-clear-btn"
+                                        class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600">
+                                        <span class="material-symbols-outlined text-base">close</span>
+                                    </button>
+                                    <div id="intermediate-autocomplete-dropdown" class="autocomplete-dropdown hidden"></div>
+                                </div>
+                                <button type="button" id="add-stop-btn" onclick="addCurrentIntermediateStop()"
+                                    class="px-3.5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow-sm transition shrink-0">
+                                    <span class="material-symbols-outlined text-base">add</span>
+                                    <span>Add Stop</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quick Add Intermediate Chips -->
+                        <div class="flex flex-wrap gap-1.5 items-center pt-0.5 text-[11px]">
+                            <span class="text-[10px] text-slate-400 font-semibold">Quick Add:</span>
+                            <button type="button" onclick="quickAddIntermediate('Akkalkot Swami Samarth Maharaj Temple', 17.5255, 76.2052, 'Temple')"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-amber-50 hover:text-amber-800 rounded-md border border-slate-200 transition text-[11px]">
+                                + Akkalkot
+                            </button>
+                            <button type="button" onclick="quickAddIntermediate('Tuljapur Bhavani Temple', 18.0167, 76.0833, 'Temple')"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-amber-50 hover:text-amber-800 rounded-md border border-slate-200 transition text-[11px]">
+                                + Tuljapur
+                            </button>
+                            <button type="button" onclick="quickAddIntermediate('Pandharpur Vitthal Temple', 17.6775, 75.3275, 'Temple')"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-amber-50 hover:text-amber-800 rounded-md border border-slate-200 transition text-[11px]">
+                                + Pandharpur
+                            </button>
+                            <button type="button" onclick="quickAddIntermediate('Solapur Bhuikot Fort', 17.6744, 75.9080, 'Historical')"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-amber-50 hover:text-amber-800 rounded-md border border-slate-200 transition text-[11px]">
+                                + Bhuikot Fort
+                            </button>
+                            <button type="button" onclick="quickAddIntermediate('Great Indian Bustard Sanctuary', 17.6975, 75.8450, 'Wildlife')"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-amber-50 hover:text-amber-800 rounded-md border border-slate-200 transition text-[11px]">
+                                + Bustard Sanctuary
+                            </button>
+                        </div>
+
+                        <!-- Stops List with Reorder and Delete -->
+                        <div class="space-y-2 pt-1">
+                            <div class="flex items-center justify-between text-[11px] text-slate-500 font-semibold px-1">
+                                <span>Intermediate Stops Visiting Sequence:</span>
+                                <button type="button" onclick="clearAllIntermediateStops()" id="clear-all-stops-btn"
+                                    class="hidden text-rose-600 hover:text-rose-800 text-[11px] font-bold hover:underline">
+                                    Clear All
+                                </button>
+                            </div>
+                            <div id="intermediate-stops-list" class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SWAP BUTTON -->
+                    <div class="flex justify-center my-2.5">
+                        <button type="button" id="swap-locations-btn" onclick="swapLocations()" title="Swap Starting and Final Destination"
+                            class="p-2 rounded-full bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 border border-slate-200 transition text-slate-600 shadow-xs flex items-center justify-center">
+                            <span class="material-symbols-outlined text-lg">swap_vert</span>
+                        </button>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- 4. FINAL DESTINATION -->
+                    <!-- ========================================================= -->
+                    <div class="space-y-2 relative">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block shadow-sm"></span>
+                                <span>Final Destination:</span>
+                            </label>
+                            <span id="end-coords-display" class="text-[10px] font-mono font-medium text-slate-500">
+                                Not selected
+                            </span>
+                        </div>
+
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3 top-2.5 text-rose-600 text-lg">location_on</span>
+                            <input type="text" id="end-search-input"
+                                placeholder="Search destination or enter city/address..."
+                                autocomplete="off"
+                                oninput="onLocationInput('end')"
+                                onfocus="onLocationFocus('end')"
+                                onkeydown="onLocationKeydown(event, 'end')"
+                                class="w-full pl-9 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-rose-500 placeholder-slate-400"/>
+                            <button type="button" onclick="clearLocation('end')" id="end-clear-btn"
+                                class="hidden absolute right-3 top-2.5 text-slate-400 hover:text-slate-600">
+                                <span class="material-symbols-outlined text-base">close</span>
+                            </button>
+                            <!-- Autocomplete Dropdown -->
+                            <div id="end-autocomplete-dropdown" class="autocomplete-dropdown hidden"></div>
+                        </div>
+
+                        <!-- End Quick Chips -->
+                        <div class="flex flex-wrap gap-1.5 items-center pt-1 text-[11px]">
+                            <span class="text-[10px] text-slate-400 font-semibold">Quick:</span>
+                            <button type="button" onclick="quickSelectLocation('end', 'Pune', 18.5204, 73.8567)"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 rounded-md border border-slate-200 transition">
+                                Pune
+                            </button>
+                            <button type="button" onclick="quickSelectLocation('end', 'Solapur Bhuikot Fort', 17.6744, 75.9080)"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 rounded-md border border-slate-200 transition">
+                                Bhuikot Fort
+                            </button>
+                            <button type="button" onclick="quickSelectLocation('end', 'Pandharpur Vitthal Temple', 17.6775, 75.3275)"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 rounded-md border border-slate-200 transition">
+                                Pandharpur
+                            </button>
+                            <button type="button" onclick="quickSelectLocation('end', 'Akkalkot Swami Samarth Maharaj Temple', 17.5255, 76.2052)"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 rounded-md border border-slate-200 transition">
+                                Akkalkot
+                            </button>
+                            <button type="button" onclick="quickSelectLocation('end', 'Solapur Railway Station', 17.6698, 75.9178)"
+                                class="px-2 py-0.5 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 rounded-md border border-slate-200 transition">
+                                Solapur Station
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- 5. TRANSPORT MODE & OPTIMIZATION OBJECTIVE -->
+                    <!-- ========================================================= -->
+                    <div class="mt-5 pt-4 border-t border-slate-100 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Transport Mode</span>
+                            <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Optimization Goal</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <!-- Transport Mode Selector -->
+                            <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl">
+                                <button type="button" onclick="setTransportMode('car')" id="mode-btn-car"
+                                    class="py-1.5 px-2 rounded-lg bg-white text-emerald-700 shadow-xs text-xs font-bold flex flex-col items-center gap-0.5 transition">
+                                    <span class="material-symbols-outlined text-base">directions_car</span>
+                                    <span class="text-[10px]">Car</span>
+                                </button>
+                                <button type="button" onclick="setTransportMode('walk')" id="mode-btn-walk"
+                                    class="py-1.5 px-2 rounded-lg text-slate-600 text-xs font-bold flex flex-col items-center gap-0.5 transition">
+                                    <span class="material-symbols-outlined text-base">directions_walk</span>
+                                    <span class="text-[10px]">Walk</span>
+                                </button>
+                                <button type="button" onclick="setTransportMode('bike')" id="mode-btn-bike"
+                                    class="py-1.5 px-2 rounded-lg text-slate-600 text-xs font-bold flex flex-col items-center gap-0.5 transition">
+                                    <span class="material-symbols-outlined text-base">pedal_bike</span>
+                                    <span class="text-[10px]">Bike</span>
+                                </button>
+                            </div>
+
+                            <!-- Objective Selector -->
+                            <div class="grid grid-cols-2 gap-1 bg-slate-100 p-1 rounded-xl">
+                                <button type="button" onclick="setOptimizationObjective('distance')" id="obj-btn-dist"
+                                    class="py-1.5 px-2 rounded-lg bg-white text-emerald-700 shadow-xs text-xs font-bold flex flex-col items-center gap-0.5 transition">
+                                    <span class="material-symbols-outlined text-base">straighten</span>
+                                    <span class="text-[10px]">Shortcut</span>
+                                </button>
+                                <button type="button" onclick="setOptimizationObjective('time')" id="obj-btn-time"
+                                    class="py-1.5 px-2 rounded-lg text-slate-600 text-xs font-bold flex flex-col items-center gap-0.5 transition">
+                                    <span class="material-symbols-outlined text-base">timer</span>
+                                    <span class="text-[10px]">Fastest</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- OPTIMIZE ROUTE BUTTON -->
+                        <button type="button" id="optimize-btn" onclick="executeRouteOptimization()"
+                            class="w-full mt-4 py-3.5 px-4 bg-gradient-to-r from-brand-600 to-tealAccent-600 hover:from-brand-700 hover:to-tealAccent-700 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/20 transition-all flex items-center justify-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span class="material-symbols-outlined text-lg" id="optimize-spinner">compare_arrows</span>
+                            <span id="optimize-btn-text">Optimize Route</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 6. COMPARISON QUICK STATS CARD -->
+                <div id="savings-summary-card" class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-6 shadow-xl border border-slate-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-bold uppercase tracking-wider text-teal-400">Route Comparison Metrics</span>
+                        <span id="status-badge" class="px-2.5 py-0.5 rounded-full bg-slate-700 text-slate-300 text-[11px] font-semibold">
+                            Ready to Optimize
+                        </span>
+                    </div>
+
+                    <!-- Comparison Delta Highlights -->
+                    <div class="grid grid-cols-2 gap-4 pb-4 border-b border-slate-700">
+                        <div class="bg-white/5 rounded-2xl p-3 border border-white/10">
+                            <span class="text-[11px] text-gray-400 uppercase tracking-wider block">Distance Difference</span>
+                            <p id="savings-dist-badge" class="text-xl font-extrabold text-teal-300 font-heading mt-1">--</p>
+                            <span id="savings-dist-sub" class="text-[10px] text-gray-400 block mt-0.5">Original vs Optimized</span>
+                        </div>
+                        <div class="bg-white/5 rounded-2xl p-3 border border-white/10">
+                            <span class="text-[11px] text-gray-400 uppercase tracking-wider block">Time Difference</span>
+                            <p id="savings-time-badge" class="text-xl font-extrabold text-teal-300 font-heading mt-1">--</p>
+                            <span id="savings-time-sub" class="text-[10px] text-gray-400 block mt-0.5">Travel time delta</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 space-y-2 text-xs">
+                        <div class="flex items-center justify-between text-gray-300">
+                            <span>🔵 Original Distance:</span>
+                            <span id="card-orig-dist" class="font-bold text-blue-300">-- km</span>
+                        </div>
+                        <div class="flex items-center justify-between text-gray-300">
+                            <span>🟢 Optimized Distance:</span>
+                            <span id="card-opt-dist" class="font-bold text-emerald-300">-- km</span>
+                        </div>
+                        <div class="flex items-center justify-between text-gray-300">
+                            <span>Route Status:</span>
+                            <span id="card-opt-status" class="font-bold text-gray-200">Awaiting input</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- RIGHT PANEL: INTERACTIVE MAP & COMPARISON PANELS (7 cols) -->
+            <!-- ============================================================= -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+
+                <!-- Interactive Leaflet Map Container -->
+                <div class="bg-white rounded-3xl p-5 shadow-md border border-slate-100 flex flex-col relative overflow-hidden">
+
+                    <!-- Top Map Header: Legend & Filter Toggles -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-brand-600 text-xl">map</span>
+                            <h3 class="font-heading font-extrabold text-base text-slate-900" id="map-header-title">Interactive Route Map</h3>
+                        </div>
+
+                        <!-- Map View Controls -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="inline-flex rounded-xl bg-slate-100 p-1 text-xs font-bold shadow-inner">
+                                <button type="button" id="ctrl-view-both" onclick="setRouteDisplayMode('both')"
+                                    class="px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm transition">
+                                    👁️ Both Routes
+                                </button>
+                                <button type="button" id="ctrl-view-orig" onclick="setRouteDisplayMode('orig')"
+                                    class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-blue-700 transition">
+                                    🔵 Original Only
+                                </button>
+                                <button type="button" id="ctrl-view-opt" onclick="setRouteDisplayMode('opt')"
+                                    class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-emerald-700 transition">
+                                    🟢 Optimized Only
+                                </button>
+                            </div>
+
+                            <button type="button" onclick="fitMapBounds()" title="Fit Map to Bounds"
+                                class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                                <span class="material-symbols-outlined text-base">crop_free</span>
+                                <span class="hidden sm:inline">Fit</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Legend Swatches Bar -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 px-1 py-1 mb-2 text-xs font-semibold">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="flex items-center gap-2 bg-blue-50/70 text-blue-900 px-3 py-1 rounded-lg border border-blue-200/60">
+                                <span class="legend-line-orig"></span>
+                                <span id="legend-orig-label">Original Route (Solid Blue)</span>
+                                <span id="legend-orig-metric" class="font-extrabold text-blue-700 ml-1">--</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-emerald-50/70 text-emerald-900 px-3 py-1 rounded-lg border border-emerald-200/60">
+                                <span class="legend-line-opt"></span>
+                                <span id="legend-opt-label">Optimized Route (Dashed Green)</span>
+                                <span id="legend-opt-metric" class="font-extrabold text-emerald-700 ml-1">--</span>
+                            </div>
+                        </div>
+
+                        <div class="text-[11px] text-slate-400">
+                            Markers: <span class="font-bold text-emerald-600">Start (🟢)</span> · <span class="font-bold text-amber-600">Stops (🟡 1, 2, ...)</span> · <span class="font-bold text-rose-600">End (🔴)</span>
+                        </div>
+                    </div>
+
+                    <!-- Map Canvas -->
+                    <div class="w-full relative h-[520px] rounded-2xl overflow-hidden shadow-inner bg-slate-100">
+                        <div id="route-map"></div>
+                    </div>
+                </div>
+
+                <!-- ========================================================= -->
+                <!-- ROUTE COMPARISON & ANALYSIS PANEL -->
+                <!-- ========================================================= -->
+                <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-100">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 mb-5 gap-3">
+                        <div>
+                            <span class="text-[11px] font-bold text-brand-600 uppercase tracking-wider block" id="comparison-mode-tag">Single Destination Comparison</span>
+                            <h3 class="text-xl font-extrabold text-slate-900 font-heading" id="comparison-title-text">Original vs. Optimized Route</h3>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="comparison-badge" class="px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold">
+                                Ready to optimize
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- VISITING SEQUENCE TIMELINES (Visible in Multiple Destinations Mode) -->
+                    <div id="visiting-sequence-card" class="hidden mb-5 p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                            <div>
+                                <span class="text-[10px] font-bold text-amber-600 uppercase tracking-wider block">Itinerary Route Comparison</span>
+                                <h4 class="font-heading font-extrabold text-sm text-slate-900">Visiting Order: Original vs. Optimized Sequence</h4>
+                            </div>
+                            <span id="order-reorganized-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-700">
+                                Awaiting Sequence
+                            </span>
+                        </div>
+
+                        <!-- Original Sequence Flow -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-blue-700">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                                <span>Original Visiting Order (Solid Blue)</span>
+                            </div>
+                            <div id="orig-sequence-flow" class="flex flex-wrap items-center gap-1.5 p-3 rounded-xl bg-blue-50/70 border border-blue-200 text-xs">
+                                <span class="text-slate-400 italic">No sequence calculated yet</span>
+                            </div>
+                        </div>
+
+                        <!-- Optimized Sequence Flow -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                                <span>Optimized Visiting Order (Dashed Green)</span>
+                            </div>
+                            <div id="opt-sequence-flow" class="flex flex-wrap items-center gap-1.5 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200 text-xs">
+                                <span class="text-slate-400 italic">No sequence calculated yet</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3 Comparison Metric Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+
+                        <!-- Original Route Summary Card -->
+                        <div class="p-5 rounded-2xl bg-blue-50/80 border border-blue-200/80 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-extrabold uppercase tracking-wider text-blue-700 flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                                        Original Route
+                                    </span>
+                                    <span class="text-[10px] font-bold bg-blue-200/80 text-blue-900 px-2 py-0.5 rounded-md">Solid Blue</span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="text-xs text-blue-600 block">Total Distance</span>
+                                    <h4 id="comp-orig-dist" class="text-2xl font-black text-blue-900 font-heading">-- km</h4>
+                                </div>
+                                <div class="mt-3">
+                                    <span class="text-xs text-blue-600 block">Estimated Travel Time</span>
+                                    <p id="comp-orig-dur" class="text-lg font-bold text-blue-900">-- min</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-blue-200/60 text-xs text-blue-800 flex items-center justify-between">
+                                <span id="comp-orig-from-to">Normal Route</span>
+                                <span class="text-[11px] font-semibold text-blue-600">Primary Path</span>
+                            </div>
+                        </div>
+
+                        <!-- Optimized Route Summary Card -->
+                        <div class="p-5 rounded-2xl bg-emerald-50/80 border border-emerald-200/80 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-700 flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                                        Optimized Route
+                                    </span>
+                                    <span id="comp-opt-badge-tag" class="text-[10px] font-bold bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded-md">Dashed Green</span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="text-xs text-emerald-600 block">Total Distance</span>
+                                    <h4 id="comp-opt-dist" class="text-2xl font-black text-emerald-900 font-heading">-- km</h4>
+                                </div>
+                                <div class="mt-3">
+                                    <span class="text-xs text-emerald-600 block">Estimated Travel Time</span>
+                                    <p id="comp-opt-dur" class="text-lg font-bold text-emerald-900">-- min</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-emerald-200/60 text-xs text-emerald-800 flex items-center justify-between">
+                                <span id="comp-opt-source-label">Optimized Path</span>
+                                <span class="text-[11px] font-bold text-emerald-700" id="comp-opt-status-tag">Shortcut</span>
+                            </div>
+                        </div>
+
+                        <!-- Comparison / Savings Difference Card -->
+                        <div class="p-5 rounded-2xl bg-slate-900 text-white border border-slate-800 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-extrabold uppercase tracking-wider text-teal-300 flex items-center gap-1.5">
+                                        <span class="material-symbols-outlined text-sm">savings</span>
+                                        Savings Delta
+                                    </span>
+                                    <span id="delta-status-pill" class="text-[10px] font-bold bg-slate-800 text-slate-300 px-2 py-0.5 rounded-md">Comparison</span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="text-xs text-slate-400 block">Distance Difference</span>
+                                    <h4 id="comp-diff-dist" class="text-2xl font-black text-teal-300 font-heading">-- km</h4>
+                                </div>
+                                <div class="mt-3">
+                                    <span class="text-xs text-slate-400 block">Travel Time Difference</span>
+                                    <p id="comp-diff-dur" class="text-lg font-bold text-teal-300">-- min</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-800 text-xs text-slate-300 flex items-center justify-between">
+                                <span id="comp-diff-note">No comparison yet</span>
+                                <span class="material-symbols-outlined text-teal-400 text-sm">analytics</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- No Alternative Route Message Banner -->
+                    <div id="no-alternative-banner" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-center gap-3 text-xs sm:text-sm">
+                        <span class="material-symbols-outlined text-amber-600 text-xl" id="no-alt-icon">info</span>
+                        <div>
+                            <strong id="no-alt-title">No alternative route is available for optimization.</strong>
+                            <p class="text-xs text-amber-700 mt-0.5" id="no-alt-desc">The primary route displayed is the only available road path between these two points.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- FOOTER -->
+    <!-- ========================================================================= -->
+    <footer class="bg-slate-900 text-gray-400 pt-12 pb-8 mt-16 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pb-6 border-b border-slate-800 text-xs">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white">
+                        <span class="material-symbols-outlined text-base">route</span>
+                    </div>
+                    <span class="font-heading font-bold text-white text-sm">TravelBuddy Solapur</span>
+                </div>
+                <div class="flex gap-6">
+                    <a href="../smarttour_home_2/code.html" data-path="home" class="hover:text-white transition">Home</a>
+                    <a href="../explore_destinations/code.html" data-path="explore" class="hover:text-white transition">Explore</a>
+                    <a href="../ai_recommendations/code.html" data-path="ai-recommendations" class="hover:text-white transition">AI Recommendations</a>
+                    <a href="../plan_my_trip/code.html" data-path="plan-trip" class="hover:text-white transition">Plan Trip</a>
+                </div>
+            </div>
+            <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-gray-500">
+                <p>© 2026 TravelBuddy Solapur. Single & Multiple Destinations Route Optimization (Blue Solid vs Green Dashed).</p>
+                <p>PostgreSQL Tourist Places & OpenStreetMap Road Geometry.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================================================= -->
+    <!-- JAVASCRIPT: SHORTCUT ROUTE OPTIMIZATION ENGINE -->
+    <!-- ========================================================================= -->
+    <script>
+        const BACKEND_URL = "http://localhost:8081";
+
+        // Regional lookup cache for instant local & external city resolution
+        const REGIONAL_CITY_CACHE = {
+            "pune": { name: "Pune, Maharashtra", lat: 18.5204, lng: 73.8567 },
+            "pune city": { name: "Pune City, Maharashtra", lat: 18.5204, lng: 73.8567 },
+            "mumbai": { name: "Mumbai, Maharashtra", lat: 19.0760, lng: 72.8777 },
+            "hyderabad": { name: "Hyderabad, Telangana", lat: 17.3850, lng: 78.4867 },
+            "solapur": { name: "Solapur, Maharashtra", lat: 17.6599, lng: 75.9064 },
+            "solapur station": { name: "Solapur Railway Station", lat: 17.6698, lng: 75.9178 },
+            "solapur railway station": { name: "Solapur Railway Station", lat: 17.6698, lng: 75.9178 },
+            "solapur bus stand": { name: "Solapur Central Bus Stand", lat: 17.6644, lng: 75.9142 },
+            "pandharpur": { name: "Pandharpur, Solapur", lat: 17.6775, lng: 75.3275 },
+            "akkalkot": { name: "Akkalkot, Solapur", lat: 17.5255, lng: 76.2052 },
+            "tuljapur": { name: "Tuljapur, Maharashtra", lat: 18.0167, lng: 76.0833 },
+            "barshi": { name: "Barshi, Solapur", lat: 18.2325, lng: 75.6946 },
+            "kurduvadi": { name: "Kurduvadi, Solapur", lat: 18.0833, lng: 75.4333 },
+            "kolhapur": { name: "Kolhapur, Maharashtra", lat: 16.7050, lng: 74.2433 },
+            "sangli": { name: "Sangli, Maharashtra", lat: 16.8524, lng: 74.5815 },
+            "satara": { name: "Satara, Maharashtra", lat: 17.6805, lng: 73.9972 },
+            "vijayapura": { name: "Vijayapura (Bijapur), Karnataka", lat: 16.8302, lng: 75.7100 },
+            "bijapur": { name: "Vijayapura (Bijapur), Karnataka", lat: 16.8302, lng: 75.7100 }
+        };
+
+        // =========================================================================
+        // APPLICATION STATE
+        // =========================================================================
+        let routePlanningMode = "single"; // 'single' or 'multi'
+        let allDatabasePlaces = [];
+        let startLocation = { name: "", lat: null, lng: null };
+        let endLocation = { name: "", lat: null, lng: null };
+        let intermediateStops = []; // Array of { id, name, location, category, lat, lng }
+        let currentTransportMode = "car";
+        let currentObjective = "distance"; // "distance" (shortcut) or "time"
+
+        // Active Route Comparison Results
+        let lastComparisonResponse = null;
+        let currentDisplayMode = "both"; // 'both', 'orig', 'opt'
+
+        // Leaflet Map & Layer Groups
+        let map = null;
+        let originalRouteLayerGroup = null;
+        let optimizedRouteLayerGroup = null;
+        let markerLayerGroup = null;
+
+        // Debounce timer for autocomplete search
+        let autocompleteDebounceTimer = null;
+
+        // =========================================================================
+        // INITIALIZATION
+        // =========================================================================
+        document.addEventListener("DOMContentLoaded", () => {
+            initLeafletMap();
+            loadTouristPlaces();
+            setupClickOutside();
+            initDefaultLocations();
+            renderIntermediateStopsList();
+            validateInputsState();
+        });
+
+        function initLeafletMap() {
+            if (map) return;
+
+            // Default center: Solapur City (17.6599, 75.9064)
+            map = L.map("route-map", {
+                zoomControl: true,
+                attributionControl: true
+            }).setView([17.6599, 75.9064], 12);
+
+            L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+            }).addTo(map);
+
+            originalRouteLayerGroup = L.layerGroup().addTo(map);
+            optimizedRouteLayerGroup = L.layerGroup().addTo(map);
+            markerLayerGroup = L.layerGroup().addTo(map);
+
+            setTimeout(() => { map.invalidateSize(); }, 300);
+        }
+
+        async function loadTouristPlaces() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/tourist-places`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (Array.isArray(data)) {
+                        allDatabasePlaces = data.filter(p => {
+                            const lat = Number(p.latitude);
+                            const lng = Number(p.longitude);
+                            return Number.isFinite(lat) && Number.isFinite(lng);
+                        });
+                    }
+                }
+            } catch (e) {
+                console.warn("Could not fetch tourist places from backend:", e.message);
+            }
+        }
+
+        function initDefaultLocations() {
+            // Check localStorage if user arrived from a destination card
+            const savedItem = localStorage.getItem("selectedPlaceForTrip") || localStorage.getItem("selectedPlace");
+            if (savedItem) {
+                try {
+                    const parsed = JSON.parse(savedItem);
+                    if (parsed && parsed.placeName && parsed.latitude && parsed.longitude) {
+                        setLocation('end', parsed.placeName, Number(parsed.latitude), Number(parsed.longitude));
+                    }
+                } catch (e) {}
+            }
+
+            // Default Start: Solapur Railway Station
+            if (!startLocation.lat) {
+                setLocation('start', 'Solapur Railway Station', 17.6698, 75.9178);
+            }
+
+            // Default Destination: Pune (regional destination) or Siddheshwar
+            if (!endLocation.lat) {
+                setLocation('end', 'Pune, Maharashtra', 18.5204, 73.8567);
+            }
+        }
+
+        // =========================================================================
+        // MODE SELECTION: SINGLE VS MULTIPLE DESTINATIONS
+        // =========================================================================
+        function setRoutePlanningMode(mode) {
+            routePlanningMode = mode;
+            hideAlert();
+
+            const tabSingle = document.getElementById("tab-mode-single");
+            const tabMulti = document.getElementById("tab-mode-multi");
+            const modeLabel = document.getElementById("active-mode-label");
+            const intermediateSection = document.getElementById("intermediate-destinations-section");
+            const panelHeading = document.getElementById("panel-heading-text");
+            const optBtnText = document.getElementById("optimize-btn-text");
+            const legendOrigLabel = document.getElementById("legend-orig-label");
+            const legendOptLabel = document.getElementById("legend-opt-label");
+            const comparisonModeTag = document.getElementById("comparison-mode-tag");
+            const visitingSequenceCard = document.getElementById("visiting-sequence-card");
+
+            const activeSingleClass = "py-2.5 px-3 rounded-xl bg-white text-emerald-800 shadow-sm border border-emerald-300 font-bold text-xs flex flex-col items-start gap-0.5 transition-all";
+            const activeMultiClass = "py-2.5 px-3 rounded-xl bg-white text-amber-800 shadow-sm border border-amber-300 font-bold text-xs flex flex-col items-start gap-0.5 transition-all";
+            const inactiveClass = "py-2.5 px-3 rounded-xl text-slate-600 hover:text-slate-900 font-bold text-xs flex flex-col items-start gap-0.5 transition-all";
+
+            if (mode === "single") {
+                tabSingle.className = activeSingleClass;
+                tabMulti.className = inactiveClass;
+                modeLabel.textContent = "Single Destination";
+                modeLabel.className = "text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200";
+                intermediateSection.classList.add("hidden");
+                panelHeading.textContent = "Find Shortcut Route";
+                optBtnText.textContent = "Optimize Route";
+                legendOrigLabel.textContent = "Original Route (Solid Blue)";
+                legendOptLabel.textContent = "Optimized Shortcut (Dashed Green)";
+                comparisonModeTag.textContent = "Single Destination Comparison";
+                if (visitingSequenceCard) visitingSequenceCard.classList.add("hidden");
+            } else {
+                tabSingle.className = inactiveClass;
+                tabMulti.className = activeMultiClass;
+                modeLabel.textContent = "Multiple Destinations";
+                modeLabel.className = "text-[11px] font-bold text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200";
+                intermediateSection.classList.remove("hidden");
+                panelHeading.textContent = "Optimize Multi-Stop Route";
+                optBtnText.textContent = "Optimize Visiting Order & Route";
+                legendOrigLabel.textContent = "Original Visiting Order (Solid Blue)";
+                legendOptLabel.textContent = "Optimized Visiting Order (Dashed Green)";
+                comparisonModeTag.textContent = "Multiple Destinations Comparison";
+                if (lastComparisonResponse && lastComparisonResponse.isMultiStop) {
+                    if (visitingSequenceCard) visitingSequenceCard.classList.remove("hidden");
+                }
+            }
+
+            validateInputsState();
+        }
+
+        // =========================================================================
+        // INTERMEDIATE DESTINATIONS MANAGEMENT
+        // =========================================================================
+        function addIntermediateStop(place) {
+            hideAlert();
+
+            if (!place || !place.lat || !place.lng) {
+                showAlert("warning", "Invalid Location", "Please select a valid intermediate destination with coordinates.");
+                return;
+            }
+
+            // Prevent duplicate stops
+            const isDuplicate = intermediateStops.some(s =>
+                (Math.abs(s.lat - place.lat) < 0.001 && Math.abs(s.lng - place.lng) < 0.001) ||
+                (s.name.toLowerCase() === place.name.toLowerCase())
+            );
+
+            if (isDuplicate) {
+                showAlert("warning", "Duplicate Destination", `"${place.name}" is already in your intermediate stops list.`);
+                return;
+            }
+
+            // Check if matches start or end
+            if (startLocation.lat && Math.abs(startLocation.lat - place.lat) < 0.001 && Math.abs(startLocation.lng - place.lng) < 0.001) {
+                showAlert("warning", "Location Matches Start", `"${place.name}" is already selected as the starting point.`);
+                return;
+            }
+            if (endLocation.lat && Math.abs(endLocation.lat - place.lat) < 0.001 && Math.abs(endLocation.lng - place.lng) < 0.001) {
+                showAlert("warning", "Location Matches Final", `"${place.name}" is already selected as the final destination.`);
+                return;
+            }
+
+            intermediateStops.push({
+                id: place.id || Date.now(),
+                name: place.name,
+                location: place.location || place.subtext || "Solapur District",
+                category: place.category || "Destination",
+                lat: Number(place.lat),
+                lng: Number(place.lng)
+            });
+
+            // Clear input & dropdown
+            const input = document.getElementById("intermediate-search-input");
+            if (input) input.value = "";
+            const clearBtn = document.getElementById("intermediate-clear-btn");
+            if (clearBtn) clearBtn.classList.add("hidden");
+            hideDropdown("intermediate");
+
+            renderIntermediateStopsList();
+            validateInputsState();
+            showAlert("success", "Stop Added", `Added "${place.name}" to intermediate visiting list (Stop #${intermediateStops.length}).`);
+        }
+
+        function quickAddIntermediate(name, lat, lng, category) {
+            addIntermediateStop({
+                name: name,
+                category: category || "Tourist Destination",
+                lat: lat,
+                lng: lng
+            });
+        }
+
+        function addCurrentIntermediateStop() {
+            const input = document.getElementById("intermediate-search-input");
+            const query = (input ? input.value : "").trim();
+            if (!query) {
+                showAlert("info", "Enter Destination", "Please enter a destination name or select one from quick recommendations.");
+                return;
+            }
+
+            // Look in database places
+            const lowerQuery = query.toLowerCase();
+            const matchedDb = allDatabasePlaces.find(p =>
+                (p.placeName && p.placeName.toLowerCase().includes(lowerQuery)) ||
+                (p.location && p.location.toLowerCase().includes(lowerQuery))
+            );
+
+            if (matchedDb) {
+                addIntermediateStop({
+                    id: matchedDb.placeId,
+                    name: matchedDb.placeName,
+                    location: matchedDb.location,
+                    category: matchedDb.category,
+                    lat: Number(matchedDb.latitude),
+                    lng: Number(matchedDb.longitude)
+                });
+                return;
+            }
+
+            // Look in regional cache
+            for (const key in REGIONAL_CITY_CACHE) {
+                if (key.includes(lowerQuery) || lowerQuery.includes(key)) {
+                    const city = REGIONAL_CITY_CACHE[key];
+                    addIntermediateStop({
+                        name: city.name,
+                        location: "Regional City",
+                        category: "City",
+                        lat: city.lat,
+                        lng: city.lng
+                    });
+                    return;
+                }
+            }
+
+            // Fallback to online geocoder
+            resolveFreeAddress('intermediate');
+        }
+
+        function removeIntermediateStop(index) {
+            if (index >= 0 && index < intermediateStops.length) {
+                const removed = intermediateStops.splice(index, 1);
+                renderIntermediateStopsList();
+                validateInputsState();
+                if (removed.length > 0) {
+                    showAlert("info", "Stop Removed", `Removed "${removed[0].name}" from intermediate stops.`);
+                }
+            }
+        }
+
+        function moveIntermediateStop(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= intermediateStops.length) return;
+
+            const temp = intermediateStops[index];
+            intermediateStops[index] = intermediateStops[newIndex];
+            intermediateStops[newIndex] = temp;
+
+            renderIntermediateStopsList();
+            validateInputsState();
+        }
+
+        function clearAllIntermediateStops() {
+            if (intermediateStops.length === 0) return;
+            intermediateStops = [];
+            renderIntermediateStopsList();
+            validateInputsState();
+            showAlert("info", "Stops Cleared", "All intermediate destinations have been cleared.");
+        }
+
+        function renderIntermediateStopsList() {
+            const listEl = document.getElementById("intermediate-stops-list");
+            const badgeEl = document.getElementById("intermediate-count-badge");
+            const clearBtn = document.getElementById("clear-all-stops-btn");
+
+            if (!listEl) return;
+
+            const count = intermediateStops.length;
+            if (badgeEl) {
+                badgeEl.textContent = `${count} ${count === 1 ? 'stop' : 'stops'} added`;
+                badgeEl.className = count >= 2
+                    ? "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200"
+                    : count === 1
+                    ? "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200"
+                    : "text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200";
+            }
+
+            if (clearBtn) {
+                clearBtn.classList.toggle("hidden", count === 0);
+            }
+
+            if (count === 0) {
+                listEl.innerHTML = `
+                    <div class="p-3.5 rounded-xl border border-dashed border-slate-200 text-center text-xs text-slate-400">
+                        <span class="material-symbols-outlined text-xl text-slate-300 block mb-1">add_road</span>
+                        <span>No intermediate stops added yet.</span>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Search or click quick chips above to add stops.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = "";
+            intermediateStops.forEach((stop, index) => {
+                const item = document.createElement("div");
+                item.className = "flex items-center justify-between p-2 rounded-xl bg-slate-50 hover:bg-slate-100/90 border border-slate-200 transition text-xs";
+                item.innerHTML = `
+                    <div class="flex items-center gap-2 min-w-0 flex-1 pr-2">
+                        <span class="w-5 h-5 rounded-full bg-amber-500 text-white font-extrabold text-[10px] flex items-center justify-center shrink-0 shadow-xs">
+                            ${index + 1}
+                        </span>
+                        <div class="min-w-0">
+                            <h5 class="font-bold text-slate-800 truncate">${escapeHTML(stop.name)}</h5>
+                            <p class="text-[10px] text-slate-400 truncate">${escapeHTML(stop.category || stop.location || 'Stop')}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-0.5 shrink-0">
+                        <button type="button" onclick="moveIntermediateStop(${index}, -1)" ${index === 0 ? 'disabled' : ''}
+                            title="Move Earlier in Sequence" class="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20 disabled:cursor-not-allowed">
+                            <span class="material-symbols-outlined text-base">arrow_upward</span>
+                        </button>
+                        <button type="button" onclick="moveIntermediateStop(${index}, 1)" ${index === count - 1 ? 'disabled' : ''}
+                            title="Move Later in Sequence" class="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-20 disabled:cursor-not-allowed">
+                            <span class="material-symbols-outlined text-base">arrow_downward</span>
+                        </button>
+                        <button type="button" onclick="removeIntermediateStop(${index})"
+                            title="Remove Stop" class="p-1 text-slate-400 hover:text-rose-600 transition ml-0.5">
+                            <span class="material-symbols-outlined text-base">delete</span>
+                        </button>
+                    </div>
+                `;
+                listEl.appendChild(item);
+            });
+        }
+
+        // =========================================================================
+        // LOCATION SELECTION & AUTOCOMPLETE
+        // =========================================================================
+        function setLocation(type, name, lat, lng) {
+            if (type === 'start') {
+                startLocation = { name, lat: Number(lat), lng: Number(lng) };
+                const input = document.getElementById("start-search-input");
+                const clearBtn = document.getElementById("start-clear-btn");
+                const display = document.getElementById("start-coords-display");
+                if (input) input.value = name;
+                if (clearBtn) clearBtn.classList.remove("hidden");
+                if (display) display.textContent = `${lat.toFixed(4)}°, ${lng.toFixed(4)}°`;
+            } else if (type === 'end') {
+                endLocation = { name, lat: Number(lat), lng: Number(lng) };
+                const input = document.getElementById("end-search-input");
+                const clearBtn = document.getElementById("end-clear-btn");
+                const display = document.getElementById("end-coords-display");
+                if (input) input.value = name;
+                if (clearBtn) clearBtn.classList.remove("hidden");
+                if (display) display.textContent = `${lat.toFixed(4)}°, ${lng.toFixed(4)}°`;
+            } else if (type === 'intermediate') {
+                addIntermediateStop({ name, lat: Number(lat), lng: Number(lng) });
+            }
+            hideDropdown(type);
+            validateInputsState();
+        }
+
+        function quickSelectLocation(type, name, lat, lng) {
+            setLocation(type, name, lat, lng);
+            hideAlert();
+        }
+
+        function clearLocation(type) {
+            if (type === 'start') {
+                startLocation = { name: "", lat: null, lng: null };
+                document.getElementById("start-search-input").value = "";
+                document.getElementById("start-clear-btn").classList.add("hidden");
+                document.getElementById("start-coords-display").textContent = "Not selected";
+            } else if (type === 'end') {
+                endLocation = { name: "", lat: null, lng: null };
+                document.getElementById("end-search-input").value = "";
+                document.getElementById("end-clear-btn").classList.add("hidden");
+                document.getElementById("end-coords-display").textContent = "Not selected";
+            } else if (type === 'intermediate') {
+                document.getElementById("intermediate-search-input").value = "";
+                document.getElementById("intermediate-clear-btn").classList.add("hidden");
+            }
+            hideDropdown(type);
+            validateInputsState();
+        }
+
+        function swapLocations() {
+            const temp = { ...startLocation };
+            startLocation = { ...endLocation };
+            endLocation = temp;
+
+            const startInput = document.getElementById("start-search-input");
+            const endInput = document.getElementById("end-search-input");
+            const startDisplay = document.getElementById("start-coords-display");
+            const endDisplay = document.getElementById("end-coords-display");
+            const startClear = document.getElementById("start-clear-btn");
+            const endClear = document.getElementById("end-clear-btn");
+
+            if (startInput) startInput.value = startLocation.name || "";
+            if (endInput) endInput.value = endLocation.name || "";
+
+            if (startDisplay) startDisplay.textContent = startLocation.lat ? `${startLocation.lat.toFixed(4)}°, ${startLocation.lng.toFixed(4)}°` : "Not selected";
+            if (endDisplay) endDisplay.textContent = endLocation.lat ? `${endLocation.lat.toFixed(4)}°, ${endLocation.lng.toFixed(4)}°` : "Not selected";
+
+            if (startClear) startClear.classList.toggle("hidden", !startLocation.name);
+            if (endClear) endClear.classList.toggle("hidden", !endLocation.name);
+
+            validateInputsState();
+            showAlert("info", "Locations Swapped", "Swapped starting point and destination.");
+        }
+
+        function validateInputsState() {
+            const badge = document.getElementById("route-ready-badge");
+            const optBtn = document.getElementById("optimize-btn");
+
+            if (routePlanningMode === "single") {
+                const hasBoth = Boolean(startLocation.lat && endLocation.lat);
+                if (hasBoth) {
+                    const isIdentical = Math.abs(startLocation.lat - endLocation.lat) < 0.0001 &&
+                                        Math.abs(startLocation.lng - endLocation.lng) < 0.0001;
+                    if (isIdentical) {
+                        badge.textContent = "Same Location";
+                        badge.className = "px-2.5 py-1 rounded-full bg-rose-100 text-rose-700 text-xs font-bold";
+                        optBtn.disabled = true;
+                    } else {
+                        badge.textContent = "Ready to Calculate";
+                        badge.className = "px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold";
+                        optBtn.disabled = false;
+                    }
+                } else {
+                    badge.textContent = "Select Points";
+                    badge.className = "px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold";
+                    optBtn.disabled = true;
+                }
+            } else {
+                // Multiple destinations mode
+                const hasStart = Boolean(startLocation.lat);
+                const hasEnd = Boolean(endLocation.lat);
+                const stopsCount = intermediateStops.length;
+
+                if (!hasStart || !hasEnd) {
+                    badge.textContent = "Select Start & End";
+                    badge.className = "px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold";
+                    optBtn.disabled = true;
+                } else if (stopsCount === 0) {
+                    badge.textContent = "Add Stops";
+                    badge.className = "px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold";
+                    optBtn.disabled = true;
+                } else {
+                    badge.textContent = `Ready (${stopsCount} stops)`;
+                    badge.className = "px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold";
+                    optBtn.disabled = false;
+                }
+            }
+        }
+
+        // =========================================================================
+        // SEARCH & AUTOCOMPLETE DROPDOWN
+        // =========================================================================
+        function onLocationInput(type) {
+            const input = document.getElementById(`${type}-search-input`);
+            const query = (input ? input.value : "").trim();
+            const clearBtn = document.getElementById(`${type}-clear-btn`);
+            if (clearBtn) clearBtn.classList.toggle("hidden", !query);
+
+            clearTimeout(autocompleteDebounceTimer);
+            if (!query) {
+                hideDropdown(type);
+                return;
+            }
+
+            autocompleteDebounceTimer = setTimeout(() => {
+                renderAutocompleteDropdown(type, query);
+            }, 250);
+        }
+
+        function onLocationFocus(type) {
+            const input = document.getElementById(`${type}-search-input`);
+            const query = (input ? input.value : "").trim();
+            renderAutocompleteDropdown(type, query);
+        }
+
+        function onLocationKeydown(event, type) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                const dropdown = document.getElementById(`${type}-autocomplete-dropdown`);
+                const firstItem = dropdown ? dropdown.querySelector(".autocomplete-item") : null;
+                if (firstItem) {
+                    firstItem.click();
+                } else {
+                    resolveFreeAddress(type);
+                }
+            }
+        }
+
+        function renderAutocompleteDropdown(type, query) {
+            const dropdown = document.getElementById(`${type}-autocomplete-dropdown`);
+            if (!dropdown) return;
+
+            dropdown.innerHTML = "";
+            const lowerQuery = query.toLowerCase();
+
+            const suggestions = [];
+
+            // 1. Match Solapur Database Places
+            if (allDatabasePlaces && allDatabasePlaces.length > 0) {
+                allDatabasePlaces.forEach(p => {
+                    const match = !query ||
+                        (p.placeName && p.placeName.toLowerCase().includes(lowerQuery)) ||
+                        (p.location && p.location.toLowerCase().includes(lowerQuery)) ||
+                        (p.category && p.category.toLowerCase().includes(lowerQuery));
+                    if (match) {
+                        suggestions.push({
+                            id: p.placeId,
+                            name: p.placeName,
+                            subtext: `${p.category || 'Destination'} · ${p.location || 'Solapur'}`,
+                            lat: Number(p.latitude),
+                            lng: Number(p.longitude),
+                            badge: "Database"
+                        });
+                    }
+                });
+            }
+
+            // 2. Match Known Regional Cities
+            for (const key in REGIONAL_CITY_CACHE) {
+                if (!query || key.includes(lowerQuery) || lowerQuery.includes(key)) {
+                    const city = REGIONAL_CITY_CACHE[key];
+                    if (!suggestions.some(s => Math.abs(s.lat - city.lat) < 0.001 && Math.abs(s.lng - city.lng) < 0.001)) {
+                        suggestions.push({
+                            name: city.name,
+                            subtext: "City / Landmark",
+                            lat: city.lat,
+                            lng: city.lng,
+                            badge: "City"
+                        });
+                    }
+                }
+            }
+
+            if (suggestions.length === 0) {
+                dropdown.innerHTML = `
+                    <div class="p-3 text-xs text-slate-500 flex items-center justify-between">
+                        <span>No local matches for "${escapeHTML(query)}"</span>
+                        <button type="button" onclick="resolveFreeAddress('${type}')" class="text-xs font-bold text-emerald-600 hover:text-emerald-800 underline">
+                            Search Online Address
+                        </button>
+                    </div>
+                `;
+                dropdown.classList.remove("hidden");
+                return;
+            }
+
+            // Limit to top 8 suggestions
+            const topList = suggestions.slice(0, 8);
+            topList.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "autocomplete-item flex items-center justify-between";
+                div.innerHTML = `
+                    <div class="min-w-0 flex-1 pr-2">
+                        <div class="font-bold text-slate-800 truncate">${escapeHTML(item.name)}</div>
+                        <div class="text-[10px] text-slate-500 truncate">${escapeHTML(item.subtext)}</div>
+                    </div>
+                    <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 shrink-0">
+                        ${item.badge}
+                    </span>
+                `;
+                div.addEventListener("click", () => {
+                    setLocation(type, item.name, item.lat, item.lng);
+                });
+                dropdown.appendChild(div);
+            });
+
+            // Option to geocode online if typed custom address
+            if (query.length >= 3) {
+                const onlineOption = document.createElement("div");
+                onlineOption.className = "autocomplete-item flex items-center gap-2 text-emerald-700 bg-emerald-50/50 font-semibold";
+                onlineOption.innerHTML = `
+                    <span class="material-symbols-outlined text-sm">search</span>
+                    <span>Search online geocoder for "${escapeHTML(query)}"...</span>
+                `;
+                onlineOption.addEventListener("click", () => {
+                    resolveFreeAddress(type);
+                });
+                dropdown.appendChild(onlineOption);
+            }
+
+            dropdown.classList.remove("hidden");
+        }
+
+        async function resolveFreeAddress(type) {
+            const input = document.getElementById(`${type}-search-input`);
+            const query = (input ? input.value : "").trim();
+            if (!query) return;
+
+            showAlert("info", "Searching Address", `Geocoding "${query}"...`);
+
+            try {
+                // Nominatim OSM Search with India prioritization
+                const searchParam = query.toLowerCase().includes("india") ? query : `${query}, India`;
+                const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(searchParam)}`;
+                const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+
+                if (!res.ok) throw new Error("Geocoder request failed.");
+                const data = await res.json();
+
+                if (Array.isArray(data) && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lng = parseFloat(data[0].lon);
+                    const name = data[0].display_name ? data[0].display_name.split(",").slice(0, 2).join(",") : query;
+                    setLocation(type, name, lat, lng);
+                    showAlert("success", "Location Verified", `Resolved to ${name} (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+                } else {
+                    throw new Error(`Could not find coordinates for "${query}". Please check spelling or select from quick recommendations.`);
+                }
+            } catch (err) {
+                showAlert("error", "Geocoding Notice", err.message || "Failed to resolve coordinates.");
+            }
+        }
+
+        function hideDropdown(type) {
+            const dropdown = document.getElementById(`${type}-autocomplete-dropdown`);
+            if (dropdown) dropdown.classList.add("hidden");
+        }
+
+        function setupClickOutside() {
+            document.addEventListener("click", (e) => {
+                if (!e.target.closest("#start-search-input") && !e.target.closest("#start-autocomplete-dropdown")) {
+                    hideDropdown("start");
+                }
+                if (!e.target.closest("#end-search-input") && !e.target.closest("#end-autocomplete-dropdown")) {
+                    hideDropdown("end");
+                }
+                if (!e.target.closest("#intermediate-search-input") && !e.target.closest("#intermediate-autocomplete-dropdown")) {
+                    hideDropdown("intermediate");
+                }
+            });
+        }
+
+        function useDeviceGpsForStart() {
+            if (!navigator.geolocation) {
+                showAlert("error", "GPS Unsupported", "Geolocation is not supported by your browser.");
+                return;
+            }
+
+            showAlert("info", "Requesting GPS", "Fetching device GPS coordinates...");
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    setLocation('start', `My Current Location (${lat.toFixed(3)}, ${lng.toFixed(3)})`, lat, lng);
+                    showAlert("success", "GPS Located", `Starting point set to device coordinates.`);
+                },
+                (err) => {
+                    let msg = "Could not obtain device location.";
+                    if (err.code === 1) msg = "Location permission denied. Please enter an address or choose from quick stops.";
+                    showAlert("warning", "GPS Notice", msg);
+                },
+                { enableHighAccuracy: true, timeout: 8000 }
+            );
+        }
+
+        // =========================================================================
+        // TRANSPORT MODE & OBJECTIVE SELECTION
+        // =========================================================================
+        function setTransportMode(mode) {
+            currentTransportMode = mode;
+            ["car", "walk", "bike"].forEach(m => {
+                const btn = document.getElementById(`mode-btn-${m}`);
+                if (!btn) return;
+                if (m === mode) {
+                    btn.className = "py-1.5 px-2 rounded-lg bg-white text-emerald-700 shadow-xs text-xs font-bold flex flex-col items-center gap-0.5 transition";
+                } else {
+                    btn.className = "py-1.5 px-2 rounded-lg text-slate-600 text-xs font-bold flex flex-col items-center gap-0.5 transition";
+                }
+            });
+            if (lastComparisonResponse) {
+                executeRouteOptimization();
+            }
+        }
+
+        function setOptimizationObjective(obj) {
+            currentObjective = obj;
+            const distBtn = document.getElementById("obj-btn-dist");
+            const timeBtn = document.getElementById("obj-btn-time");
+
+            if (obj === "distance") {
+                distBtn.className = "py-1.5 px-2 rounded-lg bg-white text-emerald-700 shadow-xs text-xs font-bold flex flex-col items-center gap-0.5 transition";
+                timeBtn.className = "py-1.5 px-2 rounded-lg text-slate-600 text-xs font-bold flex flex-col items-center gap-0.5 transition";
+            } else {
+                timeBtn.className = "py-1.5 px-2 rounded-lg bg-white text-emerald-700 shadow-xs text-xs font-bold flex flex-col items-center gap-0.5 transition";
+                distBtn.className = "py-1.5 px-2 rounded-lg text-slate-600 text-xs font-bold flex flex-col items-center gap-0.5 transition";
+            }
+            if (lastComparisonResponse) {
+                executeRouteOptimization();
+            }
+        }
+
+        // =========================================================================
+        // TSP OPTIMIZATION (2-OPT + PERMUTATION) FOR MULTIPLE DESTINATIONS
+        // =========================================================================
+        function haversineKm(a, b) {
+            const R = 6371; // Earth radius in km
+            const dLat = (b.lat - a.lat) * Math.PI / 180;
+            const dLon = (b.lng - a.lng) * Math.PI / 180;
+            const lat1 = a.lat * Math.PI / 180;
+            const lat2 = b.lat * Math.PI / 180;
+            const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+            return 2 * R * Math.asin(Math.sqrt(h));
+        }
+
+        function computeOptimalRouteOrder(start, stops, end) {
+            if (!stops || stops.length <= 1) {
+                return {
+                    orderedStops: stops ? [...stops] : [],
+                    isSameOrder: true,
+                    initialDistKm: 0,
+                    optimizedDistKm: 0
+                };
+            }
+
+            const n = stops.length;
+
+            function evalTourDist(order) {
+                let total = haversineKm(start, order[0]);
+                for (let i = 0; i < order.length - 1; i++) {
+                    total += haversineKm(order[i], order[i + 1]);
+                }
+                total += haversineKm(order[order.length - 1], end);
+                return total;
+            }
+
+            const initialDist = evalTourDist(stops);
+            let bestOrder = [...stops];
+            let bestDist = initialDist;
+
+            // For up to 7 stops (7! = 5040), exact brute force guarantees global optimum
+            if (n <= 7) {
+                function permute(arr) {
+                    if (arr.length <= 1) return [arr];
+                    const result = [];
+                    for (let i = 0; i < arr.length; i++) {
+                        const current = arr[i];
+                        const rest = arr.slice(0, i).concat(arr.slice(i + 1));
+                        const permutations = permute(rest);
+                        for (const p of permutations) {
+                            result.push([current, ...p]);
+                        }
+                    }
+                    return result;
+                }
+
+                const allPerms = permute(stops);
+                for (const candidate of allPerms) {
+                    const d = evalTourDist(candidate);
+                    if (d < bestDist - 0.0001) {
+                        bestDist = d;
+                        bestOrder = candidate;
+                    }
+                }
+            } else {
+                // Greedy Nearest Neighbor initialization
+                const remaining = [...stops];
+                const greedyTour = [];
+                let curr = start;
+                while (remaining.length > 0) {
+                    let nearestIdx = 0;
+                    let minDist = Infinity;
+                    for (let i = 0; i < remaining.length; i++) {
+                        const d = haversineKm(curr, remaining[i]);
+                        if (d < minDist) {
+                            minDist = d;
+                            nearestIdx = i;
+                        }
+                    }
+                    const chosen = remaining.splice(nearestIdx, 1)[0];
+                    greedyTour.push(chosen);
+                    curr = chosen;
+                }
+
+                bestOrder = greedyTour;
+                bestDist = evalTourDist(bestOrder);
+
+                // 2-Opt edge exchanges
+                let improved = true;
+                let passes = 0;
+                while (improved && passes < 100) {
+                    improved = false;
+                    passes++;
+                    for (let i = 0; i < bestOrder.length - 1; i++) {
+                        for (let j = i + 1; j < bestOrder.length; j++) {
+                            const candidate = [
+                                ...bestOrder.slice(0, i),
+                                ...bestOrder.slice(i, j + 1).reverse(),
+                                ...bestOrder.slice(j + 1)
+                            ];
+                            const candDist = evalTourDist(candidate);
+                            if (candDist < bestDist - 0.001) {
+                                bestDist = candDist;
+                                bestOrder = candidate;
+                                improved = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Check if the order changed from original
+            let isSameOrder = true;
+            for (let i = 0; i < n; i++) {
+                if (stops[i].name !== bestOrder[i].name ||
+                    Math.abs(stops[i].lat - bestOrder[i].lat) > 0.0001 ||
+                    Math.abs(stops[i].lng - bestOrder[i].lng) > 0.0001) {
+                    isSameOrder = false;
+                    break;
+                }
+            }
+
+            return {
+                orderedStops: bestOrder,
+                isSameOrder: isSameOrder,
+                initialDistKm: Math.round(initialDist * 10) / 10,
+                optimizedDistKm: Math.round(bestDist * 10) / 10
+            };
+        }
+
+        // =========================================================================
+        // OSRM ROAD ROUTING SERVICE CLIENT WITH FALLBACK
+        // =========================================================================
+        async function fetchOsrmRoadRoute(waypoints, profile) {
+            const osrmProfile = profile === "walk" ? "foot" : profile === "bike" ? "bicycle" : "driving";
+            const coordsStr = waypoints.map(w => `${w.lng},${w.lat}`).join(";");
+            const url = `https://router.project-osrm.org/route/v1/${osrmProfile}/${coordsStr}?overview=full&geometries=geojson`;
+
+            try {
+                const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+                if (!res.ok) throw new Error(`OSRM responded with status ${res.status}`);
+                const data = await res.json();
+                if (data.code === "Ok" && data.routes && data.routes.length > 0) {
+                    const r = data.routes[0];
+                    const distKm = Math.round((r.distance / 1000) * 10) / 10;
+                    const durMin = Math.round(r.duration / 60);
+                    return {
+                        distanceKm: distKm,
+                        durationMinutes: durMin,
+                        formattedDuration: formatMinutes(durMin),
+                        geometry: r.geometry.coordinates,
+                        source: "OSRM Road Network"
+                    };
+                }
+                throw new Error("No road geometry returned");
+            } catch (err) {
+                console.warn("OSRM routing unavailable, generating road network estimation:", err.message);
+                // Fallback: Segment estimation using Haversine * road factor (1.25)
+                let totalDist = 0;
+                const coords = [];
+                for (let i = 0; i < waypoints.length; i++) {
+                    coords.push([waypoints[i].lng, waypoints[i].lat]);
+                    if (i > 0) {
+                        const leg = haversineKm(waypoints[i - 1], waypoints[i]) * 1.25;
+                        totalDist += leg;
+                    }
+                }
+                totalDist = Math.round(totalDist * 10) / 10;
+                const speedKmH = profile === "walk" ? 5 : profile === "bike" ? 15 : 45;
+                const durMin = Math.round((totalDist / speedKmH) * 60);
+                return {
+                    distanceKm: totalDist,
+                    durationMinutes: durMin,
+                    formattedDuration: formatMinutes(durMin),
+                    geometry: coords,
+                    source: "Estimated Road Geometry"
+                };
+            }
+        }
+
+        function formatMinutes(mins) {
+            if (mins < 60) return `${mins} min`;
+            const hrs = Math.floor(mins / 60);
+            const rem = mins % 60;
+            return rem === 0 ? `${hrs} hrs` : `${hrs} hrs ${rem} min`;
+        }
+
+        // =========================================================================
+        // ROUTE OPTIMIZATION EXECUTION (DUAL MODE)
+        // =========================================================================
+        async function executeRouteOptimization() {
+            hideAlert();
+
+            if (!startLocation.lat || !endLocation.lat) {
+                showAlert("warning", "Locations Missing", "Please select both a starting location and a final destination.");
+                return;
+            }
+
+            if (Math.abs(startLocation.lat - endLocation.lat) < 0.0001 && Math.abs(startLocation.lng - endLocation.lng) < 0.0001) {
+                showAlert("error", "Identical Locations", "Starting location and final destination cannot be identical.");
+                return;
+            }
+
+            if (routePlanningMode === "multi" && intermediateStops.length === 0) {
+                showAlert("warning", "No Intermediate Stops", "Please add at least 1 intermediate destination (or 2+ stops) to calculate a multi-destination route.");
+                return;
+            }
+
+            const optBtn = document.getElementById("optimize-btn");
+            const spinner = document.getElementById("optimize-spinner");
+            const btnText = document.getElementById("optimize-btn-text");
+            const statusBadge = document.getElementById("status-badge");
+            const compBadge = document.getElementById("comparison-badge");
+
+            if (optBtn) optBtn.disabled = true;
+            if (spinner) {
+                spinner.textContent = "refresh";
+                spinner.classList.add("animate-spin");
+            }
+            if (btnText) btnText.textContent = routePlanningMode === "single"
+                ? "Calculating original & shortcut..."
+                : "Optimizing visiting sequence...";
+
+            if (statusBadge) {
+                statusBadge.textContent = "Calculating routes...";
+                statusBadge.className = "px-2.5 py-0.5 rounded-full bg-blue-600/30 text-blue-300 text-[11px] font-semibold animate-pulse border border-blue-500/40";
+            }
+            if (compBadge) {
+                compBadge.textContent = "Calculating road geometry...";
+                compBadge.className = "px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold animate-pulse";
+            }
+
+            try {
+                if (routePlanningMode === "single") {
+                    await executeSingleDestinationOptimization();
+                } else {
+                    await executeMultipleDestinationsOptimization();
+                }
+            } catch (err) {
+                console.error("Route calculation error:", err);
+                if (statusBadge) {
+                    statusBadge.textContent = "Calculation Failed";
+                    statusBadge.className = "px-2.5 py-0.5 rounded-full bg-rose-600/30 text-rose-300 text-[11px] font-semibold border border-rose-500/40";
+                }
+                if (compBadge) {
+                    compBadge.textContent = "Calculation Error";
+                    compBadge.className = "px-3 py-1 rounded-full bg-rose-100 text-rose-800 text-xs font-bold";
+                }
+                showAlert("error", "Route Calculation Error", err.message || "Failed to calculate route geometry.");
+            } finally {
+                if (optBtn) optBtn.disabled = false;
+                if (spinner) {
+                    spinner.textContent = "compare_arrows";
+                    spinner.classList.remove("animate-spin");
+                }
+                if (btnText) {
+                    btnText.textContent = routePlanningMode === "single" ? "Optimize Route" : "Optimize Visiting Order & Route";
+                }
+            }
+        }
+
+        // =========================================================================
+        // OPTION 1: SINGLE DESTINATION EXECUTION
+        // =========================================================================
+        async function executeSingleDestinationOptimization() {
+            // Fetch multiple alternative routes and compare
+            const data = await queryClientSideSingleAlternatives();
+
+            data.isMultiStop = false;
+            lastComparisonResponse = data;
+
+            // Render Map & Panels
+            renderRoutesOnMap(data);
+            renderComparisonPanels(data);
+
+            const statusBadge = document.getElementById("status-badge");
+            const compBadge = document.getElementById("comparison-badge");
+
+            if (data.routeState === "OPTIMIZED_FOUND") {
+                if (statusBadge) {
+                    statusBadge.textContent = "Shortcut Found";
+                    statusBadge.className = "px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold border border-emerald-500/30";
+                }
+                if (compBadge) {
+                    compBadge.textContent = "Shortcut Found";
+                    compBadge.className = "px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold";
+                }
+                showAlert("success", "Shortcut Route Found",
+                    `Found an alternative route saving ${data.distanceSavedKm} km (${data.percentReduction}% reduction)!`);
+            } else if (data.routeState === "ALREADY_SHORTEST") {
+                if (statusBadge) {
+                    statusBadge.textContent = "Already Shortest";
+                    statusBadge.className = "px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 text-[11px] font-semibold border border-teal-500/30";
+                }
+                if (compBadge) {
+                    compBadge.textContent = "Already Shortest";
+                    compBadge.className = "px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold";
+                }
+                showAlert("info", "Shortest Route",
+                    "The current route is already the shortest available route. No optimization is required.");
+            } else {
+                if (statusBadge) {
+                    statusBadge.textContent = "Single Route";
+                    statusBadge.className = "px-2.5 py-0.5 rounded-full bg-slate-700 text-slate-300 text-[11px] font-semibold";
+                }
+                if (compBadge) {
+                    compBadge.textContent = "No Alternative";
+                    compBadge.className = "px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold";
+                }
+                showAlert("info", "No Alternative Route",
+                    "No alternative route is available for optimization.");
+            }
+        }
+
+        async function queryClientSideSingleAlternatives() {
+            const osrmProfile = currentTransportMode === "walk" ? "foot" : currentTransportMode === "bike" ? "bicycle" : "driving";
+            const url = `https://router.project-osrm.org/route/v1/${osrmProfile}/${startLocation.lng},${startLocation.lat};${endLocation.lng},${endLocation.lat}?overview=full&geometries=geojson&alternatives=3`;
+
+            let osrmData = null;
+            try {
+                const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+                if (res.ok) {
+                    osrmData = await res.json();
+                }
+            } catch (netErr) {
+                console.warn("OSRM alternatives request error:", netErr.message);
+            }
+
+            if (!osrmData || osrmData.code !== "Ok" || !Array.isArray(osrmData.routes) || osrmData.routes.length === 0) {
+                // Graceful fallback estimation if network request failed completely
+                const hDist = Math.round(haversineKm(startLocation, endLocation) * 1.25 * 10) / 10;
+                const durMin = Math.round((hDist / 45) * 60);
+                const fallbackRoute = {
+                    distanceKm: hDist,
+                    durationMinutes: durMin,
+                    formattedDuration: formatMinutes(durMin),
+                    geometry: [[startLocation.lng, startLocation.lat], [endLocation.lng, endLocation.lat]],
+                    source: "Estimated Single Path"
+                };
+                return {
+                    success: true,
+                    routeState: "NO_ALTERNATIVE",
+                    hasOptimizedRoute: false,
+                    startName: startLocation.name,
+                    startLat: startLocation.lat,
+                    startLon: startLocation.lng,
+                    endName: endLocation.name,
+                    endLat: endLocation.lat,
+                    endLon: endLocation.lng,
+                    originalRoute: fallbackRoute,
+                    optimizedRoute: null,
+                    allAlternatives: [],
+                    distanceSavedKm: 0.0,
+                    timeSavedMinutes: 0,
+                    percentReduction: 0.0,
+                    externalNavigationUrl: `https://www.google.com/maps/dir/?api=1&origin=${startLocation.lat},${startLocation.lng}&destination=${endLocation.lat},${endLocation.lng}`,
+                    message: "No alternative route is available for optimization."
+                };
+            }
+
+            // Parse all returned routes into normalized route objects
+            const parsedRoutes = osrmData.routes.map((r, idx) => ({
+                index: idx,
+                distanceKm: Math.round((r.distance / 1000) * 10) / 10,
+                durationMinutes: Math.round(r.duration / 60),
+                formattedDuration: formatMinutes(Math.round(r.duration / 60)),
+                geometry: r.geometry.coordinates,
+                source: idx === 0 ? "Original Route" : `Alternative Route #${idx}`
+            }));
+
+            const origRoute = parsedRoutes[0];
+            const alternatives = parsedRoutes.slice(1);
+
+            let routeState = "NO_ALTERNATIVE";
+            let optRoute = null;
+            let distSaved = 0.0;
+            let timeSaved = 0;
+            let percent = 0.0;
+            let message = "";
+
+            if (alternatives.length === 0) {
+                // Rule 7: Only one valid route is available
+                routeState = "NO_ALTERNATIVE";
+                message = "No alternative route is available for optimization.";
+            } else {
+                // Rule 3, 4 & 5: Check if any alternative route is strictly shorter in distance than original route
+                const shorterAlternatives = alternatives.filter(alt => alt.distanceKm < origRoute.distanceKm - 0.05);
+
+                if (shorterAlternatives.length === 0) {
+                    // Rule 6 & 8: Multiple routes exist, but none is shorter than original route
+                    routeState = "ALREADY_SHORTEST";
+                    message = "The current route is already the shortest available route. No optimization is required.";
+                } else {
+                    // Rule 5: Select the alternative route with the minimum distance
+                    optRoute = shorterAlternatives.reduce((min, cur) => cur.distanceKm < min.distanceKm ? cur : min, shorterAlternatives[0]);
+                    optRoute.source = "Optimized Shortcut Route";
+                    routeState = "OPTIMIZED_FOUND";
+
+                    distSaved = Math.round((origRoute.distanceKm - optRoute.distanceKm) * 10) / 10;
+                    timeSaved = Math.round(origRoute.durationMinutes - optRoute.durationMinutes);
+                    percent = origRoute.distanceKm > 0 ? Math.round((distSaved / origRoute.distanceKm) * 1000) / 10 : 0.0;
+                    message = `Optimized shortcut route found saving ${distSaved} km (${percent}% reduction).`;
+                }
+            }
+
+            const hasOptimized = (routeState === "OPTIMIZED_FOUND" && optRoute !== null);
+
+            return {
+                success: true,
+                routeState: routeState,
+                hasOptimizedRoute: hasOptimized,
+                startName: startLocation.name,
+                startLat: startLocation.lat,
+                startLon: startLocation.lng,
+                endName: endLocation.name,
+                endLat: endLocation.lat,
+                endLon: endLocation.lng,
+                originalRoute: origRoute,
+                optimizedRoute: optRoute,
+                allAlternatives: alternatives,
+                distanceSavedKm: distSaved,
+                timeSavedMinutes: timeSaved,
+                percentReduction: percent,
+                externalNavigationUrl: `https://www.google.com/maps/dir/?api=1&origin=${startLocation.lat},${startLocation.lng}&destination=${endLocation.lat},${endLocation.lng}`,
+                message: message
+            };
+        }
+
+        // =========================================================================
+        // OPTION 2: MULTIPLE DESTINATIONS EXECUTION (TSP WAYPOINT OPTIMIZATION)
+        // =========================================================================
+        async function executeMultipleDestinationsOptimization() {
+            // 1. Calculate road route for Original Waypoints Sequence
+            const originalStops = [...intermediateStops];
+            const origWaypoints = [startLocation, ...originalStops, endLocation];
+            const origRouteData = await fetchOsrmRoadRoute(origWaypoints, currentTransportMode);
+
+            // 2. Run TSP optimization on intermediate stops with Start and End fixed
+            const tspResult = computeOptimalRouteOrder(startLocation, intermediateStops, endLocation);
+            const optimizedStops = tspResult.orderedStops;
+            const optWaypoints = [startLocation, ...optimizedStops, endLocation];
+
+            let optRouteData = null;
+            let routeState = "ALREADY_SHORTEST";
+            let distSaved = 0.0;
+            let timeSaved = 0;
+            let percent = 0.0;
+            let message = "";
+
+            if (tspResult.isSameOrder) {
+                // Rule 6: Original visiting sequence was already optimal
+                routeState = "ALREADY_SHORTEST";
+                message = "The current route is already the shortest available route. No optimization is required.";
+            } else {
+                // Calculate road route for the candidate reordered sequence
+                const candOptRoute = await fetchOsrmRoadRoute(optWaypoints, currentTransportMode);
+
+                // Rule 4 & 5: Check strictly if the reordered route has a shorter distance
+                if (candOptRoute.distanceKm < origRouteData.distanceKm - 0.05) {
+                    optRouteData = candOptRoute;
+                    optRouteData.source = "Optimized Visiting Sequence";
+                    routeState = "OPTIMIZED_FOUND";
+                    distSaved = Math.round((origRouteData.distanceKm - optRouteData.distanceKm) * 10) / 10;
+                    timeSaved = Math.round(origRouteData.durationMinutes - optRouteData.durationMinutes);
+                    percent = origRouteData.distanceKm > 0 ? Math.round((distSaved / origRouteData.distanceKm) * 1000) / 10 : 0.0;
+                    message = `Optimized visiting order determined saving ${distSaved} km (${percent}% reduction).`;
+                } else {
+                    // Rule 6 & 8: Reordered sequence is not shorter than original
+                    optRouteData = null;
+                    routeState = "ALREADY_SHORTEST";
+                    message = "The current route is already the shortest available route. No optimization is required.";
+                }
+            }
+
+            const hasOptimized = (routeState === "OPTIMIZED_FOUND" && optRouteData !== null);
+
+            const response = {
+                success: true,
+                isMultiStop: true,
+                routeState: routeState,
+                hasOptimizedRoute: hasOptimized,
+                isSameOrder: tspResult.isSameOrder,
+                startName: startLocation.name,
+                startLat: startLocation.lat,
+                startLon: startLocation.lng,
+                endName: endLocation.name,
+                endLat: endLocation.lat,
+                endLon: endLocation.lng,
+                originalStops: originalStops,
+                optimizedStops: optimizedStops,
+                originalRoute: origRouteData,
+                optimizedRoute: optRouteData,
+                distanceSavedKm: distSaved,
+                timeSavedMinutes: timeSaved,
+                percentReduction: percent,
+                externalNavigationUrl: buildMultiStopGoogleMapsUrl(startLocation, hasOptimized ? optimizedStops : originalStops, endLocation),
+                message: message
+            };
+
+            lastComparisonResponse = response;
+
+            // Render Map & Panels
+            renderRoutesOnMap(response);
+            renderComparisonPanels(response);
+
+            const statusBadge = document.getElementById("status-badge");
+            const compBadge = document.getElementById("comparison-badge");
+
+            if (routeState === "OPTIMIZED_FOUND") {
+                if (statusBadge) {
+                    statusBadge.textContent = "Order Optimized";
+                    statusBadge.className = "px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-semibold border border-emerald-500/30";
+                }
+                if (compBadge) {
+                    compBadge.textContent = "Sequence Reordered";
+                    compBadge.className = "px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold";
+                }
+                showAlert("success", "Route Sequence Optimized",
+                    `Intermediate stops reordered! Saved ${distSaved} km (${percent}% reduction) and ${timeSaved} minutes.`);
+            } else {
+                if (statusBadge) {
+                    statusBadge.textContent = "Already Shortest";
+                    statusBadge.className = "px-2.5 py-0.5 rounded-full bg-teal-500/20 text-teal-300 text-[11px] font-semibold border border-teal-500/30";
+                }
+                if (compBadge) {
+                    compBadge.textContent = "Already Shortest";
+                    compBadge.className = "px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold";
+                }
+                showAlert("info", "Shortest Route",
+                    "The current route is already the shortest available route. No optimization is required.");
+            }
+        }
+
+        function buildMultiStopGoogleMapsUrl(start, intermediateList, end) {
+            let url = `https://www.google.com/maps/dir/?api=1&origin=${start.lat},${start.lng}&destination=${end.lat},${end.lng}`;
+            if (intermediateList && intermediateList.length > 0) {
+                const wpStr = intermediateList.map(s => `${s.lat},${s.lng}`).join("%7C");
+                url += `&waypoints=${wpStr}`;
+            }
+            return url;
+        }
+
+        // =========================================================================
+        // LEAFLET MAP RENDERING (BOTH MODES & NUMBERED PINS)
+        // =========================================================================
+        function renderRoutesOnMap(data) {
+            initLeafletMap();
+
+            originalRouteLayerGroup.clearLayers();
+            optimizedRouteLayerGroup.clearLayers();
+            markerLayerGroup.clearLayers();
+
+            const bounds = L.latLngBounds();
+
+            // 1. Draw ORIGINAL Route (Solid Blue) - Always present
+            if (data.originalRoute && data.originalRoute.geometry && data.originalRoute.geometry.length > 0) {
+                const origLatLngs = data.originalRoute.geometry.map(([lng, lat]) => [lat, lng]);
+
+                // Glow background
+                L.polyline(origLatLngs, {
+                    color: "#1d4ed8",
+                    weight: 8,
+                    opacity: 0.35,
+                    lineJoin: "round"
+                }).addTo(originalRouteLayerGroup);
+
+                // Primary line
+                const origLine = L.polyline(origLatLngs, {
+                    color: "#2563eb",
+                    weight: 5,
+                    opacity: 0.9,
+                    lineJoin: "round"
+                }).addTo(originalRouteLayerGroup);
+
+                const routeTitle = data.isMultiStop ? "ORIGINAL VISITING SEQUENCE" : "ORIGINAL ROUTE";
+                origLine.bindPopup(`
+                    <div style="font-family:'Inter',sans-serif;">
+                        <span style="font-size:10px; font-weight:800; color:#2563eb; background:#eff6ff; padding:2px 6px; border-radius:4px;">
+                            ${routeTitle}
+                        </span>
+                        <h4 style="font-size:14px; font-weight:800; margin:6px 0 2px; color:#1e293b;">
+                            ${data.originalRoute.distanceKm} km · ${data.originalRoute.formattedDuration}
+                        </h4>
+                        <p style="font-size:11px; color:#64748b; margin:0;">
+                            ${data.hasOptimizedRoute ? 'Primary road path' : 'Shortest available road route'}
+                        </p>
+                    </div>
+                `);
+
+                origLatLngs.forEach(pt => bounds.extend(pt));
+            }
+
+            // 2. Draw OPTIMIZED Route (Dashed Green) ONLY when a strictly shorter route exists!
+            if (data.hasOptimizedRoute && data.optimizedRoute && data.optimizedRoute.geometry && data.optimizedRoute.geometry.length > 0) {
+                const optLatLngs = data.optimizedRoute.geometry.map(([lng, lat]) => [lat, lng]);
+
+                const optLine = L.polyline(optLatLngs, {
+                    color: "#059669",
+                    weight: 5,
+                    opacity: 0.95,
+                    dashArray: "8, 8",
+                    lineJoin: "round"
+                }).addTo(optimizedRouteLayerGroup);
+
+                const optTitle = data.isMultiStop ? "OPTIMIZED VISITING SEQUENCE" : "OPTIMIZED SHORTCUT ROUTE";
+                optLine.bindPopup(`
+                    <div style="font-family:'Inter',sans-serif;">
+                        <span style="font-size:10px; font-weight:800; color:#059669; background:#ecfdf5; padding:2px 6px; border-radius:4px;">
+                            ${optTitle}
+                        </span>
+                        <h4 style="font-size:14px; font-weight:800; margin:6px 0 2px; color:#1e293b;">
+                            ${data.optimizedRoute.distanceKm} km · ${data.optimizedRoute.formattedDuration}
+                        </h4>
+                        <p style="font-size:11px; color:#047857; font-weight:600; margin:0;">
+                            Saves ${data.distanceSavedKm} km (${data.percentReduction}% reduction)
+                        </p>
+                    </div>
+                `);
+
+                optLatLngs.forEach(pt => bounds.extend(pt));
+            }
+
+            // 3. Start Marker (Green Pin 'S')
+            const startIcon = L.divIcon({
+                className: "custom-start-marker",
+                html: `
+                    <div style="width:34px; height:34px; border-radius:50%; background:#10b981; color:#ffffff; display:flex; align-items:center; justify-content:center; border:2.5px solid #ffffff; box-shadow:0 4px 10px rgba(0,0,0,0.35); font-weight:800; font-size:13px;">
+                        S
+                    </div>
+                `,
+                iconSize: [34, 34],
+                iconAnchor: [17, 17]
+            });
+
+            L.marker([data.startLat, data.startLon], { icon: startIcon })
+                .bindPopup(`
+                    <div style="font-family:'Inter',sans-serif;">
+                        <span style="font-size:10px; font-weight:800; color:#059669; background:#ecfdf5; padding:2px 6px; border-radius:4px;">STARTING POINT</span>
+                        <h4 style="font-size:13px; font-weight:800; margin:4px 0 0; color:#1e293b;">${escapeHTML(data.startName)}</h4>
+                    </div>
+                `)
+                .addTo(markerLayerGroup);
+
+            // 4. Numbered Intermediate Markers (In Multiple Destinations Mode)
+            if (data.isMultiStop && data.originalStops && data.originalStops.length > 0) {
+                const displayStops = (data.hasOptimizedRoute && data.optimizedStops) ? data.optimizedStops : data.originalStops;
+                displayStops.forEach((stop, idx) => {
+                    const stopIcon = L.divIcon({
+                        className: `custom-stop-marker-${idx + 1}`,
+                        html: `
+                            <div style="width:30px; height:30px; border-radius:50%; background:#f59e0b; color:#ffffff; display:flex; align-items:center; justify-content:center; border:2.5px solid #ffffff; box-shadow:0 3px 8px rgba(0,0,0,0.35); font-weight:800; font-size:12px;">
+                                ${idx + 1}
+                            </div>
+                        `,
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 15]
+                    });
+
+                    L.marker([stop.lat, stop.lng], { icon: stopIcon })
+                        .bindPopup(`
+                            <div style="font-family:'Inter',sans-serif;">
+                                <span style="font-size:10px; font-weight:800; color:#b45309; background:#fef3c7; padding:2px 6px; border-radius:4px;">
+                                    STOP #${idx + 1}
+                                </span>
+                                <h4 style="font-size:13px; font-weight:800; margin:4px 0 2px; color:#1e293b;">${escapeHTML(stop.name)}</h4>
+                                <p style="font-size:11px; color:#64748b; margin:0;">
+                                    ${data.hasOptimizedRoute ? 'Optimized Sequence Position #' + (idx + 1) : 'Visiting Order #' + (idx + 1)}
+                                </p>
+                            </div>
+                        `)
+                        .addTo(markerLayerGroup);
+                });
+            }
+
+            // 5. Final Destination Marker (Red Pin 'D')
+            const endIcon = L.divIcon({
+                className: "custom-end-marker",
+                html: `
+                    <div style="width:34px; height:34px; border-radius:50%; background:#f43f5e; color:#ffffff; display:flex; align-items:center; justify-content:center; border:2.5px solid #ffffff; box-shadow:0 4px 10px rgba(0,0,0,0.35); font-weight:800; font-size:13px;">
+                        D
+                    </div>
+                `,
+                iconSize: [34, 34],
+                iconAnchor: [17, 17]
+            });
+
+            L.marker([data.endLat, data.endLon], { icon: endIcon })
+                .bindPopup(`
+                    <div style="font-family:'Inter',sans-serif;">
+                        <span style="font-size:10px; font-weight:800; color:#e11d48; background:#fff1f2; padding:2px 6px; border-radius:4px;">FINAL DESTINATION</span>
+                        <h4 style="font-size:13px; font-weight:800; margin:4px 0 0; color:#1e293b;">${escapeHTML(data.endName)}</h4>
+                    </div>
+                `)
+                .addTo(markerLayerGroup);
+
+            // Fit map bounds
+            if (bounds.isValid()) {
+                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+            }
+
+            applyRouteDisplayMode();
+        }
+
+        // =========================================================================
+        // DISPLAY TOGGLES (BOTH, ORIGINAL ONLY, OPTIMIZED ONLY)
+        // =========================================================================
+        function setRouteDisplayMode(mode) {
+            currentDisplayMode = mode;
+
+            const btnBoth = document.getElementById("ctrl-view-both");
+            const btnOrig = document.getElementById("ctrl-view-orig");
+            const btnOpt = document.getElementById("ctrl-view-opt");
+
+            const activeClass = "px-3 py-1.5 rounded-lg bg-white text-slate-900 shadow-sm transition";
+            const inactiveClass = "px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition";
+
+            if (btnBoth) btnBoth.className = mode === "both" ? activeClass : inactiveClass;
+            if (btnOrig) btnOrig.className = mode === "orig" ? activeClass : inactiveClass;
+            if (btnOpt) btnOpt.className = mode === "opt" ? activeClass : inactiveClass;
+
+            applyRouteDisplayMode();
+            fitMapBounds();
+        }
+
+        function applyRouteDisplayMode() {
+            if (!map) return;
+            const hasOpt = Boolean(lastComparisonResponse && lastComparisonResponse.hasOptimizedRoute);
+
+            if (currentDisplayMode === "both") {
+                if (!map.hasLayer(originalRouteLayerGroup)) originalRouteLayerGroup.addTo(map);
+                if (hasOpt) {
+                    if (!map.hasLayer(optimizedRouteLayerGroup)) optimizedRouteLayerGroup.addTo(map);
+                } else {
+                    if (map.hasLayer(optimizedRouteLayerGroup)) map.removeLayer(optimizedRouteLayerGroup);
+                }
+            } else if (currentDisplayMode === "orig") {
+                if (!map.hasLayer(originalRouteLayerGroup)) originalRouteLayerGroup.addTo(map);
+                if (map.hasLayer(optimizedRouteLayerGroup)) map.removeLayer(optimizedRouteLayerGroup);
+            } else if (currentDisplayMode === "opt") {
+                if (hasOpt) {
+                    if (map.hasLayer(originalRouteLayerGroup)) map.removeLayer(originalRouteLayerGroup);
+                    if (!map.hasLayer(optimizedRouteLayerGroup)) optimizedRouteLayerGroup.addTo(map);
+                } else {
+                    // When no separate shorter route exists, keep original visible
+                    if (!map.hasLayer(originalRouteLayerGroup)) originalRouteLayerGroup.addTo(map);
+                    if (map.hasLayer(optimizedRouteLayerGroup)) map.removeLayer(optimizedRouteLayerGroup);
+                }
+            }
+        }
+
+        function fitMapBounds() {
+            if (!map || !lastComparisonResponse) return;
+            const bounds = L.latLngBounds();
+
+            if (currentDisplayMode === "both" || currentDisplayMode === "orig") {
+                if (lastComparisonResponse.originalRoute && lastComparisonResponse.originalRoute.geometry) {
+                    lastComparisonResponse.originalRoute.geometry.forEach(([lng, lat]) => bounds.extend([lat, lng]));
+                }
+            }
+            if (currentDisplayMode === "both" || currentDisplayMode === "opt") {
+                if (lastComparisonResponse.hasOptimizedRoute && lastComparisonResponse.optimizedRoute && lastComparisonResponse.optimizedRoute.geometry) {
+                    lastComparisonResponse.optimizedRoute.geometry.forEach(([lng, lat]) => bounds.extend([lat, lng]));
+                }
+            }
+            if (bounds.isValid()) {
+                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+            }
+        }
+
+        // =========================================================================
+        // COMPARISON PANELS & DELTA METRICS
+        // =========================================================================
+        function renderComparisonPanels(data) {
+            const orig = data.originalRoute;
+            const opt = data.optimizedRoute;
+            const isMulti = Boolean(data.isMultiStop);
+            const hasOpt = Boolean(data.hasOptimizedRoute && opt);
+            const isShortest = (data.routeState === "ALREADY_SHORTEST");
+            const noAlt = (data.routeState === "NO_ALTERNATIVE");
+
+            // 1. Legend Metrics
+            document.getElementById("legend-orig-metric").textContent = orig
+                ? `${orig.distanceKm} km (${orig.formattedDuration})` : "--";
+
+            if (hasOpt) {
+                document.getElementById("legend-opt-metric").textContent = `${opt.distanceKm} km (${opt.formattedDuration})`;
+            } else if (isShortest) {
+                document.getElementById("legend-opt-metric").textContent = "Already Shortest";
+            } else {
+                document.getElementById("legend-opt-metric").textContent = "None";
+            }
+
+            // 2. Original Card
+            document.getElementById("comp-orig-dist").textContent = orig ? `${orig.distanceKm} km` : "-- km";
+            document.getElementById("comp-orig-dur").textContent = orig ? orig.formattedDuration : "-- min";
+            document.getElementById("comp-orig-from-to").textContent = isMulti
+                ? `Circuit (${data.originalStops ? data.originalStops.length : 0} stops)`
+                : `${escapeHTML(data.startName)} → ${escapeHTML(data.endName)}`;
+
+            // 3. Optimized Card
+            const optDistEl = document.getElementById("comp-opt-dist");
+            const optDurEl = document.getElementById("comp-opt-dur");
+            const optSourceEl = document.getElementById("comp-opt-source-label");
+            const optStatusEl = document.getElementById("comp-opt-status-tag");
+            const noAltBanner = document.getElementById("no-alternative-banner");
+            const noAltIcon = document.getElementById("no-alt-icon");
+            const noAltTitle = document.getElementById("no-alt-title");
+            const noAltDesc = document.getElementById("no-alt-desc");
+
+            if (hasOpt) {
+                optDistEl.textContent = `${opt.distanceKm} km`;
+                optDurEl.textContent = opt.formattedDuration;
+                optSourceEl.textContent = isMulti ? "Optimized Circuit" : "Shortcut Route";
+                optStatusEl.textContent = "Shorter Path Found";
+                noAltBanner.classList.add("hidden");
+            } else if (isShortest) {
+                optDistEl.textContent = orig ? `${orig.distanceKm} km` : "-- km";
+                optDurEl.textContent = orig ? orig.formattedDuration : "-- min";
+                optSourceEl.textContent = "Current Route";
+                optStatusEl.textContent = "Already Shortest";
+
+                noAltBanner.className = "p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 flex items-center gap-3 text-xs sm:text-sm";
+                if (noAltIcon) {
+                    noAltIcon.textContent = "check_circle";
+                    noAltIcon.className = "material-symbols-outlined text-blue-600 text-xl";
+                }
+                noAltTitle.textContent = "The current route is already the shortest available route. No optimization is required.";
+                noAltDesc.textContent = isMulti
+                    ? "Your selected stop order is already the shortest visiting sequence. No further optimization is needed."
+                    : "All available alternative routes are longer than the primary route. Your current path is already the most direct.";
+                noAltBanner.classList.remove("hidden");
+            } else {
+                optDistEl.textContent = "-- km";
+                optDurEl.textContent = "-- min";
+                optSourceEl.textContent = "No Alternative";
+                optStatusEl.textContent = "Single Route";
+
+                noAltBanner.className = "p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 flex items-center gap-3 text-xs sm:text-sm";
+                if (noAltIcon) {
+                    noAltIcon.textContent = "info";
+                    noAltIcon.className = "material-symbols-outlined text-amber-600 text-xl";
+                }
+                noAltTitle.textContent = "No alternative route is available for optimization.";
+                noAltDesc.textContent = "The routing service provides a single valid road path between these locations.";
+                noAltBanner.classList.remove("hidden");
+            }
+
+            // 4. Visiting Sequence Box (for Multi-Stop Mode)
+            const seqCard = document.getElementById("visiting-sequence-card");
+            if (isMulti && data.originalStops) {
+                seqCard.classList.remove("hidden");
+                renderVisitingSequenceFlow(data);
+            } else {
+                seqCard.classList.add("hidden");
+            }
+
+            // 5. Comparison Delta (Savings Card)
+            const distDiffEl = document.getElementById("comp-diff-dist");
+            const timeDiffEl = document.getElementById("comp-diff-dur");
+            const deltaPill = document.getElementById("delta-status-pill");
+            const deltaNote = document.getElementById("comp-diff-note");
+
+            if (hasOpt) {
+                distDiffEl.textContent = `${data.distanceSavedKm} km saved`;
+                distDiffEl.className = "text-2xl font-black text-emerald-400 font-heading";
+                deltaNote.textContent = `${data.percentReduction}% shorter road distance`;
+                deltaPill.textContent = isMulti ? "Order Optimized" : "Shortcut";
+                deltaPill.className = "text-[10px] font-bold bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md";
+
+                if (data.timeSavedMinutes > 0) {
+                    timeDiffEl.textContent = `${data.timeSavedMinutes} min saved`;
+                    timeDiffEl.className = "text-lg font-bold text-emerald-400";
+                } else if (data.timeSavedMinutes < 0) {
+                    timeDiffEl.textContent = `+${Math.abs(data.timeSavedMinutes)} min longer`;
+                    timeDiffEl.className = "text-lg font-bold text-amber-400";
+                } else {
+                    timeDiffEl.textContent = "Same travel time";
+                    timeDiffEl.className = "text-lg font-bold text-slate-300";
+                }
+
+                // Sync Left Overview Card
+                document.getElementById("savings-dist-badge").textContent = distDiffEl.textContent;
+                document.getElementById("savings-time-badge").textContent = timeDiffEl.textContent;
+                document.getElementById("card-orig-dist").textContent = `${orig.distanceKm} km`;
+                document.getElementById("card-opt-dist").textContent = `${opt.distanceKm} km`;
+                document.getElementById("card-opt-status").textContent = isMulti ? "Visiting Order Optimized" : "Shortcut Found";
+            } else if (isShortest) {
+                distDiffEl.textContent = "0.0 km saved";
+                distDiffEl.className = "text-2xl font-black text-teal-300 font-heading";
+                timeDiffEl.textContent = "Already Shortest";
+                timeDiffEl.className = "text-lg font-bold text-teal-300";
+                deltaNote.textContent = "Current route is the shortest available route";
+                deltaPill.textContent = "Already Shortest";
+                deltaPill.className = "text-[10px] font-bold bg-teal-500/20 text-teal-300 px-2 py-0.5 rounded-md";
+
+                // Sync Left Overview Card
+                document.getElementById("savings-dist-badge").textContent = "0.0 km (Shortest)";
+                document.getElementById("savings-time-badge").textContent = "Already Optimal";
+                document.getElementById("card-orig-dist").textContent = orig ? `${orig.distanceKm} km` : "--";
+                document.getElementById("card-opt-dist").textContent = orig ? `${orig.distanceKm} km` : "--";
+                document.getElementById("card-opt-status").textContent = "Already Shortest";
+            } else {
+                distDiffEl.textContent = "No Shortcut";
+                distDiffEl.className = "text-2xl font-black text-slate-400 font-heading";
+                timeDiffEl.textContent = "Single Path";
+                timeDiffEl.className = "text-lg font-bold text-slate-400";
+                deltaNote.textContent = "No alternative route found";
+                deltaPill.textContent = "Single Route";
+                deltaPill.className = "text-[10px] font-bold bg-slate-800 text-slate-400 px-2 py-0.5 rounded-md";
+
+                // Sync Left Overview Card
+                document.getElementById("savings-dist-badge").textContent = "None";
+                document.getElementById("savings-time-badge").textContent = "None";
+                document.getElementById("card-orig-dist").textContent = orig ? `${orig.distanceKm} km` : "--";
+                document.getElementById("card-opt-dist").textContent = "None";
+                document.getElementById("card-opt-status").textContent = "No Alternative";
+            }
+
+            // Google Maps Button
+            const extNavBtn = document.getElementById("ext-nav-btn");
+            if (extNavBtn && data.externalNavigationUrl) {
+                extNavBtn.href = data.externalNavigationUrl;
+                extNavBtn.classList.remove("hidden");
+            }
+        }
+
+        function renderVisitingSequenceFlow(data) {
+            const origFlow = document.getElementById("orig-sequence-flow");
+            const optFlow = document.getElementById("opt-sequence-flow");
+            const reorgBadge = document.getElementById("order-reorganized-badge");
+
+            if (!origFlow || !optFlow) return;
+
+            if (reorgBadge) {
+                if (data.hasOptimizedRoute) {
+                    reorgBadge.textContent = `Order Reorganized: -${data.distanceSavedKm} km Saved!`;
+                    reorgBadge.className = "px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800";
+                } else {
+                    reorgBadge.textContent = "Sequence Already Optimal";
+                    reorgBadge.className = "px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800";
+                }
+            }
+
+            // Build Original Sequence Elements
+            origFlow.innerHTML = "";
+            const origItems = [
+                { label: "Start", name: data.startName, isPin: false, color: "bg-emerald-600 text-white" },
+                ...data.originalStops.map((s, i) => ({ label: `Stop ${i+1}`, name: s.name, isPin: true, color: "bg-blue-600 text-white" })),
+                { label: "Final", name: data.endName, isPin: false, color: "bg-rose-600 text-white" }
+            ];
+
+            origItems.forEach((item, idx) => {
+                const el = document.createElement("div");
+                el.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-blue-200 text-slate-800 font-semibold shadow-2xs";
+                el.innerHTML = `
+                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${item.color}">${item.label}</span>
+                    <span class="truncate max-w-[140px]">${escapeHTML(item.name)}</span>
+                `;
+                origFlow.appendChild(el);
+                if (idx < origItems.length - 1) {
+                    const arrow = document.createElement("span");
+                    arrow.className = "material-symbols-outlined text-blue-400 text-sm";
+                    arrow.textContent = "arrow_forward";
+                    origFlow.appendChild(arrow);
+                }
+            });
+
+            // Build Optimized Sequence Elements
+            optFlow.innerHTML = "";
+            const displayOptimized = (data.hasOptimizedRoute && data.optimizedStops) ? data.optimizedStops : data.originalStops;
+            const optItems = [
+                { label: "Start", name: data.startName, isPin: false, color: "bg-emerald-600 text-white" },
+                ...displayOptimized.map((s, i) => ({
+                    label: `Stop ${i+1}`,
+                    name: s.name,
+                    isPin: true,
+                    color: data.hasOptimizedRoute ? "bg-amber-500 text-white" : "bg-blue-600 text-white"
+                })),
+                { label: "Final", name: data.endName, isPin: false, color: "bg-rose-600 text-white" }
+            ];
+
+            optItems.forEach((item, idx) => {
+                const el = document.createElement("div");
+                el.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-emerald-200 text-slate-800 font-semibold shadow-2xs";
+                el.innerHTML = `
+                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${item.color}">${item.label}</span>
+                    <span class="truncate max-w-[140px]">${escapeHTML(item.name)}</span>
+                `;
+                optFlow.appendChild(el);
+                if (idx < optItems.length - 1) {
+                    const arrow = document.createElement("span");
+                    arrow.className = "material-symbols-outlined text-emerald-500 text-sm";
+                    arrow.textContent = "arrow_forward";
+                    optFlow.appendChild(arrow);
+                }
+            });
+        }
+
+        // =========================================================================
+        // UTILITIES
+        // =========================================================================
+        function saveCurrentRoute() {
+            if (!lastComparisonResponse) {
+                showAlert("warning", "No Route Calculated", "Please calculate route optimization first before saving.");
+                return;
+            }
+            try {
+                const savePayload = {
+                    savedAt: new Date().toISOString(),
+                    mode: routePlanningMode,
+                    startName: startLocation.name,
+                    endName: endLocation.name,
+                    intermediateCount: intermediateStops.length,
+                    comparison: lastComparisonResponse
+                };
+                localStorage.setItem("savedTravelBuddyShortcutRoute", JSON.stringify(savePayload));
+                showAlert("success", "Route Saved", "Successfully saved route comparison to browser storage.");
+            } catch (e) {
+                showAlert("error", "Save Failed", "Could not save route comparison.");
+            }
+        }
+
+        function showAlert(type, title, message) {
+            const alertBox = document.getElementById("statusAlert");
+            const icon = document.getElementById("statusAlertIcon");
+            const titleEl = document.getElementById("statusAlertTitle");
+            const msgEl = document.getElementById("statusAlertMessage");
+
+            alertBox.className = "mb-6 px-5 py-4 rounded-2xl flex items-start gap-3 text-sm shadow-sm ";
+            if (type === "error") {
+                alertBox.classList.add("bg-rose-50", "border", "border-rose-200", "text-rose-900");
+                icon.textContent = "error";
+                icon.className = "material-symbols-outlined text-rose-600 mt-0.5";
+            } else if (type === "warning") {
+                alertBox.classList.add("bg-amber-50", "border", "border-amber-200", "text-amber-900");
+                icon.textContent = "warning";
+                icon.className = "material-symbols-outlined text-amber-600 mt-0.5";
+            } else if (type === "success") {
+                alertBox.classList.add("bg-emerald-50", "border", "border-emerald-200", "text-emerald-900");
+                icon.textContent = "check_circle";
+                icon.className = "material-symbols-outlined text-emerald-600 mt-0.5";
+            } else {
+                alertBox.classList.add("bg-teal-50", "border", "border-teal-200", "text-teal-900");
+                icon.textContent = "info";
+                icon.className = "material-symbols-outlined text-teal-600 mt-0.5";
+            }
+
+            titleEl.textContent = title;
+            msgEl.textContent = message;
+            alertBox.classList.remove("hidden");
+        }
+
+        function hideAlert() {
+            document.getElementById("statusAlert").classList.add("hidden");
+        }
+
+        function escapeHTML(str) {
+            if (str == null) return "";
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Backward compatibility hooks
+        window.executeRouteOptimization = executeRouteOptimization;
+        window.setTransportMode = setTransportMode;
+        window.setOptimizationObjective = setOptimizationObjective;
+        window.swapLocations = swapLocations;
+        window.setRoutePlanningMode = setRoutePlanningMode;
+        window.quickAddIntermediate = quickAddIntermediate;
+        window.removeIntermediateStop = removeIntermediateStop;
+        window.moveIntermediateStop = moveIntermediateStop;
+        window.clearAllIntermediateStops = clearAllIntermediateStops;
+    </script>
+
+    <!-- Multilingual Support (i18n) & Navigation -->
+    <script src="../translations.js"></script>
+    <script src="../i18n.js"></script>
+    <script src="../navigation.js"></script>
+</body>
+</html>

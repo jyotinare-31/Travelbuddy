@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Tourist Place Details - TravelBuddy</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Material Symbols -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+        rel="stylesheet"
+    >
+
+    <!-- Leaflet Map CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <style>
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Map */
+        #destination-map {
+            width: 100%;
+            height: 400px;
+            border-radius: 16px;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        /* Make Leaflet popup readable */
+        .leaflet-popup-content {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+
+<body class="bg-gray-50 text-gray-900">
+
+
+    <!-- ================================= -->
+    <!-- HEADER -->
+    <!-- ================================= -->
+
+    <header
+        class="fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md shadow-sm"
+    >
+
+        <div
+            class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between"
+        >
+
+            <div class="flex items-center gap-3">
+
+                <span
+                    class="material-symbols-outlined text-3xl text-teal-600"
+                >
+                    travel_explore
+                </span>
+
+                <span class="text-2xl font-bold">
+                    TravelBuddy
+                </span>
+
+            </div>
+
+
+            <a
+                href="javascript:history.back()"
+                class="flex items-center gap-2 text-gray-600 hover:text-teal-600"
+            >
+
+                <span class="material-symbols-outlined">
+                    arrow_back
+                </span>
+
+                Back
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- ================================= -->
+    <!-- MAIN -->
+    <!-- ================================= -->
+
+    <main class="pt-20">
+
+
+        <!-- ================================= -->
+        <!-- HERO IMAGE -->
+        <!-- ================================= -->
+
+        <section
+            class="relative h-[500px] overflow-hidden bg-gray-300"
+        >
+
+            <!-- BACKEND IMAGE -->
+
+            <img
+                id="place-image"
+                src=""
+                alt="Tourist Place"
+                class="absolute inset-0 w-full h-full object-cover"
+            >
+
+
+            <!-- DARK OVERLAY -->
+
+            <div
+                class="absolute inset-0 bg-black/40"
+            ></div>
+
+
+            <!-- HERO CONTENT -->
+
+            <div
+                class="absolute inset-0 flex items-end"
+            >
+
+                <div
+                    class="max-w-7xl mx-auto w-full px-6 pb-12 text-white"
+                >
+
+                    <!-- LOCATION -->
+
+                    <div
+                        class="flex items-center gap-2 mb-4"
+                    >
+
+                        <span
+                            class="material-symbols-outlined"
+                        >
+                            location_on
+                        </span>
+
+                        <span id="place-location">
+                            Loading...
+                        </span>
+
+                    </div>
+
+
+                    <!-- PLACE NAME -->
+
+                    <h1
+                        id="place-name"
+                        class="text-5xl md:text-6xl font-bold mb-4"
+                    >
+                        Loading...
+                    </h1>
+
+
+                    <!-- RATING / REVIEWS / CATEGORY -->
+
+                    <div
+                        class="flex items-center gap-4 flex-wrap"
+                    >
+
+                        <div
+                            class="flex items-center gap-2"
+                        >
+
+                            <span
+                                class="material-symbols-outlined text-yellow-400"
+                                style="font-variation-settings: 'FILL' 1;"
+                            >
+                                star
+                            </span>
+
+                            <span
+                                id="place-rating"
+                                class="text-xl font-semibold"
+                            >
+                                -
+                            </span>
+
+                        </div>
+
+
+                        <span
+                            id="place-reviews"
+                            class="text-white/80"
+                        >
+                            (0 reviews)
+                        </span>
+
+
+                        <span
+                            id="place-category"
+                            class="px-4 py-1 rounded-full bg-white/20 backdrop-blur-sm"
+                        >
+                            -
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================================= -->
+        <!-- CONTENT -->
+        <!-- ================================= -->
+
+        <section
+            class="max-w-7xl mx-auto px-6 py-12"
+        >
+
+            <div
+                class="grid grid-cols-1 lg:grid-cols-3 gap-10"
+            >
+
+
+                <!-- ================================= -->
+                <!-- LEFT CONTENT -->
+                <!-- ================================= -->
+
+                <div
+                    class="lg:col-span-2"
+                >
+
+
+                    <!-- ABOUT -->
+
+                    <div class="mb-10">
+
+                        <h2
+                            class="text-3xl font-bold mb-5"
+                        >
+                            About This Place
+                        </h2>
+
+
+                        <p
+                            id="place-description"
+                            class="text-lg text-gray-600 leading-relaxed"
+                        >
+                            Loading description...
+                        </p>
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- LOCATION MAP -->
+                    <!-- ================================= -->
+
+                    <div class="mb-10">
+
+                        <h2
+                            class="text-3xl font-bold mb-5"
+                        >
+                            Location Map
+                        </h2>
+
+
+                        <div
+                            id="destination-map"
+                            class="w-full h-[400px] rounded-2xl shadow-sm overflow-hidden"
+                        ></div>
+
+                    </div>
+
+
+                    <!-- ================================= -->
+                    <!-- DETAILS -->
+                    <!-- ================================= -->
+
+                    <div>
+
+                        <h2
+                            class="text-3xl font-bold mb-6"
+                        >
+                            Place Information
+                        </h2>
+
+
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-2 gap-5"
+                        >
+
+
+                            <!-- CATEGORY -->
+
+                            <div
+                                class="bg-white rounded-xl p-5 shadow-sm"
+                            >
+
+                                <div class="flex items-center gap-3">
+
+                                    <span
+                                        class="material-symbols-outlined text-teal-600"
+                                    >
+                                        category
+                                    </span>
+
+                                    <div>
+
+                                        <p class="text-sm text-gray-500">
+                                            Category
+                                        </p>
+
+                                        <p
+                                            id="info-category"
+                                            class="font-semibold"
+                                        >
+                                            -
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- SUB CATEGORY -->
+
+                            <div
+                                class="bg-white rounded-xl p-5 shadow-sm"
+                            >
+
+                                <div class="flex items-center gap-3">
+
+                                    <span
+                                        class="material-symbols-outlined text-teal-600"
+                                    >
+                                        label
+                                    </span>
+
+                                    <div>
+
+                                        <p class="text-sm text-gray-500">
+                                            Sub Category
+                                        </p>
+
+                                        <p
+                                            id="info-subcategory"
+                                            class="font-semibold"
+                                        >
+                                            -
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- OPENING TIME -->
+
+                            <div
+                                class="bg-white rounded-xl p-5 shadow-sm"
+                            >
+
+                                <div class="flex items-center gap-3">
+
+                                    <span
+                                        class="material-symbols-outlined text-teal-600"
+                                    >
+                                        schedule
+                                    </span>
+
+                                    <div>
+
+                                        <p class="text-sm text-gray-500">
+                                            Opening Time
+                                        </p>
+
+                                        <p
+                                            id="opening-time"
+                                            class="font-semibold"
+                                        >
+                                            -
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- CLOSING TIME -->
+
+                            <div
+                                class="bg-white rounded-xl p-5 shadow-sm"
+                            >
+
+                                <div class="flex items-center gap-3">
+
+                                    <span
+                                        class="material-symbols-outlined text-teal-600"
+                                    >
+                                        schedule
+                                    </span>
+
+                                    <div>
+
+                                        <p class="text-sm text-gray-500">
+                                            Closing Time
+                                        </p>
+
+                                        <p
+                                            id="closing-time"
+                                            class="font-semibold"
+                                        >
+                                            -
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- RATING -->
+
+                            <div
+                                class="bg-white rounded-xl p-5 shadow-sm"
+                            >
+
+                                <div class="flex items-center gap-3">
+
+                                    <span
+                                        class="material-symbols-outlined text-yellow-500"
+                                    >
+                                        star
+                                    </span>
+
+                                    <div>
+
+                                        <p class="text-sm text-gray-500">
+                                            Rating
+                                        </p>
+
+                                        <p
+                                            id="info-rating"
+                                            class="font-semibold"
+                                        >
+                                            -
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- REVIEWS -->
+
+                            <div
+                                class="bg-white rounded-xl p-5 shadow-sm"
+                            >
+
+                                <div class="flex items-center gap-3">
+
+                                    <span
+                                        class="material-symbols-outlined text-teal-600"
+                                    >
+                                        reviews
+                                    </span>
+
+                                    <div>
+
+                                        <p class="text-sm text-gray-500">
+                                            Reviews
+                                        </p>
+
+                                        <p
+                                            id="info-reviews"
+                                            class="font-semibold"
+                                        >
+                                            -
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- RIGHT SIDEBAR -->
+                <!-- ================================= -->
+
+                <div>
+
+                    <div
+                        class="bg-white rounded-2xl p-6 shadow-sm sticky top-28"
+                    >
+
+                        <h3
+                            class="text-2xl font-bold mb-6"
+                        >
+                            Quick Information
+                        </h3>
+
+
+                        <!-- LOCATION -->
+
+                        <div
+                            class="flex gap-4 mb-6"
+                        >
+
+                            <span
+                                class="material-symbols-outlined text-teal-600"
+                            >
+                                location_on
+                            </span>
+
+                            <div>
+
+                                <p class="text-sm text-gray-500">
+                                    Location
+                                </p>
+
+                                <p
+                                    id="info-location"
+                                    class="font-semibold"
+                                >
+                                    -
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- OPENING -->
+
+                        <div
+                            class="flex gap-4 mb-6"
+                        >
+
+                            <span
+                                class="material-symbols-outlined text-teal-600"
+                            >
+                                access_time
+                            </span>
+
+                            <div>
+
+                                <p class="text-sm text-gray-500">
+                                    Opening Hours
+                                </p>
+
+                                <p class="font-semibold">
+
+                                    <span id="sidebar-opening">
+                                        -
+                                    </span>
+
+                                    -
+
+                                    <span id="sidebar-closing">
+                                        -
+                                    </span>
+
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- RATING -->
+
+                        <div
+                            class="flex gap-4"
+                        >
+
+                            <span
+                                class="material-symbols-outlined text-yellow-500"
+                            >
+                                star
+                            </span>
+
+                            <div>
+
+                                <p class="text-sm text-gray-500">
+                                    Rating
+                                </p>
+
+                                <p
+                                    id="sidebar-rating"
+                                    class="font-semibold"
+                                >
+                                    -
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================================= -->
+    <!-- LEAFLET MAP JAVASCRIPT -->
+    <!-- ================================= -->
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    ></script>
+
+
+    <!-- ================================= -->
+    <!-- MAIN JAVASCRIPT -->
+    <!-- ================================= -->
+
+    <script>
+
+        const BACKEND_URL =
+            "http://localhost:8081";
+
+
+        // ====================================
+        // PAGE LOAD
+        // ====================================
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            loadPlaceDetails
+        );
+
+
+        // ====================================
+        // INITIALIZE DESTINATION MAP
+        // ====================================
+
+        function initializeMap(place) {
+
+            const latitude = Number(place.latitude);
+            const longitude = Number(place.longitude);
+
+            console.log("=================================");
+            console.log("INITIALIZING DESTINATION MAP");
+            console.log("Latitude:", latitude);
+            console.log("Longitude:", longitude);
+            console.log("=================================");
+
+
+            // Check coordinates
+
+            if (
+                !Number.isFinite(latitude) ||
+                !Number.isFinite(longitude)
+            ) {
+
+                console.error(
+                    "Invalid latitude or longitude:",
+                    place.latitude,
+                    place.longitude
+                );
+
+                const mapContainer =
+                    document.getElementById(
+                        "destination-map"
+                    );
+
+                if (mapContainer) {
+
+                    mapContainer.innerHTML = `
+                        <div class="h-full flex items-center justify-center bg-gray-100 text-gray-500">
+                            <div class="text-center">
+                                <span class="material-symbols-outlined text-4xl mb-2">
+                                    location_off
+                                </span>
+                                <p>Location coordinates are not available.</p>
+                            </div>
+                        </div>
+                    `;
+
+                }
+
+                return;
+            }
+
+
+            // Create map
+
+            const map =
+                L.map("destination-map").setView(
+                    [
+                        latitude,
+                        longitude
+                    ],
+                    15
+                );
+
+
+            // OpenStreetMap tiles
+
+            L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+                    maxZoom: 19,
+
+                    attribution:
+                        '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+                }
+            ).addTo(map);
+
+
+            // Create marker
+
+            const marker =
+                L.marker(
+                    [
+                        latitude,
+                        longitude
+                    ]
+                ).addTo(map);
+
+
+            // Popup
+
+            marker.bindPopup(`
+                <div style="min-width:180px;">
+                    <strong>
+                        ${escapeHtml(
+                            place.placeName ||
+                            "Tourist Place"
+                        )}
+                    </strong>
+
+                    <br>
+
+                    <span>
+                        ${escapeHtml(
+                            place.location ||
+                            ""
+                        )}
+                    </span>
+                </div>
+            `).openPopup();
+
+
+            // Fix map rendering
+
+            setTimeout(
+                function () {
+                    map.invalidateSize();
+                },
+                300
+            );
+
+        }
+
+
+        // ====================================
+        // LOAD SELECTED PLACE
+        // ====================================
+
+        async function loadPlaceDetails() {
+
+            console.log(
+                "================================="
+            );
+
+            console.log(
+                "TOURIST PLACE DETAILS PAGE"
+            );
+
+            console.log(
+                "================================="
+            );
+
+
+            // ====================================
+            // GET SELECTED PLACE
+            // ====================================
+
+            const savedPlace =
+                localStorage.getItem(
+                    "selectedPlace"
+                );
+
+
+            if (!savedPlace) {
+
+                console.error(
+                    "No selectedPlace found in localStorage."
+                );
+
+                alert(
+                    "No tourist place selected."
+                );
+
+                return;
+            }
+
+
+            try {
+
+                const place =
+                    JSON.parse(savedPlace);
+
+
+                console.log(
+                    "Selected place:",
+                    place
+                );
+
+
+                // ====================================
+                // CHECK COORDINATES
+                // ====================================
+
+                console.log(
+                    "Latitude:",
+                    place.latitude
+                );
+
+                console.log(
+                    "Longitude:",
+                    place.longitude
+                );
+
+
+                // ====================================
+                // INITIALIZE MAP
+                // ====================================
+
+                initializeMap(place);
+
+
+                // ====================================
+                // PLACE NAME
+                // ====================================
+
+                document.getElementById(
+                    "place-name"
+                ).textContent =
+                    place.placeName ||
+                    "Tourist Place";
+
+
+                // ====================================
+                // LOCATION
+                // ====================================
+
+                document.getElementById(
+                    "place-location"
+                ).textContent =
+                    place.location ||
+                    "Solapur";
+
+
+                document.getElementById(
+                    "info-location"
+                ).textContent =
+                    place.location ||
+                    "Solapur";
+
+
+                // ====================================
+                // DESCRIPTION
+                // ====================================
+
+                document.getElementById(
+                    "place-description"
+                ).textContent =
+                    place.description ||
+                    "No description available.";
+
+
+                // ====================================
+                // CATEGORY
+                // ====================================
+
+                const category =
+                    place.category ||
+                    "Tourist Place";
+
+
+                document.getElementById(
+                    "place-category"
+                ).textContent =
+                    category;
+
+
+                document.getElementById(
+                    "info-category"
+                ).textContent =
+                    category;
+
+
+                // ====================================
+                // SUB CATEGORY
+                // ====================================
+
+                document.getElementById(
+                    "info-subcategory"
+                ).textContent =
+                    place.subCategory ||
+                    "Not available";
+
+
+                // ====================================
+                // RATING
+                // ====================================
+
+                const rating =
+                    place.rating != null
+                        ? place.rating
+                        : "N/A";
+
+
+                document.getElementById(
+                    "place-rating"
+                ).textContent =
+                    rating;
+
+
+                document.getElementById(
+                    "info-rating"
+                ).textContent =
+                    rating;
+
+
+                document.getElementById(
+                    "sidebar-rating"
+                ).textContent =
+                    rating;
+
+
+                // ====================================
+                // REVIEWS
+                // ====================================
+
+                const reviewCount =
+                    place.reviewCount != null
+                        ? place.reviewCount
+                        : 0;
+
+
+                document.getElementById(
+                    "place-reviews"
+                ).textContent =
+                    `(${reviewCount} reviews)`;
+
+
+                document.getElementById(
+                    "info-reviews"
+                ).textContent =
+                    reviewCount;
+
+
+                // ====================================
+                // OPENING TIME
+                // ====================================
+
+                const openingTime =
+                    place.openingTime ||
+                    "Not available";
+
+
+                document.getElementById(
+                    "opening-time"
+                ).textContent =
+                    openingTime;
+
+
+                document.getElementById(
+                    "sidebar-opening"
+                ).textContent =
+                    place.openingTime ||
+                    "-";
+
+
+                // ====================================
+                // CLOSING TIME
+                // ====================================
+
+                const closingTime =
+                    place.closingTime ||
+                    "Not available";
+
+
+                document.getElementById(
+                    "closing-time"
+                ).textContent =
+                    closingTime;
+
+
+                document.getElementById(
+                    "sidebar-closing"
+                ).textContent =
+                    place.closingTime ||
+                    "-";
+
+
+                // ====================================
+                // BACKEND IMAGE
+                // ====================================
+
+                const image =
+                    document.getElementById(
+                        "place-image"
+                    );
+
+
+                let imageUrl =
+                    place.imageUrl;
+
+
+                console.log(
+                    "Image URL from backend:",
+                    imageUrl
+                );
+
+
+                if (imageUrl) {
+
+                    imageUrl =
+                        String(imageUrl).trim();
+
+
+                    // --------------------------------
+                    // FULL URL
+                    // --------------------------------
+
+                    if (
+                        imageUrl.startsWith(
+                            "http://"
+                        ) ||
+                        imageUrl.startsWith(
+                            "https://"
+                        )
+                    ) {
+
+                        // Already complete URL
+
+                    }
+
+
+                    // --------------------------------
+                    // RELATIVE URL
+                    // --------------------------------
+
+                    else if (
+                        imageUrl.startsWith("/")
+                    ) {
+
+                        imageUrl =
+                            BACKEND_URL +
+                            imageUrl;
+
+                    }
+
+
+                    // --------------------------------
+                    // FILE NAME
+                    // --------------------------------
+
+                    else {
+
+                        imageUrl =
+                            BACKEND_URL +
+                            "/" +
+                            imageUrl;
+
+                    }
+
+                }
+
+
+                // --------------------------------
+                // NO IMAGE
+                // --------------------------------
+
+                if (!imageUrl) {
+
+                    imageUrl =
+                        "https://via.placeholder.com/1200x600?text=No+Image";
+
+                }
+
+
+                console.log(
+                    "FINAL IMAGE URL:",
+                    imageUrl
+                );
+
+
+                // --------------------------------
+                // SET IMAGE
+                // --------------------------------
+
+                image.src =
+                    imageUrl;
+
+
+                image.alt =
+                    place.placeName ||
+                    "Tourist Place";
+
+
+                // --------------------------------
+                // IMAGE ERROR
+                // --------------------------------
+
+                image.onerror =
+                    function () {
+
+                        console.error(
+                            "IMAGE FAILED TO LOAD:",
+                            this.src
+                        );
+
+
+                        this.onerror = null;
+
+
+                        this.src =
+                            "https://via.placeholder.com/1200x600?text=Image+Not+Found";
+
+                    };
+
+
+                console.log(
+                    "Tourist place details loaded successfully."
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Error displaying tourist place:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to display tourist place details."
+                );
+
+            }
+
+        }
+
+
+        // ====================================
+        // ESCAPE HTML
+        // ====================================
+
+        function escapeHtml(value) {
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+
+            div.textContent =
+                value ?? "";
+
+
+            return div.innerHTML;
+
+        }
+
+    </script>
+
+    <!-- Multilingual Support (i18n) & Navigation -->
+    <script src="../translations.js"></script>
+    <script src="../i18n.js"></script>
+    <script src="../navigation.js"></script>
+
+</body>
+
+</html>

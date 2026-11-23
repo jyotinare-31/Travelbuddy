@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>TravelBuddy Community - Travel Feed & Reviews</title>
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { display: none; }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0F172A",
+            "secondary": "#0D9488",
+            "secondary-dark": "#0B7269",
+            "secondary-container": "#CCFBF1",
+            "on-secondary": "#FFFFFF",
+            "surface": "#F8FAFC",
+            "surface-white": "#FFFFFF",
+            "surface-container": "#F1F5F9",
+            "surface-container-low": "#F8FAFC",
+            "surface-container-high": "#E2E8F0",
+            "on-surface": "#0F172A",
+            "on-surface-variant": "#475569",
+            "text-muted": "#64748B",
+            "text-main": "#0F172A",
+            "outline-variant": "#CBD5E1",
+            "error": "#EF4444",
+            "error-container": "#FEE2E2",
+            "primary-container": "#1E293B",
+            "on-primary-container": "#94A3B8"
+          },
+          fontFamily: {
+            "headline-xl": ["Montserrat", "sans-serif"],
+            "headline-lg": ["Montserrat", "sans-serif"],
+            "headline-md": ["Montserrat", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "label-md": ["Inter", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+</head>
+<body class="bg-[#F8FAFC] font-body-md text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- ========================================================= -->
+  <!-- TOAST NOTIFICATION -->
+  <!-- ========================================================= -->
+  <div id="toast" class="fixed top-24 right-6 z-50 transform translate-y-[-150%] opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 bg-primary text-white px-5 py-3.5 rounded-xl shadow-2xl border border-white/10">
+    <span class="material-symbols-outlined text-secondary" id="toast-icon">check_circle</span>
+    <span class="font-label-md text-sm" id="toast-message">Notification</span>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- TOP NAVIGATION HEADER -->
+  <!-- ========================================================= -->
+  <header class="fixed top-0 w-full z-40 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-sm transition-all">
+    <div class="h-20 max-w-[1280px] mx-auto px-4 md:px-8 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="../smarttour_home_2/code.html" class="flex items-center gap-2 group">
+          <div class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-2xl">explore</span>
+          </div>
+          <span class="font-headline-md text-2xl text-primary font-bold tracking-tight">TravelBuddy</span>
+        </a>
+      </div>
+
+      <nav class="hidden lg:flex items-center gap-8 h-full">
+        <a class="font-label-md text-slate-600 hover:text-primary transition-colors py-2" data-path="home" href="../smarttour_home_2/code.html">Home</a>
+        <a class="font-label-md text-slate-600 hover:text-primary transition-colors py-2" data-path="explore" href="../explore_destinations/explore_destinations.html">Explore Destinations</a>
+        <a class="font-label-md text-slate-600 hover:text-primary transition-colors py-2" data-path="plan-trip" href="../plan_my_trip/code.html">Plan Trip</a>
+        <a aria-current="page" class="transition-colors py-2 text-secondary font-bold border-b-2 border-secondary" data-path="community" href="#">Community</a>
+        <a class="font-label-md text-slate-600 hover:text-primary transition-colors py-2" data-path="ai-assistant" href="../ai_assistant/code.html">AI Assistant</a>
+      </nav>
+
+      <div class="flex items-center gap-4">
+        <!-- Live Auth User Display -->
+        <div id="nav-user-area" class="flex items-center gap-3">
+          <!-- Populated by JS -->
+          <a href="../login_smarttour/code.html" class="px-4 py-2 text-sm font-semibold text-secondary border border-secondary rounded-lg hover:bg-secondary/10 transition">Sign In</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================= -->
+  <!-- MAIN COMMUNITY CONTENT -->
+  <!-- ========================================================= -->
+  <main class="w-full pt-24 pb-16 flex-grow">
+    <div class="max-w-[1280px] mx-auto px-4 md:px-8 py-6">
+
+      <!-- Hero Banner -->
+      <div class="mb-8 p-6 md:p-8 rounded-3xl bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 text-white relative overflow-hidden shadow-xl">
+        <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-secondary/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 max-w-2xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/20 border border-secondary/30 text-teal-300 text-xs font-semibold uppercase tracking-wider mb-3">
+            <span class="material-symbols-outlined text-[16px]">groups</span>
+            Travelers Community
+          </div>
+          <h1 class="font-headline-xl text-3xl md:text-4xl font-bold tracking-tight mb-2">Connect, Share &amp; Discover Solapur</h1>
+          <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+            Real stories, verified tips, and photos from travelers exploring Maharashtra's historic temples, forts, and cultural treasures.
+          </p>
+        </div>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button onclick="openCreateModal()" class="inline-flex items-center gap-2 bg-secondary hover:bg-secondary-dark text-white px-5 py-2.5 rounded-full font-label-md text-sm font-semibold shadow-lg hover:shadow-teal-500/25 transition">
+            <span class="material-symbols-outlined text-lg">add_a_photo</span>
+            Share Experience
+          </button>
+          <button onclick="openReviewModal()" class="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur text-white px-5 py-2.5 rounded-full font-label-md text-sm font-semibold transition border border-white/15">
+            <span class="material-symbols-outlined text-lg">rate_review</span>
+            Write Destination Review
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Layout Grid: 3 columns -->
+      <div class="flex flex-col lg:flex-row gap-8">
+
+        <!-- ===================================================== -->
+        <!-- LEFT SIDEBAR: PROFILE & DESTINATION FILTERS -->
+        <!-- ===================================================== -->
+        <aside class="w-full lg:w-1/4 space-y-6">
+
+          <!-- Current User Profile Card -->
+          <div id="sidebar-profile-card" class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col items-center text-center">
+            <div class="w-20 h-20 rounded-full overflow-hidden mb-3 relative ring-4 ring-secondary/20 shadow-inner">
+              <img id="sidebar-avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTQEYiqqhF13mq1MvVG8oj8P-2C6AHl2G_Oyz7QGmleqq3BA4arNRGaj--XucMf6LOOlYqj0yD604G0_kevFGoJO75JE3UJHS5binQOHuR51eWnjxmfKNuKSBTPomvHwt_oyFVnXuh_OL7AdEn-eYaMA4DRLUIV30tuDYb7YE70upE5AVnJlDzfTl2QcswaDCFYhhqwLegiKwotE0-CTTQyg9PJqvNGCR_7vuOL5XIrZaWCNpvQwS9Sw" alt="Profile"/>
+            </div>
+            <h2 id="sidebar-name" class="font-headline-md text-lg font-bold text-primary mb-0.5">Alex Wanderer</h2>
+            <p id="sidebar-bio" class="text-xs text-text-muted mb-4 line-clamp-2">Explorer &amp; Heritage Travel Enthusiast</p>
+
+            <div class="grid grid-cols-3 w-full py-3 mb-4 rounded-xl bg-slate-50 border border-slate-100 text-center">
+              <div>
+                <span id="sidebar-posts-count" class="block font-headline-md font-bold text-primary text-base">--</span>
+                <span class="block text-[11px] text-text-muted uppercase tracking-wider">Posts</span>
+              </div>
+              <div class="border-x border-slate-200">
+                <span id="sidebar-reviews-count" class="block font-headline-md font-bold text-primary text-base">--</span>
+                <span class="block text-[11px] text-text-muted uppercase tracking-wider">Reviews</span>
+              </div>
+              <div>
+                <span id="sidebar-likes-count" class="block font-headline-md font-bold text-primary text-base">--</span>
+                <span class="block text-[11px] text-text-muted uppercase tracking-wider">Likes</span>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-2 w-full">
+              <button onclick="viewMyProfile()" class="w-full bg-slate-900 hover:bg-black text-white font-label-md text-xs font-semibold py-2.5 rounded-lg transition">
+                View My Profile
+              </button>
+              <div id="sidebar-auth-actions" class="w-full">
+                <!-- Log out or Quick Demo Login buttons inserted here -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Destinations Filter Card -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-headline-md text-base font-bold text-primary flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary text-lg">explore</span>
+                Filter by Destination
+              </h3>
+              <button onclick="resetDestinationFilter()" class="text-xs text-secondary hover:underline font-medium">Reset</button>
+            </div>
+
+            <div id="destinations-filter-list" class="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+              <button onclick="selectDestinationFilter(null, 'All Destinations')" class="dest-filter-btn active w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-left transition bg-teal-50 text-secondary border border-teal-200">
+                <span>📍 All Destinations</span>
+                <span class="material-symbols-outlined text-sm">check</span>
+              </button>
+              <!-- Loaded dynamically from database -->
+            </div>
+          </div>
+
+        </aside>
+
+        <!-- ===================================================== -->
+        <!-- MAIN COMMUNITY FEED -->
+        <!-- ===================================================== -->
+        <main class="w-full lg:w-2/4 space-y-6">
+
+          <!-- Search & Filter Controls -->
+          <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm space-y-3">
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+              <input id="feed-search-input" type="text" placeholder="Search posts by keywords, tags, or places..." oninput="handleSearchInput()" class="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50 focus:bg-white transition"/>
+              <button id="clear-search-btn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                <span class="material-symbols-outlined text-sm">close</span>
+              </button>
+            </div>
+
+            <!-- Sort and Active Filter Bar -->
+            <div class="flex items-center justify-between pt-1 flex-wrap gap-2">
+              <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-semibold text-slate-600">
+                <button onclick="changeSort('latest')" id="tab-latest" class="sort-tab active px-3 py-1.5 rounded-lg bg-white text-primary shadow-xs transition">Latest</button>
+                <button onclick="changeSort('trending')" id="tab-trending" class="sort-tab px-3 py-1.5 rounded-lg hover:text-primary transition">🔥 Trending</button>
+                <button onclick="changeSort('top_rated')" id="tab-top_rated" class="sort-tab px-3 py-1.5 rounded-lg hover:text-primary transition">⭐ Top Rated</button>
+              </div>
+
+              <div id="active-filter-badge" class="hidden inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-teal-100 text-teal-800 font-medium">
+                <span id="active-filter-label">Destination</span>
+                <button onclick="resetDestinationFilter()" class="hover:text-black">
+                  <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Post Box -->
+          <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex items-center gap-3">
+            <img id="quick-post-avatar" class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTQEYiqqhF13mq1MvVG8oj8P-2C6AHl2G_Oyz7QGmleqq3BA4arNRGaj--XucMf6LOOlYqj0yD604G0_kevFGoJO75JE3UJHS5binQOHuR51eWnjxmfKNuKSBTPomvHwt_oyFVnXuh_OL7AdEn-eYaMA4DRLUIV30tuDYb7YE70upE5AVnJlDzfTl2QcswaDCFYhhqwLegiKwotE0-CTTQyg9PJqvNGCR_7vuOL5XIrZaWCNpvQwS9Sw" alt="User"/>
+            <button onclick="openCreateModal()" class="flex-grow text-left px-4 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 text-sm transition border border-slate-200/60 flex items-center justify-between">
+              <span>Share your travel experience, tip or photo...</span>
+              <span class="material-symbols-outlined text-secondary text-lg">add_photo_alternate</span>
+            </button>
+          </div>
+
+          <!-- POSTS CONTAINER -->
+          <div id="posts-container" class="space-y-6">
+            <!-- Loading Skeleton -->
+            <div id="feed-loading" class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm animate-pulse space-y-4">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-slate-200"></div>
+                <div class="space-y-2 flex-grow">
+                  <div class="h-4 bg-slate-200 rounded w-1/4"></div>
+                  <div class="h-3 bg-slate-100 rounded w-1/3"></div>
+                </div>
+              </div>
+              <div class="h-64 bg-slate-200 rounded-xl"></div>
+              <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+              <div class="h-3 bg-slate-100 rounded w-full"></div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div id="feed-empty" class="hidden bg-white rounded-2xl p-12 text-center border border-slate-200/80 shadow-sm">
+            <span class="material-symbols-outlined text-5xl text-slate-300 mb-3">hiking</span>
+            <h3 class="font-headline-md text-lg font-bold text-primary mb-1">No posts found</h3>
+            <p class="text-sm text-text-muted mb-4">Be the first to share an experience for this destination!</p>
+            <button onclick="openCreateModal()" class="px-5 py-2 bg-secondary text-white rounded-full text-xs font-semibold shadow hover:bg-secondary-dark transition">Create Post</button>
+          </div>
+
+        </main>
+
+        <!-- ===================================================== -->
+        <!-- RIGHT SIDEBAR: DESTINATION REVIEWS & TIPS -->
+        <!-- ===================================================== -->
+        <aside class="w-full lg:w-1/4 space-y-6">
+
+          <!-- Solapur Tourist Destination Reviews -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-headline-md text-base font-bold text-primary flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-amber-500 text-lg">hotel_class</span>
+                Destination Reviews
+              </h3>
+              <button onclick="openReviewModal()" class="text-xs text-secondary hover:underline font-semibold">+ Review</button>
+            </div>
+
+            <!-- Reviews list loaded from backend -->
+            <div id="sidebar-reviews-list" class="space-y-4">
+              <div class="text-xs text-slate-400 text-center py-4">Loading verified reviews...</div>
+            </div>
+          </div>
+
+          <!-- Community Guidelines Widget -->
+          <div class="bg-gradient-to-br from-slate-50 to-teal-50/50 rounded-2xl p-6 border border-teal-100/80 shadow-sm">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="material-symbols-outlined text-secondary text-xl">verified</span>
+              <h4 class="font-headline-md text-sm font-bold text-primary">Community Guidelines</h4>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-2">
+              <li class="flex items-start gap-2">
+                <span class="text-secondary font-bold">✓</span>
+                Share authentic photos, local culinary tips, and honest routes.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-secondary font-bold">✓</span>
+                Respect local heritage sites, heritage monuments &amp; temple customs.
+              </li>
+              <li class="flex items-start gap-2">
+                <span class="text-secondary font-bold">✓</span>
+                Report inaccurate or inappropriate posts to help keep our travel community welcoming.
+              </li>
+            </ul>
+          </div>
+
+        </aside>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- FLOATING ACTION BUTTON (SHARE EXPERIENCE) -->
+  <!-- ========================================================= -->
+  <button onclick="openCreateModal()" aria-label="Share Experience" class="fixed bottom-8 right-8 bg-secondary hover:bg-secondary-dark text-white rounded-full shadow-2xl flex items-center gap-2 px-5 py-3.5 hover:-translate-y-1 transition duration-200 z-30 group">
+    <span class="material-symbols-outlined text-2xl group-hover:rotate-12 transition-transform">edit_document</span>
+    <span class="font-label-md text-sm font-semibold whitespace-nowrap">Share Experience</span>
+  </button>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 1: CREATE / EDIT POST -->
+  <!-- ========================================================= -->
+  <div id="post-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-200">
+      <div class="flex items-center justify-between p-5 border-b border-slate-100">
+        <h3 id="post-modal-title" class="font-headline-md text-lg font-bold text-primary">Share Travel Experience</h3>
+        <button onclick="closePostModal()" class="text-slate-400 hover:text-slate-600 rounded-full p-1 hover:bg-slate-100">
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+      </div>
+
+      <form id="post-form" onsubmit="handlePostSubmit(event)" class="p-6 space-y-4">
+        <input type="hidden" id="edit-post-id" value=""/>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="post-title">Post Title *</label>
+          <input type="text" id="post-title" required placeholder="e.g., Majestic Sunset Views at Bhuikot Fort" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50"/>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="post-destination-select">Destination</label>
+            <select id="post-destination-select" onchange="handleDestSelectChange()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50 bg-white">
+              <option value="">Select Destination...</option>
+              <!-- Loaded dynamically -->
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="post-custom-dest">Or Custom Place Name</label>
+            <input type="text" id="post-custom-dest" placeholder="e.g., Solapur Textile Market" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50"/>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Your Rating *</label>
+          <div class="flex items-center gap-1.5" id="post-star-container">
+            <!-- 5 stars -->
+            <button type="button" onclick="setPostRating(1)" class="star-btn text-2xl text-amber-400 focus:outline-none">★</button>
+            <button type="button" onclick="setPostRating(2)" class="star-btn text-2xl text-amber-400 focus:outline-none">★</button>
+            <button type="button" onclick="setPostRating(3)" class="star-btn text-2xl text-amber-400 focus:outline-none">★</button>
+            <button type="button" onclick="setPostRating(4)" class="star-btn text-2xl text-amber-400 focus:outline-none">★</button>
+            <button type="button" onclick="setPostRating(5)" class="star-btn text-2xl text-amber-400 focus:outline-none">★</button>
+            <span id="rating-label" class="text-xs font-medium text-slate-500 ml-2">5 of 5 Stars</span>
+          </div>
+          <input type="hidden" id="post-rating" value="5"/>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="post-image-url">Image URL (Optional)</label>
+          <input type="url" id="post-image-url" placeholder="https://images.unsplash.com/..." oninput="updateImagePreview()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50"/>
+          
+          <!-- Image Presets for Solapur -->
+          <div class="mt-2 flex flex-wrap gap-1.5 items-center">
+            <span class="text-[11px] text-slate-400">Presets:</span>
+            <button type="button" onclick="setImagePreset('http://localhost:8081/images/bhuikot.webp')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-[11px] text-slate-700">Fort</button>
+            <button type="button" onclick="setImagePreset('http://localhost:8081/images/Siddheshwar_temple_02.jpg.jpeg')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-[11px] text-slate-700">Siddheshwar</button>
+            <button type="button" onclick="setImagePreset('http://localhost:8081/images/SwamiSamarthTemple.avif')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-[11px] text-slate-700">Akkalkot</button>
+            <button type="button" onclick="setImagePreset('https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=1200&q=80')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-[11px] text-slate-700">Local Cuisine</button>
+          </div>
+
+          <!-- Preview image -->
+          <div id="image-preview-container" class="mt-2 hidden rounded-xl overflow-hidden h-36 border border-slate-200 relative">
+            <img id="image-preview" src="" alt="Preview" class="w-full h-full object-cover"/>
+            <button type="button" onclick="clearImagePreset()" class="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white hover:bg-black">
+              <span class="material-symbols-outlined text-xs">close</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="post-description">Travel Story &amp; Description *</label>
+          <textarea id="post-description" rows="4" required placeholder="What made this visit special? Mention best times to visit, local tips, entry fees, or food recommendations..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closePostModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-sm font-medium transition">Cancel</button>
+          <button type="submit" id="post-submit-btn" class="px-6 py-2 rounded-xl bg-secondary hover:bg-secondary-dark text-white text-sm font-semibold shadow transition">Publish Story</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: WRITE DESTINATION REVIEW -->
+  <!-- ========================================================= -->
+  <div id="review-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full border border-slate-200">
+      <div class="flex items-center justify-between p-5 border-b border-slate-100">
+        <h3 class="font-headline-md text-lg font-bold text-primary">Review a Destination</h3>
+        <button onclick="closeReviewModal()" class="text-slate-400 hover:text-slate-600 rounded-full p-1 hover:bg-slate-100">
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+      </div>
+
+      <form id="review-form" onsubmit="handleReviewSubmit(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="review-destination-select">Select Solapur Destination *</label>
+          <select id="review-destination-select" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50 bg-white">
+            <option value="">Select Place to Review...</option>
+            <!-- Loaded dynamically from tourist_places -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Your Star Rating *</label>
+          <div class="flex items-center gap-1.5" id="review-star-container">
+            <button type="button" onclick="setReviewRating(1)" class="rev-star-btn text-2xl text-amber-400">★</button>
+            <button type="button" onclick="setReviewRating(2)" class="rev-star-btn text-2xl text-amber-400">★</button>
+            <button type="button" onclick="setReviewRating(3)" class="rev-star-btn text-2xl text-amber-400">★</button>
+            <button type="button" onclick="setReviewRating(4)" class="rev-star-btn text-2xl text-amber-400">★</button>
+            <button type="button" onclick="setReviewRating(5)" class="rev-star-btn text-2xl text-amber-400">★</button>
+            <span id="review-rating-label" class="text-xs font-medium text-slate-500 ml-2">5 Stars</span>
+          </div>
+          <input type="hidden" id="review-rating" value="5"/>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="review-date">Visit Date (Optional)</label>
+          <input type="date" id="review-date" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50"/>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="review-text">Your Review *</label>
+          <textarea id="review-text" rows="3" required placeholder="Write your honest thoughts about maintenance, crowd, facilities, best time..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeReviewModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-sm font-medium transition">Cancel</button>
+          <button type="submit" id="review-submit-btn" class="px-6 py-2 rounded-xl bg-secondary hover:bg-secondary-dark text-white text-sm font-semibold shadow transition">Submit Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 3: REPORT POST -->
+  <!-- ========================================================= -->
+  <div id="report-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full border border-slate-200">
+      <div class="flex items-center justify-between p-5 border-b border-slate-100">
+        <h3 class="font-headline-md text-base font-bold text-primary flex items-center gap-2">
+          <span class="material-symbols-outlined text-error text-xl">flag</span>
+          Report Inappropriate Post
+        </h3>
+        <button onclick="closeReportModal()" class="text-slate-400 hover:text-slate-600 rounded-full p-1 hover:bg-slate-100">
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+      </div>
+
+      <form id="report-form" onsubmit="handleReportSubmit(event)" class="p-6 space-y-4">
+        <input type="hidden" id="report-post-id" value=""/>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="report-reason">Reason for reporting *</label>
+          <select id="report-reason" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50 bg-white">
+            <option value="Inappropriate content">Inappropriate / Offensive content</option>
+            <option value="Spam or advertising">Spam or unwanted advertising</option>
+            <option value="Misleading travel information">Misleading travel information</option>
+            <option value="Harassment or hate speech">Harassment or hate speech</option>
+            <option value="Copyright violation">Copyright violation</option>
+          </select>
+        </div>
+
+        <p class="text-xs text-text-muted leading-relaxed">
+          Our moderation team reviews reported posts within 24 hours to ensure high quality and respectful community standards.
+        </p>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeReportModal()" class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100 text-sm font-medium transition">Cancel</button>
+          <button type="submit" id="report-submit-btn" class="px-5 py-2 rounded-xl bg-error hover:bg-red-700 text-white text-sm font-semibold shadow transition">Submit Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 4: USER PROFILE MODAL -->
+  <!-- ========================================================= -->
+  <div id="profile-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-200">
+      <div class="relative bg-gradient-to-r from-slate-900 to-teal-900 text-white p-6 rounded-t-3xl">
+        <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-white/80 hover:text-white p-1 rounded-full bg-white/10 hover:bg-white/20 transition">
+          <span class="material-symbols-outlined text-xl">close</span>
+        </button>
+
+        <div class="flex items-center gap-4">
+          <img id="modal-profile-avatar" class="w-20 h-20 rounded-full object-cover ring-4 ring-white/20 shadow-lg" src="" alt="Avatar"/>
+          <div>
+            <h2 id="modal-profile-name" class="font-headline-md text-xl font-bold">User Name</h2>
+            <p id="modal-profile-email" class="text-xs text-teal-200 font-mono mb-1">email@example.com</p>
+            <p id="modal-profile-bio" class="text-xs text-slate-300 max-w-md">Bio...</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 mt-6 p-3 rounded-2xl bg-white/10 backdrop-blur border border-white/10 text-center">
+          <div>
+            <span id="modal-posts-count" class="block font-headline-md font-bold text-lg">0</span>
+            <span class="block text-[11px] text-teal-200 uppercase tracking-wider">Posts</span>
+          </div>
+          <div class="border-x border-white/15">
+            <span id="modal-reviews-count" class="block font-headline-md font-bold text-lg">0</span>
+            <span class="block text-[11px] text-teal-200 uppercase tracking-wider">Reviews</span>
+          </div>
+          <div>
+            <span id="modal-likes-count" class="block font-headline-md font-bold text-lg">0</span>
+            <span class="block text-[11px] text-teal-200 uppercase tracking-wider">Likes Received</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <!-- Profile tabs -->
+        <div class="flex items-center gap-2 border-b border-slate-200 mb-6">
+          <button onclick="switchProfileTab('posts')" id="ptab-posts" class="px-4 py-2 text-sm font-semibold text-secondary border-b-2 border-secondary">My Travel Posts</button>
+          <button onclick="switchProfileTab('reviews')" id="ptab-reviews" class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-800">My Destination Reviews</button>
+          <button onclick="switchProfileTab('edit')" id="ptab-edit" class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-800">Edit Profile</button>
+        </div>
+
+        <!-- Tab 1: Posts -->
+        <div id="profile-posts-tab" class="space-y-4">
+          <div id="profile-posts-list" class="space-y-3">
+            <!-- Dynamic -->
+          </div>
+        </div>
+
+        <!-- Tab 2: Reviews -->
+        <div id="profile-reviews-tab" class="hidden space-y-4">
+          <div id="profile-reviews-list" class="space-y-3">
+            <!-- Dynamic -->
+          </div>
+        </div>
+
+        <!-- Tab 3: Edit Bio -->
+        <div id="profile-edit-tab" class="hidden space-y-4">
+          <form onsubmit="handleProfileUpdate(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="edit-profile-name">Full Name</label>
+              <input type="text" id="edit-profile-name" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="edit-profile-avatar">Avatar URL</label>
+              <input type="url" id="edit-profile-avatar" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1" for="edit-profile-bio">Bio &amp; Travel Passion</label>
+              <textarea id="edit-profile-bio" rows="3" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-secondary/50"></textarea>
+            </div>
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-secondary hover:bg-secondary-dark text-white text-sm font-semibold shadow transition">Save Profile Changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- FOOTER -->
+  <!-- ========================================================= -->
+  <footer class="w-full bg-primary-container text-on-primary-container py-12 mt-auto border-t border-slate-800">
+    <div class="max-w-[1280px] mx-auto px-4 md:px-8">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center text-white">
+            <span class="material-symbols-outlined text-lg">explore</span>
+          </div>
+          <span class="font-headline-md text-white font-bold text-xl">TravelBuddy Community</span>
+        </div>
+        <p class="text-xs text-slate-400">© 2026 TravelBuddy Technologies. Solapur Tourism Hub. All rights reserved.</p>
+        <div class="flex gap-6 text-xs text-slate-400">
+          <a href="../smarttour_home_2/code.html" class="hover:text-secondary transition">Home</a>
+          <a href="../explore_destinations/explore_destinations.html" class="hover:text-secondary transition">Destinations</a>
+          <a href="../plan_my_trip/code.html" class="hover:text-secondary transition">Route Planner</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================= -->
+  <!-- JAVASCRIPT: COMMUNITY MODULE FRONTEND LOGIC -->
+  <!-- ========================================================= -->
+  <script>
+    const API_BASE = 'http://localhost:8081/api';
+
+    // State
+    let currentUser = null;
+    let currentToken = null;
+    let currentPosts = [];
+    let destinationsList = [];
+    let activeSort = 'latest';
+    let activeDestinationId = null;
+    let activeDestinationName = null;
+    let searchQuery = '';
+    let searchDebounceTimeout = null;
+
+    // -------------------------------------------------------------
+    // INITIALIZATION
+    // -------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', async () => {
+      initAuth();
+      await loadDestinations();
+      await loadFeed();
+      await loadRecentReviews();
+      if (currentUser) {
+        await loadUserProfileStats(currentUser.userId);
+      }
+    });
+
+    // -------------------------------------------------------------
+    // AUTHENTICATION STATE
+    // -------------------------------------------------------------
+    function initAuth() {
+      const storedToken = localStorage.getItem('travelbuddy_token') || localStorage.getItem('smarttour_token') || localStorage.getItem('token');
+      const storedUser = localStorage.getItem('travelbuddy_user') || localStorage.getItem('smarttour_user') || localStorage.getItem('user');
+
+      if (storedToken && storedUser) {
+        try {
+          currentToken = storedToken;
+          currentUser = JSON.parse(storedUser);
+          renderAuthenticatedHeader();
+        } catch (e) {
+          console.error('Failed to parse user session', e);
+          logout();
+        }
+      } else {
+        renderGuestHeader();
+      }
+    }
+
+    function renderAuthenticatedHeader() {
+      const userArea = document.getElementById('nav-user-area');
+      const avatarSrc = currentUser.avatarUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuBTQEYiqqhF13mq1MvVG8oj8P-2C6AHl2G_Oyz7QGmleqq3BA4arNRGaj--XucMf6LOOlYqj0yD604G0_kevFGoJO75JE3UJHS5binQOHuR51eWnjxmfKNuKSBTPomvHwt_oyFVnXuh_OL7AdEn-eYaMA4DRLUIV30tuDYb7YE70upE5AVnJlDzfTl2QcswaDCFYhhqwLegiKwotE0-CTTQyg9PJqvNGCR_7vuOL5XIrZaWCNpvQwS9Sw';
+
+      userArea.innerHTML = `
+        <div class="flex items-center gap-3">
+          <button onclick="viewMyProfile()" class="flex items-center gap-2 group p-1 pr-3 rounded-full hover:bg-slate-100 transition">
+            <img class="w-9 h-9 rounded-full object-cover ring-2 ring-secondary/50" src="${avatarSrc}" alt="${escapeHtml(currentUser.fullName)}"/>
+            <span class="text-xs font-semibold text-slate-800 max-w-[120px] truncate hidden sm:inline">${escapeHtml(currentUser.fullName)}</span>
+          </button>
+          <button onclick="logout()" class="text-xs text-slate-500 hover:text-error p-2 rounded-lg hover:bg-slate-100 transition" title="Log Out">
+            <span class="material-symbols-outlined text-[20px]">logout</span>
+          </button>
+        </div>
+      `;
+
+      // Update Sidebar Profile
+      document.getElementById('sidebar-name').textContent = currentUser.fullName;
+      document.getElementById('sidebar-avatar').src = avatarSrc;
+      document.getElementById('sidebar-bio').textContent = currentUser.bio || 'TravelBuddy Travel Contributor';
+      document.getElementById('quick-post-avatar').src = avatarSrc;
+
+      document.getElementById('sidebar-auth-actions').innerHTML = `
+        <button onclick="logout()" class="w-full text-xs text-slate-500 hover:text-error py-1.5 transition text-center font-medium">
+          Sign Out (${escapeHtml(currentUser.email)})
+        </button>
+      `;
+    }
+
+    function renderGuestHeader() {
+      const userArea = document.getElementById('nav-user-area');
+      userArea.innerHTML = `
+        <div class="flex items-center gap-2">
+          <button onclick="quickDemoLogin('alex@wanderer.com', 'password123')" class="px-3 py-1.5 text-xs font-semibold bg-teal-50 text-secondary hover:bg-teal-100 rounded-lg transition border border-teal-200">
+            Demo: Alex
+          </button>
+          <a href="../login_smarttour/code.html" class="px-4 py-2 text-xs font-semibold bg-secondary hover:bg-secondary-dark text-white rounded-lg transition shadow-xs">
+            Sign In
+          </a>
+        </div>
+      `;
+
+      document.getElementById('sidebar-name').textContent = 'Guest Explorer';
+      document.getElementById('sidebar-bio').textContent = 'Log in to like posts, comment, and share your Solapur adventures!';
+      document.getElementById('sidebar-posts-count').textContent = '0';
+      document.getElementById('sidebar-reviews-count').textContent = '0';
+      document.getElementById('sidebar-likes-count').textContent = '0';
+
+      document.getElementById('sidebar-auth-actions').innerHTML = `
+        <div class="flex flex-col gap-1.5 mt-1">
+          <button onclick="quickDemoLogin('alex@wanderer.com', 'password123')" class="w-full text-xs font-medium bg-teal-50 hover:bg-teal-100 text-secondary py-1.5 rounded border border-teal-200 transition">
+            ⚡ 1-Click Demo Login (Alex)
+          </button>
+          <a href="../login_smarttour/code.html" class="w-full text-xs text-center text-slate-500 hover:text-primary py-1 font-medium transition">
+            Sign In / Register
+          </a>
+        </div>
+      `;
+    }
+
+    async function quickDemoLogin(email, password) {
+      try {
+        showToast('Logging in as ' + email.split('@')[0] + '...', 'sync');
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Login failed');
+
+        localStorage.setItem('smarttour_token', data.token);
+        localStorage.setItem('smarttour_user', JSON.stringify(data.user));
+        localStorage.setItem('travelbuddy_token', data.token);
+        localStorage.setItem('travelbuddy_user', JSON.stringify(data.user));
+        currentToken = data.token;
+        currentUser = data.user;
+
+        initAuth();
+        await loadFeed();
+        await loadUserProfileStats(currentUser.userId);
+        showToast(`Welcome back, ${currentUser.fullName}!`, 'check_circle');
+      } catch (err) {
+        showToast(err.message || 'Login failed', 'error');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('travelbuddy_token');
+      localStorage.removeItem('travelbuddy_user');
+      localStorage.removeItem('smarttour_token');
+      localStorage.removeItem('smarttour_user');
+      currentToken = null;
+      currentUser = null;
+      initAuth();
+      loadFeed();
+      showToast('Logged out successfully', 'check_circle');
+    }
+
+    function requireAuth() {
+      if (!currentToken || !currentUser) {
+        if (confirm('You must be signed in to perform this action. Would you like to log in now as Demo Traveler Alex Wanderer?')) {
+          quickDemoLogin('alex@wanderer.com', 'password123');
+        }
+        return false;
+      }
+      return true;
+    }
+
+    // -------------------------------------------------------------
+    // DESTINATIONS
+    // -------------------------------------------------------------
+    async function loadDestinations() {
+      try {
+        const res = await fetch(`${API_BASE}/community/destinations`);
+        if (!res.ok) throw new Error('Failed to load destinations');
+        destinationsList = await res.json();
+
+        // Populate sidebar destination filter list
+        const destFilterList = document.getElementById('destinations-filter-list');
+        const postDestSelect = document.getElementById('post-destination-select');
+        const revDestSelect = document.getElementById('review-destination-select');
+
+        // Clear existing options except default
+        postDestSelect.innerHTML = '<option value="">Select Destination...</option>';
+        revDestSelect.innerHTML = '<option value="">Select Place to Review...</option>';
+
+        let filterHtml = `
+          <button onclick="selectDestinationFilter(null, 'All Destinations')" class="dest-filter-btn active w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-left transition bg-teal-50 text-secondary border border-teal-200">
+            <span>📍 All Destinations</span>
+            <span class="material-symbols-outlined text-sm">check</span>
+          </button>
+        `;
+
+        destinationsList.forEach(dest => {
+          const name = dest.placeName || dest.place_name || `Destination #${dest.placeId || dest.place_id}`;
+          const id = dest.placeId || dest.place_id;
+
+          filterHtml += `
+            <button onclick="selectDestinationFilter(${id}, '${escapeHtml(name)}')" class="dest-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 text-left transition">
+              <span class="truncate">🏛️ ${escapeHtml(name)}</span>
+            </button>
+          `;
+
+          const opt = `<option value="${id}">${escapeHtml(name)}</option>`;
+          postDestSelect.insertAdjacentHTML('beforeend', opt);
+          revDestSelect.insertAdjacentHTML('beforeend', opt);
+        });
+
+        destFilterList.innerHTML = filterHtml;
+      } catch (err) {
+        console.error('Error loading destinations:', err);
+      }
+    }
+
+    function selectDestinationFilter(destId, destName) {
+      activeDestinationId = destId;
+      activeDestinationName = destName;
+
+      // Update button styles
+      document.querySelectorAll('.dest-filter-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-teal-50', 'text-secondary', 'border', 'border-teal-200');
+        btn.classList.add('text-slate-700', 'hover:bg-slate-100');
+        const check = btn.querySelector('.material-symbols-outlined');
+        if (check) check.remove();
+      });
+
+      const clickedBtn = event.currentTarget;
+      if (clickedBtn) {
+        clickedBtn.classList.add('active', 'bg-teal-50', 'text-secondary', 'border', 'border-teal-200');
+        clickedBtn.classList.remove('text-slate-700', 'hover:bg-slate-100');
+        if (!clickedBtn.querySelector('.material-symbols-outlined')) {
+          clickedBtn.insertAdjacentHTML('beforeend', '<span class="material-symbols-outlined text-sm">check</span>');
+        }
+      }
+
+      // Update active filter badge
+      const badge = document.getElementById('active-filter-badge');
+      if (destId) {
+        document.getElementById('active-filter-label').textContent = `📍 ${destName}`;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      loadFeed();
+    }
+
+    function resetDestinationFilter() {
+      selectDestinationFilter(null, 'All Destinations');
+    }
+
+    // -------------------------------------------------------------
+    // FEED LOADING & RENDERING
+    // -------------------------------------------------------------
+    async function loadFeed() {
+      const container = document.getElementById('posts-container');
+      const emptyState = document.getElementById('feed-empty');
+
+      container.innerHTML = `
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm animate-pulse space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-slate-200"></div>
+            <div class="space-y-2 flex-grow">
+              <div class="h-4 bg-slate-200 rounded w-1/4"></div>
+              <div class="h-3 bg-slate-100 rounded w-1/3"></div>
+            </div>
+          </div>
+          <div class="h-64 bg-slate-200 rounded-xl"></div>
+          <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+        </div>
+      `;
+      emptyState.classList.add('hidden');
+
+      const params = new URLSearchParams();
+      if (searchQuery.trim()) params.append('search', searchQuery.trim());
+      if (activeDestinationId) params.append('destinationId', activeDestinationId);
+      if (activeSort) params.append('sortBy', activeSort);
+
+      const headers = {};
+      if (currentToken) {
+        headers['Authorization'] = `Bearer ${currentToken}`;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/community/posts?${params.toString()}`, { headers });
+        if (!res.ok) throw new Error('Failed to fetch posts');
+        currentPosts = await res.json();
+
+        container.innerHTML = '';
+        if (currentPosts.length === 0) {
+          emptyState.classList.remove('hidden');
+        } else {
+          currentPosts.forEach(post => {
+            container.appendChild(renderPostCard(post));
+          });
+        }
+      } catch (err) {
+        console.error('Error loading posts:', err);
+        container.innerHTML = `
+          <div class="p-6 bg-error-container text-error rounded-2xl text-center text-sm">
+            <p class="font-bold mb-1">Failed to load posts</p>
+            <p>${escapeHtml(err.message)}</p>
+            <button onclick="loadFeed()" class="mt-3 px-4 py-1.5 bg-error text-white rounded-lg text-xs font-semibold">Retry</button>
+          </div>
+        `;
+      }
+    }
+
+    function renderPostCard(post) {
+      const card = document.createElement('article');
+      card.id = `post-card-${post.postId}`;
+      card.className = 'bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow duration-300';
+
+      const authorName = post.author ? post.author.fullName : 'Traveler';
+      const authorAvatar = (post.author && post.author.avatarUrl) ? post.author.avatarUrl : 'https://lh3.googleusercontent.com/aida-public/AB6AXuBTQEYiqqhF13mq1MvVG8oj8P-2C6AHl2G_Oyz7QGmleqq3BA4arNRGaj--XucMf6LOOlYqj0yD604G0_kevFGoJO75JE3UJHS5binQOHuR51eWnjxmfKNuKSBTPomvHwt_oyFVnXuh_OL7AdEn-eYaMA4DRLUIV30tuDYb7YE70upE5AVnJlDzfTl2QcswaDCFYhhqwLegiKwotE0-CTTQyg9PJqvNGCR_7vuOL5XIrZaWCNpvQwS9Sw';
+      const timeFormatted = formatTimeAgo(post.createdAt);
+      const isLiked = post.isLikedByCurrentUser;
+      const isOwner = post.isOwner;
+
+      // Stars
+      const starCount = post.rating || 5;
+      const starsHtml = '★'.repeat(starCount) + '☆'.repeat(5 - starCount);
+
+      // Post Card HTML
+      card.innerHTML = `
+        <!-- Post Header -->
+        <div class="p-4 md:p-5 flex items-center justify-between border-b border-slate-100">
+          <div class="flex items-center gap-3">
+            <button onclick="viewUserProfile(${post.author ? post.author.userId : 1})" class="w-10 h-10 rounded-full overflow-hidden shrink-0 ring-2 ring-slate-100 hover:ring-secondary transition">
+              <img class="w-full h-full object-cover" src="${authorAvatar}" alt="${escapeHtml(authorName)}"/>
+            </button>
+            <div>
+              <div class="flex items-center gap-2">
+                <button onclick="viewUserProfile(${post.author ? post.author.userId : 1})" class="font-headline-md text-sm font-bold text-primary hover:text-secondary text-left transition">
+                  ${escapeHtml(authorName)}
+                </button>
+                ${isOwner ? '<span class="text-[10px] bg-teal-100 text-teal-800 font-bold px-1.5 py-0.5 rounded">You</span>' : ''}
+              </div>
+              <div class="flex items-center gap-1.5 text-xs text-text-muted mt-0.5">
+                <span class="material-symbols-outlined text-[13px] text-secondary">location_on</span>
+                <span class="font-medium text-slate-700">${escapeHtml(post.destinationName || 'Solapur, Maharashtra')}</span>
+                <span>•</span>
+                <span>${timeFormatted}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions Dropdown Trigger -->
+          <div class="relative">
+            <button onclick="togglePostMenu(${post.postId})" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-full hover:bg-slate-100 transition">
+              <span class="material-symbols-outlined text-lg">more_horiz</span>
+            </button>
+            <div id="post-menu-${post.postId}" class="hidden absolute right-0 top-8 z-20 w-40 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 text-xs font-medium">
+              ${isOwner ? `
+                <button onclick="openEditModal(${post.postId})" class="w-full px-4 py-2 text-left text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm">edit</span> Edit Post
+                </button>
+                <button onclick="deletePost(${post.postId})" class="w-full px-4 py-2 text-left text-error hover:bg-red-50 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm">delete</span> Delete Post
+                </button>
+              ` : `
+                <button onclick="openReportModal(${post.postId})" class="w-full px-4 py-2 text-left text-slate-700 hover:bg-slate-50 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm text-error">flag</span> Report Inappropriate
+                </button>
+              `}
+            </div>
+          </div>
+        </div>
+
+        <!-- Optional Post Image -->
+        ${post.imageUrl ? `
+          <div class="w-full max-h-[460px] overflow-hidden bg-slate-100 relative group">
+            <img class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" src="${post.imageUrl}" alt="${escapeHtml(post.title)}" onerror="this.parentElement.style.display='none'"/>
+            <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-xs text-white text-xs px-3 py-1 rounded-full flex items-center gap-1.5">
+              <span class="text-amber-400 font-bold">${starsHtml}</span>
+              <span class="font-semibold">${starCount}/5</span>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Post Content -->
+        <div class="p-4 md:p-5">
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="font-headline-md text-base md:text-lg font-bold text-primary">${escapeHtml(post.title)}</h2>
+            ${!post.imageUrl ? `
+              <span class="text-amber-500 text-sm font-bold tracking-wider">${starsHtml}</span>
+            ` : ''}
+          </div>
+          <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-line">${escapeHtml(post.description)}</p>
+
+          <!-- Interaction Bar -->
+          <div class="flex items-center justify-between border-t border-slate-100 pt-3.5 mt-4">
+            <div class="flex items-center gap-5">
+              <!-- Like Button -->
+              <button onclick="toggleLike(${post.postId})" id="like-btn-${post.postId}" class="flex items-center gap-1.5 text-xs font-semibold ${isLiked ? 'text-secondary' : 'text-slate-500 hover:text-secondary'} transition-colors group">
+                <span class="material-symbols-outlined text-xl ${isLiked ? 'text-secondary fill-current' : 'group-hover:scale-110'} transition-transform" style="${isLiked ? "font-variation-settings: 'FILL' 1" : ''}">favorite</span>
+                <span id="like-count-${post.postId}">${post.likesCount || 0}</span>
+              </button>
+
+              <!-- Comment Button -->
+              <button onclick="toggleCommentsSection(${post.postId})" class="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-primary transition-colors group">
+                <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">chat_bubble</span>
+                <span id="comment-count-${post.postId}">${post.commentsCount || 0}</span>
+              </button>
+
+              <!-- Share Button -->
+              <button onclick="sharePost(${post.postId})" class="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-primary transition-colors" title="Copy Link">
+                <span class="material-symbols-outlined text-lg">share</span>
+              </button>
+            </div>
+
+            <!-- Destination Tag -->
+            <span class="text-[11px] font-semibold text-teal-800 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200">
+              📍 ${escapeHtml(post.destinationName || 'Solapur')}
+            </span>
+          </div>
+
+          <!-- Comments Drawer (Initially Hidden) -->
+          <div id="comments-drawer-${post.postId}" class="hidden pt-4 mt-4 border-t border-slate-100 space-y-3">
+            <div id="comments-list-${post.postId}" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+              <div class="text-xs text-slate-400 text-center py-2">Loading comments...</div>
+            </div>
+
+            <!-- Add Comment Form -->
+            <form onsubmit="handleCommentSubmit(event, ${post.postId})" class="flex items-center gap-2 pt-2">
+              <input type="text" id="comment-input-${post.postId}" required placeholder="Write a comment..." class="flex-grow px-3.5 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-secondary/50"/>
+              <button type="submit" class="px-4 py-2 rounded-xl bg-secondary hover:bg-secondary-dark text-white text-xs font-semibold shadow transition">
+                Post
+              </button>
+            </form>
+          </div>
+        </div>
+      `;
+
+      return card;
+    }
+
+    function togglePostMenu(postId) {
+      const menu = document.getElementById(`post-menu-${postId}`);
+      if (menu) {
+        menu.classList.toggle('hidden');
+      }
+    }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('[id^="post-menu-"]') && !e.target.closest('button[onclick^="togglePostMenu"]')) {
+        document.querySelectorAll('[id^="post-menu-"]').forEach(m => m.classList.add('hidden'));
+      }
+    });
+
+    // -------------------------------------------------------------
+    // SEARCH & SORT CONTROLS
+    // -------------------------------------------------------------
+    function handleSearchInput() {
+      const input = document.getElementById('feed-search-input');
+      const clearBtn = document.getElementById('clear-search-btn');
+      searchQuery = input.value;
+
+      if (searchQuery.trim()) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      clearTimeout(searchDebounceTimeout);
+      searchDebounceTimeout = setTimeout(() => {
+        loadFeed();
+      }, 350);
+    }
+
+    function clearSearch() {
+      document.getElementById('feed-search-input').value = '';
+      document.getElementById('clear-search-btn').classList.add('hidden');
+      searchQuery = '';
+      loadFeed();
+    }
+
+    function changeSort(sortBy) {
+      activeSort = sortBy;
+      document.querySelectorAll('.sort-tab').forEach(t => {
+        t.classList.remove('active', 'bg-white', 'text-primary', 'shadow-xs');
+        t.classList.add('text-slate-600');
+      });
+      const activeBtn = document.getElementById(`tab-${sortBy}`);
+      if (activeBtn) {
+        activeBtn.classList.add('active', 'bg-white', 'text-primary', 'shadow-xs');
+        activeBtn.classList.remove('text-slate-600');
+      }
+      loadFeed();
+    }
+
+    // -------------------------------------------------------------
+    // LIKE / UNLIKE POST
+    // -------------------------------------------------------------
+    async function toggleLike(postId) {
+      if (!requireAuth()) return;
+
+      const btn = document.getElementById(`like-btn-${postId}`);
+      const countSpan = document.getElementById(`like-count-${postId}`);
+      const icon = btn.querySelector('.material-symbols-outlined');
+
+      try {
+        const res = await fetch(`${API_BASE}/community/posts/${postId}/like`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to toggle like');
+
+        countSpan.textContent = data.likesCount;
+        if (data.liked) {
+          btn.classList.add('text-secondary');
+          btn.classList.remove('text-slate-500');
+          icon.style.fontVariationSettings = "'FILL' 1";
+          showToast('Added to liked posts!', 'favorite');
+        } else {
+          btn.classList.remove('text-secondary');
+          btn.classList.add('text-slate-500');
+          icon.style.fontVariationSettings = "'FILL' 0";
+          showToast('Removed like', 'heart_broken');
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // COMMENTS
+    // -------------------------------------------------------------
+    async function toggleCommentsSection(postId) {
+      const drawer = document.getElementById(`comments-drawer-${postId}`);
+      if (!drawer) return;
+
+      if (drawer.classList.contains('hidden')) {
+        drawer.classList.remove('hidden');
+        await loadComments(postId);
+      } else {
+        drawer.classList.add('hidden');
+      }
+    }
+
+    async function loadComments(postId) {
+      const listContainer = document.getElementById(`comments-list-${postId}`);
+      try {
+        const headers = {};
+        if (currentToken) headers['Authorization'] = `Bearer ${currentToken}`;
+
+        const res = await fetch(`${API_BASE}/community/posts/${postId}/comments`, { headers });
+        const comments = await res.json();
+
+        if (comments.length === 0) {
+          listContainer.innerHTML = '<div class="text-xs text-slate-400 text-center py-2">No comments yet. Start the conversation!</div>';
+          return;
+        }
+
+        listContainer.innerHTML = comments.map(c => {
+          const authorAvatar = (c.author && c.author.avatarUrl) ? c.author.avatarUrl : 'https://lh3.googleusercontent.com/aida-public/AB6AXuBTQEYiqqhF13mq1MvVG8oj8P-2C6AHl2G_Oyz7QGmleqq3BA4arNRGaj--XucMf6LOOlYqj0yD604G0_kevFGoJO75JE3UJHS5binQOHuR51eWnjxmfKNuKSBTPomvHwt_oyFVnXuh_OL7AdEn-eYaMA4DRLUIV30tuDYb7YE70upE5AVnJlDzfTl2QcswaDCFYhhqwLegiKwotE0-CTTQyg9PJqvNGCR_7vuOL5XIrZaWCNpvQwS9Sw';
+          const authorName = c.author ? c.author.fullName : 'Traveler';
+          const isOwner = c.isOwner;
+
+          return `
+            <div class="flex items-start justify-between gap-2.5 p-2 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+              <div class="flex items-start gap-2">
+                <img class="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5" src="${authorAvatar}" alt="${escapeHtml(authorName)}"/>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-slate-800">${escapeHtml(authorName)}</span>
+                    <span class="text-[10px] text-slate-400">${formatTimeAgo(c.createdAt)}</span>
+                  </div>
+                  <p class="text-slate-700 mt-0.5">${escapeHtml(c.commentText)}</p>
+                </div>
+              </div>
+              ${isOwner ? `
+                <button onclick="deleteComment(${postId}, ${c.commentId})" class="text-slate-400 hover:text-error p-1" title="Delete Comment">
+                  <span class="material-symbols-outlined text-[14px]">delete</span>
+                </button>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        listContainer.innerHTML = `<div class="text-xs text-error py-2">Failed to load comments</div>`;
+      }
+    }
+
+    async function handleCommentSubmit(event, postId) {
+      event.preventDefault();
+      if (!requireAuth()) return;
+
+      const input = document.getElementById(`comment-input-${postId}`);
+      const text = input.value.trim();
+      if (!text) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/community/posts/${postId}/comments`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentToken}`
+          },
+          body: JSON.stringify({ commentText: text })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to post comment');
+
+        input.value = '';
+        await loadComments(postId);
+
+        // Update comment counter
+        const countSpan = document.getElementById(`comment-count-${postId}`);
+        if (countSpan) {
+          countSpan.textContent = parseInt(countSpan.textContent || '0') + 1;
+        }
+        showToast('Comment posted!', 'chat');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    async function deleteComment(postId, commentId) {
+      if (!requireAuth()) return;
+      if (!confirm('Are you sure you want to delete this comment?')) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/community/comments/${commentId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Failed to delete comment');
+        }
+
+        await loadComments(postId);
+        const countSpan = document.getElementById(`comment-count-${postId}`);
+        if (countSpan) {
+          const current = parseInt(countSpan.textContent || '1');
+          countSpan.textContent = Math.max(0, current - 1);
+        }
+        showToast('Comment deleted', 'delete');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // CREATE / EDIT POST
+    // -------------------------------------------------------------
+    function openCreateModal() {
+      if (!requireAuth()) return;
+      document.getElementById('post-modal-title').textContent = 'Share Travel Experience';
+      document.getElementById('edit-post-id').value = '';
+      document.getElementById('post-title').value = '';
+      document.getElementById('post-destination-select').value = '';
+      document.getElementById('post-custom-dest').value = '';
+      document.getElementById('post-description').value = '';
+      document.getElementById('post-image-url').value = '';
+      document.getElementById('image-preview-container').classList.add('hidden');
+      document.getElementById('post-submit-btn').textContent = 'Publish Story';
+      setPostRating(5);
+
+      document.getElementById('post-modal').classList.remove('hidden');
+    }
+
+    function openEditModal(postId) {
+      if (!requireAuth()) return;
+      const post = currentPosts.find(p => p.postId === postId);
+      if (!post) return;
+
+      document.getElementById('post-modal-title').textContent = 'Edit Travel Story';
+      document.getElementById('edit-post-id').value = post.postId;
+      document.getElementById('post-title').value = post.title;
+      document.getElementById('post-destination-select').value = post.destinationId || '';
+      document.getElementById('post-custom-dest').value = post.destinationId ? '' : (post.destinationName || '');
+      document.getElementById('post-description').value = post.description;
+      document.getElementById('post-image-url').value = post.imageUrl || '';
+      document.getElementById('post-submit-btn').textContent = 'Update Story';
+      setPostRating(post.rating || 5);
+      updateImagePreview();
+
+      document.getElementById('post-modal').classList.remove('hidden');
+    }
+
+    function closePostModal() {
+      document.getElementById('post-modal').classList.add('hidden');
+    }
+
+    function setPostRating(val) {
+      document.getElementById('post-rating').value = val;
+      document.getElementById('rating-label').textContent = `${val} of 5 Stars`;
+      const buttons = document.querySelectorAll('#post-star-container .star-btn');
+      buttons.forEach((btn, index) => {
+        btn.textContent = index < val ? '★' : '☆';
+        btn.className = `star-btn text-2xl focus:outline-none ${index < val ? 'text-amber-400' : 'text-slate-300'}`;
+      });
+    }
+
+    function handleDestSelectChange() {
+      const select = document.getElementById('post-destination-select');
+      const customInput = document.getElementById('post-custom-dest');
+      if (select.value) {
+        customInput.value = '';
+      }
+    }
+
+    function setImagePreset(url) {
+      document.getElementById('post-image-url').value = url;
+      updateImagePreview();
+    }
+
+    function clearImagePreset() {
+      document.getElementById('post-image-url').value = '';
+      document.getElementById('image-preview-container').classList.add('hidden');
+    }
+
+    function updateImagePreview() {
+      const url = document.getElementById('post-image-url').value.trim();
+      const container = document.getElementById('image-preview-container');
+      const img = document.getElementById('image-preview');
+
+      if (url) {
+        img.src = url;
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+
+    async function handlePostSubmit(event) {
+      event.preventDefault();
+      if (!requireAuth()) return;
+
+      const editPostId = document.getElementById('edit-post-id').value;
+      const title = document.getElementById('post-title').value.trim();
+      const destSelect = document.getElementById('post-destination-select');
+      const destinationId = destSelect.value ? parseInt(destSelect.value) : null;
+      let destinationName = destinationId ? destSelect.options[destSelect.selectedIndex].text : document.getElementById('post-custom-dest').value.trim();
+      if (!destinationName) destinationName = 'Solapur, Maharashtra';
+
+      const rating = parseInt(document.getElementById('post-rating').value) || 5;
+      const imageUrl = document.getElementById('post-image-url').value.trim() || null;
+      const description = document.getElementById('post-description').value.trim();
+
+      const submitBtn = document.getElementById('post-submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+
+      try {
+        const bodyData = { title, destinationId, destinationName, rating, imageUrl, description };
+        let res;
+
+        if (editPostId) {
+          // Update Post
+          res = await fetch(`${API_BASE}/community/posts/${editPostId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${currentToken}`
+            },
+            body: JSON.stringify(bodyData)
+          });
+        } else {
+          // Create Post
+          res = await fetch(`${API_BASE}/community/posts`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${currentToken}`
+            },
+            body: JSON.stringify(bodyData)
+          });
+        }
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save post');
+
+        closePostModal();
+        showToast(editPostId ? 'Post updated successfully!' : 'Travel story published!', 'check_circle');
+        await loadFeed();
+        if (currentUser) {
+          loadUserProfileStats(currentUser.userId);
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = editPostId ? 'Update Story' : 'Publish Story';
+      }
+    }
+
+    async function deletePost(postId) {
+      if (!requireAuth()) return;
+      if (!confirm('Are you sure you want to permanently delete this travel post?')) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/community/posts/${postId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${currentToken}` }
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || 'Failed to delete post');
+        }
+
+        showToast('Post deleted successfully', 'delete');
+        const card = document.getElementById(`post-card-${postId}`);
+        if (card) card.remove();
+        if (currentUser) {
+          loadUserProfileStats(currentUser.userId);
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // DESTINATION REVIEWS
+    // -------------------------------------------------------------
+    function openReviewModal() {
+      if (!requireAuth()) return;
+      document.getElementById('review-form').reset();
+      setReviewRating(5);
+      document.getElementById('review-modal').classList.remove('hidden');
+    }
+
+    function closeReviewModal() {
+      document.getElementById('review-modal').classList.add('hidden');
+    }
+
+    function setReviewRating(val) {
+      document.getElementById('review-rating').value = val;
+      document.getElementById('review-rating-label').textContent = `${val} Stars`;
+      const buttons = document.querySelectorAll('#review-star-container .rev-star-btn');
+      buttons.forEach((btn, index) => {
+        btn.textContent = index < val ? '★' : '☆';
+        btn.className = `rev-star-btn text-2xl ${index < val ? 'text-amber-400' : 'text-slate-300'}`;
+      });
+    }
+
+    async function handleReviewSubmit(event) {
+      event.preventDefault();
+      if (!requireAuth()) return;
+
+      const destId = document.getElementById('review-destination-select').value;
+      if (!destId) {
+        showToast('Please select a destination', 'error');
+        return;
+      }
+
+      const rating = parseInt(document.getElementById('review-rating').value) || 5;
+      const reviewText = document.getElementById('review-text').value.trim();
+      const visitDate = document.getElementById('review-date').value || null;
+
+      const btn = document.getElementById('review-submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      try {
+        const res = await fetch(`${API_BASE}/community/destinations/${destId}/reviews`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentToken}`
+          },
+          body: JSON.stringify({ rating, reviewText, visitDate })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to submit review');
+
+        closeReviewModal();
+        showToast('Destination review submitted! Thank you.', 'hotel_class');
+        await loadRecentReviews();
+        if (currentUser) {
+          loadUserProfileStats(currentUser.userId);
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit Review';
+      }
+    }
+
+    async function loadRecentReviews() {
+      const container = document.getElementById('sidebar-reviews-list');
+      try {
+        // Fetch reviews from first couple destinations or top ones
+        const sampleDests = [2, 42, 43]; // Bhuikot, Siddheshwar, Akkalkot
+        let allReviews = [];
+
+        for (const did of sampleDests) {
+          try {
+            const res = await fetch(`${API_BASE}/community/destinations/${did}/reviews`);
+            if (res.ok) {
+              const reviews = await res.json();
+              allReviews = allReviews.concat(reviews);
+            }
+          } catch (e) {}
+        }
+
+        if (allReviews.length === 0) {
+          container.innerHTML = '<div class="text-xs text-slate-400 text-center py-4">No reviews yet. Be the first to share one!</div>';
+          return;
+        }
+
+        // Show latest 3 reviews
+        allReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const topReviews = allReviews.slice(0, 3);
+
+        container.innerHTML = topReviews.map(r => {
+          const stars = '★'.repeat(r.rating || 5);
+          const authorName = r.author ? r.author.fullName : 'Traveler';
+          return `
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-slate-800">${escapeHtml(r.destinationName || 'Solapur Place')}</span>
+                <span class="text-amber-500 font-bold">${stars}</span>
+              </div>
+              <p class="text-slate-600 line-clamp-2">${escapeHtml(r.reviewText)}</p>
+              <div class="text-[10px] text-slate-400 flex items-center justify-between pt-1">
+                <span>By ${escapeHtml(authorName)}</span>
+                <span>${formatTimeAgo(r.createdAt)}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        container.innerHTML = '<div class="text-xs text-slate-400 text-center py-2">Reviews ready soon.</div>';
+      }
+    }
+
+    // -------------------------------------------------------------
+    // REPORT POST
+    // -------------------------------------------------------------
+    function openReportModal(postId) {
+      if (!requireAuth()) return;
+      document.getElementById('report-post-id').value = postId;
+      document.getElementById('report-modal').classList.remove('hidden');
+    }
+
+    function closeReportModal() {
+      document.getElementById('report-modal').classList.add('hidden');
+    }
+
+    async function handleReportSubmit(event) {
+      event.preventDefault();
+      if (!requireAuth()) return;
+
+      const postId = document.getElementById('report-post-id').value;
+      const reason = document.getElementById('report-reason').value;
+      const btn = document.getElementById('report-submit-btn');
+
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+
+      try {
+        const res = await fetch(`${API_BASE}/community/posts/${postId}/report`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentToken}`
+          },
+          body: JSON.stringify({ reason })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to submit report');
+
+        closeReportModal();
+        showToast(data.message || 'Report submitted. Thank you!', 'flag');
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Submit Report';
+      }
+    }
+
+    // -------------------------------------------------------------
+    // USER PROFILE VIEW & STATS
+    // -------------------------------------------------------------
+    async function loadUserProfileStats(userId) {
+      try {
+        const headers = currentToken ? { 'Authorization': `Bearer ${currentToken}` } : {};
+        const res = await fetch(`${API_BASE}/community/profile/${userId}`, { headers });
+        if (!res.ok) return;
+
+        const profile = await res.json();
+        document.getElementById('sidebar-posts-count').textContent = profile.postsCount || 0;
+        document.getElementById('sidebar-reviews-count').textContent = profile.reviewsCount || 0;
+        document.getElementById('sidebar-likes-count').textContent = profile.totalLikesReceived || 0;
+      } catch (e) {
+        console.error('Error loading profile stats', e);
+      }
+    }
+
+    async function viewMyProfile() {
+      if (!requireAuth()) return;
+      viewUserProfile(currentUser.userId);
+    }
+
+    async function viewUserProfile(userId) {
+      try {
+        const headers = currentToken ? { 'Authorization': `Bearer ${currentToken}` } : {};
+        const res = await fetch(`${API_BASE}/community/profile/${userId}`, { headers });
+        if (!res.ok) throw new Error('Failed to load user profile');
+
+        const profile = await res.json();
+        const u = profile.user;
+
+        document.getElementById('modal-profile-name').textContent = u.fullName;
+        document.getElementById('modal-profile-email').textContent = u.email;
+        document.getElementById('modal-profile-bio').textContent = u.bio || 'Exploring the world, one journey at a time.';
+        document.getElementById('modal-profile-avatar').src = u.avatarUrl || 'https://lh3.googleusercontent.com/aida-public/AB6AXuBTQEYiqqhF13mq1MvVG8oj8P-2C6AHl2G_Oyz7QGmleqq3BA4arNRGaj--XucMf6LOOlYqj0yD604G0_kevFGoJO75JE3UJHS5binQOHuR51eWnjxmfKNuKSBTPomvHwt_oyFVnXuh_OL7AdEn-eYaMA4DRLUIV30tuDYb7YE70upE5AVnJlDzfTl2QcswaDCFYhhqwLegiKwotE0-CTTQyg9PJqvNGCR_7vuOL5XIrZaWCNpvQwS9Sw';
+
+        document.getElementById('modal-posts-count').textContent = profile.postsCount || 0;
+        document.getElementById('modal-reviews-count').textContent = profile.reviewsCount || 0;
+        document.getElementById('modal-likes-count').textContent = profile.totalLikesReceived || 0;
+
+        // Render Posts Tab
+        const postsContainer = document.getElementById('profile-posts-list');
+        if (!profile.posts || profile.posts.length === 0) {
+          postsContainer.innerHTML = '<div class="text-xs text-slate-400 text-center py-6">No posts published yet.</div>';
+        } else {
+          postsContainer.innerHTML = profile.posts.map(p => `
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                ${p.imageUrl ? `<img src="${p.imageUrl}" class="w-12 h-12 rounded-xl object-cover" alt="Thumb"/>` : ''}
+                <div>
+                  <h4 class="font-bold text-sm text-primary">${escapeHtml(p.title)}</h4>
+                  <p class="text-xs text-text-muted">📍 ${escapeHtml(p.destinationName || 'Solapur')} • ${p.likesCount || 0} Likes</p>
+                </div>
+              </div>
+              ${p.isOwner ? `
+                <div class="flex items-center gap-1">
+                  <button onclick="closeProfileModal(); openEditModal(${p.postId});" class="text-slate-500 hover:text-secondary p-1.5" title="Edit">
+                    <span class="material-symbols-outlined text-lg">edit</span>
+                  </button>
+                  <button onclick="deletePost(${p.postId}); closeProfileModal();" class="text-slate-500 hover:text-error p-1.5" title="Delete">
+                    <span class="material-symbols-outlined text-lg">delete</span>
+                  </button>
+                </div>
+              ` : ''}
+            </div>
+          `).join('');
+        }
+
+        // Render Reviews Tab
+        const reviewsContainer = document.getElementById('profile-reviews-list');
+        if (!profile.reviews || profile.reviews.length === 0) {
+          reviewsContainer.innerHTML = '<div class="text-xs text-slate-400 text-center py-6">No destination reviews submitted yet.</div>';
+        } else {
+          reviewsContainer.innerHTML = profile.reviews.map(r => `
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1">
+              <div class="flex items-center justify-between font-bold text-slate-800">
+                <span>📍 ${escapeHtml(r.destinationName || 'Destination')}</span>
+                <span class="text-amber-500">${'★'.repeat(r.rating || 5)}</span>
+              </div>
+              <p class="text-slate-600">${escapeHtml(r.reviewText)}</p>
+            </div>
+          `).join('');
+        }
+
+        // Edit form defaults
+        if (currentUser && currentUser.userId === u.userId) {
+          document.getElementById('edit-profile-name').value = u.fullName;
+          document.getElementById('edit-profile-avatar').value = u.avatarUrl || '';
+          document.getElementById('edit-profile-bio').value = u.bio || '';
+          document.getElementById('ptab-edit').classList.remove('hidden');
+        } else {
+          document.getElementById('ptab-edit').classList.add('hidden');
+        }
+
+        switchProfileTab('posts');
+        document.getElementById('profile-modal').classList.remove('hidden');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function switchProfileTab(tab) {
+      document.getElementById('profile-posts-tab').classList.add('hidden');
+      document.getElementById('profile-reviews-tab').classList.add('hidden');
+      document.getElementById('profile-edit-tab').classList.add('hidden');
+
+      ['posts', 'reviews', 'edit'].forEach(t => {
+        const btn = document.getElementById(`ptab-${t}`);
+        if (btn) {
+          btn.className = 'px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-800';
+        }
+      });
+
+      const activeBtn = document.getElementById(`ptab-${tab}`);
+      if (activeBtn) {
+        activeBtn.className = 'px-4 py-2 text-sm font-semibold text-secondary border-b-2 border-secondary';
+      }
+
+      document.getElementById(`profile-${tab}-tab`).classList.remove('hidden');
+    }
+
+    async function handleProfileUpdate(event) {
+      event.preventDefault();
+      if (!requireAuth()) return;
+
+      const fullName = document.getElementById('edit-profile-name').value.trim();
+      const avatarUrl = document.getElementById('edit-profile-avatar').value.trim();
+      const bio = document.getElementById('edit-profile-bio').value.trim();
+
+      try {
+        const res = await fetch(`${API_BASE}/community/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentToken}`
+          },
+          body: JSON.stringify({ fullName, avatarUrl, bio })
+        });
+
+        const updated = await res.json();
+        if (!res.ok) throw new Error(updated.error || 'Failed to update profile');
+
+        // Update local session
+        currentUser.fullName = updated.fullName;
+        currentUser.avatarUrl = updated.avatarUrl;
+        currentUser.bio = updated.bio;
+        localStorage.setItem('smarttour_user', JSON.stringify(currentUser));
+        localStorage.setItem('travelbuddy_user', JSON.stringify(currentUser));
+
+        renderAuthenticatedHeader();
+        closeProfileModal();
+        showToast('Profile updated successfully!', 'check_circle');
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profile-modal').classList.add('hidden');
+    }
+
+    // -------------------------------------------------------------
+    // UTILITIES
+    // -------------------------------------------------------------
+    function sharePost(postId) {
+      const url = `${window.location.origin}${window.location.pathname}#post-${postId}`;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('Post link copied to clipboard!', 'share');
+      }).catch(() => {
+        showToast('Shared: Post #' + postId, 'share');
+      });
+    }
+
+    function showToast(message, icon = 'check_circle') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      const toastIcon = document.getElementById('toast-icon');
+
+      toastMsg.textContent = message;
+      toastIcon.textContent = icon;
+
+      toast.classList.remove('opacity-0', 'translate-y-[-150%]');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-[-150%]');
+        toast.classList.remove('opacity-100', 'translate-y-0');
+      }, 3000);
+    }
+
+    function formatTimeAgo(dateString) {
+      if (!dateString) return 'recently';
+      const now = new Date();
+      const date = new Date(dateString);
+      const seconds = Math.floor((now - date) / 1000);
+
+      if (seconds < 60) return 'just now';
+      const minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return `${minutes}m ago`;
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return `${hours}h ago`;
+      const days = Math.floor(hours / 24);
+      if (days < 30) return `${days}d ago`;
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  </script>
+  <!-- Multilingual Support (i18n) -->
+  <script src="../translations.js"></script>
+  <script src="../i18n.js"></script>
+  <script src="../navigation.js"></script>
+</body>
+</html>

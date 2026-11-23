@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TravelBuddy - Plan My Trip</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: { extend: {
+    colors: {
+      "primary": "#000000", "primary-container": "#131b2e", "secondary": "#006a61",
+      "secondary-container": "#86f2e4", "on-primary": "#ffffff", "surface": "#f7f9fb",
+      "background": "#f7f9fb", "surface-container-low": "#f2f4f6", "surface-container": "#eceef0",
+      "surface-container-high": "#e6e8ea", "surface-container-lowest": "#ffffff",
+      "surface-variant": "#e0e3e5", "on-surface": "#191c1e", "on-surface-variant": "#45464d",
+      "outline-variant": "#c6c6cd", "text-muted": "#64748B", "error": "#ba1a1a"
+    },
+    fontFamily: {
+      "headline-md": ["Montserrat", "sans-serif"], "headline-xl": ["Montserrat", "sans-serif"],
+      "body-md": ["Inter", "sans-serif"], "body-lg": ["Inter", "sans-serif"]
+    }
+  } }
+};
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<style>
+html, body { margin: 0; padding: 0; }
+body { overscroll-behavior: none; }
+.animate-spin-slow { animation: spin 2s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.hotel-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.hotel-card:hover { transform: translateY(-4px); }
+.selected-hotel { border: 2px solid #006a61; }
+.interest-chip.selected { background: rgba(0,106,97,0.10); border-color: #006a61; color: #006a61; }
+.pace-button.active { background: #006a61; color: white; }
+.itinerary-card { border-left: 4px solid #006a61; }
+</style>
+</head>
+
+<body class="bg-background text-on-surface">
+
+<!-- HEADER -->
+<header class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-sm">
+  <div class="h-20 max-w-[1280px] mx-auto px-4 lg:px-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="font-headline-md font-bold text-primary text-xl">TravelBuddy</span>
+    </div>
+    <nav class="hidden lg:flex items-center gap-8">
+      <a href="../smarttour_home_2/code.html" class="text-on-surface-variant hover:text-on-surface">Home</a>
+      <a href="../explore_destinations/explore_destinations.html" class="text-on-surface-variant hover:text-on-surface">Explore Destinations</a>
+      <a href="#" class="text-secondary font-bold border-b-2 border-secondary py-2">Plan Trip</a>
+      <a href="../community_feed/code.html" class="text-on-surface-variant hover:text-on-surface">Community</a>
+      <a href="../ai_assistant/code.html" class="text-on-surface-variant hover:text-on-surface">AI Assistant</a>
+    </nav>
+    <div class="flex items-center gap-4">
+      <span class="material-symbols-outlined">notifications</span>
+      <span class="material-symbols-outlined text-slate-700 cursor-default" title="Traveler Profile">account_circle</span>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="pt-20">
+  <div class="max-w-[1280px] mx-auto px-4 lg:px-16 py-10 lg:py-16">
+
+    <div class="mb-12 max-w-3xl">
+      <h1 class="font-headline-xl text-4xl lg:text-5xl font-bold mb-4">Design Your Journey</h1>
+      <p class="text-lg text-on-surface-variant">
+        Tell us what you're dreaming of, and TravelBuddy will create a personalized travel plan based on your destination, dates, budget and interests.
+      </p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+
+      <!-- SIDEBAR -->
+      <aside class="w-full lg:w-1/4">
+        <div class="bg-surface-container-low rounded-xl p-6">
+          <ul class="space-y-6">
+            <li data-step="1" class="flex items-center gap-4">
+              <div id="indicator-1" class="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center">1</div>
+              <span>Destinations</span>
+            </li>
+            <li data-step="2" class="flex items-center gap-4 opacity-60">
+              <div id="indicator-2" class="w-7 h-7 rounded-full bg-surface-variant flex items-center justify-center">2</div>
+              <span>Travel Details</span>
+            </li>
+            <li data-step="3" class="flex items-center gap-4 opacity-60">
+              <div id="indicator-3" class="w-7 h-7 rounded-full bg-surface-variant flex items-center justify-center">3</div>
+              <span>Budget & Style</span>
+            </li>
+            <li data-step="4" class="flex items-center gap-4 opacity-60">
+              <div id="indicator-4" class="w-7 h-7 rounded-full bg-surface-variant flex items-center justify-center">4</div>
+              <span>Interests</span>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- FORM -->
+      <div class="w-full lg:w-3/4">
+        <div class="bg-surface-container-lowest rounded-xl p-6 lg:p-8 shadow-lg">
+
+          <!-- STEP 1 -->
+          <section id="step-1" class="step-section">
+            <h2 class="font-headline-md text-2xl font-semibold mb-6">Where to?</h2>
+            <div class="space-y-6">
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2">flight_takeoff</span>
+                <input id="starting-location" type="text" placeholder="Starting location"
+                  class="w-full bg-surface-container-low py-4 pl-12 pr-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary">
+              </div>
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2">flight_land</span>
+                <input id="destination-input" type="text" placeholder="Destination (e.g. Siddheshwar Temple)" list="destination-suggestions"
+                  class="w-full bg-surface-container-low py-4 pl-12 pr-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary">
+                <datalist id="destination-suggestions"></datalist>
+              </div>
+              <!-- Quick Suggestions for Solapur District -->
+              <div class="flex flex-wrap items-center gap-2 pt-1">
+                <span class="text-xs text-on-surface-variant font-medium">Popular in Solapur:</span>
+                <button type="button" onclick="selectQuickDestination('Siddheshwar Temple')" class="text-xs bg-surface-container hover:bg-secondary/15 hover:text-secondary px-3 py-1.5 rounded-full border border-outline-variant transition-all font-medium">Siddheshwar Temple</button>
+                <button type="button" onclick="selectQuickDestination('Solapur Bhuikot Fort')" class="text-xs bg-surface-container hover:bg-secondary/15 hover:text-secondary px-3 py-1.5 rounded-full border border-outline-variant transition-all font-medium">Bhuikot Fort</button>
+                <button type="button" onclick="selectQuickDestination('Akkalkot Swami Samarth Maharaj Temple')" class="text-xs bg-surface-container hover:bg-secondary/15 hover:text-secondary px-3 py-1.5 rounded-full border border-outline-variant transition-all font-medium">Akkalkot Temple</button>
+                <button type="button" onclick="selectQuickDestination('Pandharpur Vitthal Temple')" class="text-xs bg-surface-container hover:bg-secondary/15 hover:text-secondary px-3 py-1.5 rounded-full border border-outline-variant transition-all font-medium">Pandharpur Temple</button>
+                <button type="button" onclick="selectQuickDestination('Great Indian Bustard Sanctuary')" class="text-xs bg-surface-container hover:bg-secondary/15 hover:text-secondary px-3 py-1.5 rounded-full border border-outline-variant transition-all font-medium">Nannaj Sanctuary</button>
+              </div>
+            </div>
+            <div class="mt-8 flex justify-end">
+              <button type="button" id="step1-next-btn" onclick="nextStep(2)" class="bg-secondary text-white py-3 px-8 rounded-lg flex items-center gap-2 font-medium hover:bg-secondary/90 transition-colors shadow">
+                Next <span class="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </div>
+          </section>
+
+          <!-- STEP 2 -->
+          <section id="step-2" class="step-section hidden">
+            <h2 class="font-headline-md text-2xl font-semibold mb-6">When and Who?</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div>
+                <label class="block text-sm text-on-surface-variant mb-2">Departure</label>
+                <input id="departure-date" type="date" class="w-full bg-surface-container-low py-4 px-4 rounded-lg">
+              </div>
+              <div>
+                <label class="block text-sm text-on-surface-variant mb-2">Return</label>
+                <input id="return-date" type="date" class="w-full bg-surface-container-low py-4 px-4 rounded-lg">
+              </div>
+            </div>
+            <label class="block text-sm text-on-surface-variant mb-4">Who is traveling?</label>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <button type="button" class="traveler-option bg-surface-variant p-4 rounded-xl" onclick="selectTraveler(this,'Solo')">
+                <span class="material-symbols-outlined text-3xl">person</span><div>Solo</div>
+              </button>
+              <button type="button" class="traveler-option bg-primary-container text-white p-4 rounded-xl" onclick="selectTraveler(this,'Couple')">
+                <span class="material-symbols-outlined text-3xl">favorite</span><div>Couple</div>
+              </button>
+              <button type="button" class="traveler-option bg-surface-variant p-4 rounded-xl" onclick="selectTraveler(this,'Family')">
+                <span class="material-symbols-outlined text-3xl">diversity_3</span><div>Family</div>
+              </button>
+              <button type="button" class="traveler-option bg-surface-variant p-4 rounded-xl" onclick="selectTraveler(this,'Friends')">
+                <span class="material-symbols-outlined text-3xl">groups</span><div>Friends</div>
+              </button>
+            </div>
+            <div class="mt-8 flex justify-end gap-4">
+              <button type="button" onclick="prevStep(1)" class="py-3 px-6">Back</button>
+              <button type="button" onclick="nextStep(3)" class="bg-secondary text-white py-3 px-8 rounded-lg">Next</button>
+            </div>
+          </section>
+
+          <!-- STEP 3 -->
+          <section id="step-3" class="step-section hidden">
+            <h2 class="font-headline-md text-2xl font-semibold mb-6">Budget & Pace</h2>
+            <div class="mb-10">
+              <div class="flex justify-between mb-4">
+                <label class="text-sm text-on-surface-variant">Budget per person</label>
+                <span id="budget-value" class="text-2xl font-semibold text-secondary">₹2,500</span>
+              </div>
+              <input id="budget-slider" type="range" min="500" max="100000" step="500" value="2500" class="w-full accent-secondary">
+              <div class="flex justify-between text-sm text-on-surface-variant mt-2">
+                <span>Economy</span><span>Luxury</span>
+              </div>
+            </div>
+            <label class="block text-sm text-on-surface-variant mb-4">Travel Pace</label>
+            <div class="grid grid-cols-3 gap-2 bg-surface-container-low p-2 rounded-xl">
+              <button type="button" onclick="setPace('Relaxed')" class="pace-button py-3 rounded-lg">Relaxed</button>
+              <button type="button" onclick="setPace('Balanced')" class="pace-button active py-3 rounded-lg">Balanced</button>
+              <button type="button" onclick="setPace('Action Packed')" class="pace-button py-3 rounded-lg">Action Packed</button>
+            </div>
+            <div class="mt-8 flex justify-end gap-4">
+              <button type="button" onclick="prevStep(2)" class="py-3 px-6">Back</button>
+              <button type="button" onclick="nextStep(4)" class="bg-secondary text-white py-3 px-8 rounded-lg">Next</button>
+            </div>
+          </section>
+
+          <!-- STEP 4 -->
+          <section id="step-4" class="step-section hidden">
+            <h2 class="font-headline-md text-2xl font-semibold mb-2">What interests you?</h2>
+            <p class="text-on-surface-variant mb-6">Select all that apply.</p>
+            <div class="flex flex-wrap gap-3">
+              <button type="button" class="interest-chip px-5 py-2 rounded-full border border-outline-variant">Culture & History</button>
+              <button type="button" class="interest-chip selected px-5 py-2 rounded-full border">Food & Drink</button>
+              <button type="button" class="interest-chip selected px-5 py-2 rounded-full border">Nature & Wildlife</button>
+              <button type="button" class="interest-chip px-5 py-2 rounded-full border border-outline-variant">Adventure Sports</button>
+              <button type="button" class="interest-chip px-5 py-2 rounded-full border border-outline-variant">Relaxation & Spa</button>
+              <button type="button" class="interest-chip px-5 py-2 rounded-full border border-outline-variant">Nightlife</button>
+              <button type="button" class="interest-chip px-5 py-2 rounded-full border border-outline-variant">Shopping</button>
+              <button type="button" class="interest-chip selected px-5 py-2 rounded-full border">Art & Museums</button>
+              <button type="button" class="interest-chip px-5 py-2 rounded-full border border-outline-variant">Local Festivals</button>
+            </div>
+
+            <!-- PLANNING METHOD -->
+            <div class="mt-8">
+              <h3 class="text-xl font-semibold mb-3">How should we plan your trip?</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button type="button" id="auto-plan-option" onclick="setPlanningMethod('automatic')"
+                  class="text-left border-2 border-secondary rounded-xl p-4">
+                  <b>🤖 Automatic</b>
+                  <p class="text-sm text-on-surface-variant">We pick places from your interests.</p>
+                </button>
+                <button type="button" id="manual-plan-option" onclick="setPlanningMethod('manual')"
+                  class="text-left border-2 border-outline-variant rounded-xl p-4">
+                  <b>👤 Manual</b>
+                  <p class="text-sm text-on-surface-variant">You choose the places.</p>
+                </button>
+              </div>
+              <div id="manual-place-selection" class="hidden mt-6">
+                <span id="selected-place-count" class="text-sm font-semibold text-secondary">0 selected</span>
+                <div id="manual-place-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3"></div>
+              </div>
+            </div>
+
+            <div class="mt-8 flex justify-between items-center">
+              <button type="button" onclick="prevStep(3)" class="py-3 px-6">Back</button>
+              <button type="button" onclick="generateItinerary()" class="bg-primary text-white py-3 px-8 rounded-lg flex items-center gap-2">
+                <span class="material-symbols-outlined">auto_awesome</span> Generate Itinerary
+              </button>
+            </div>
+          </section>
+        </div>
+
+        <!-- HOTEL RECOMMENDATIONS -->
+        <section id="hotel-recommendations" class="hidden mt-10">
+          <div class="mb-6">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="material-symbols-outlined text-secondary text-3xl">hotel</span>
+              <h2 class="font-headline-md text-2xl font-semibold">Live Hotel Recommendations</h2>
+            </div>
+            <p id="hotel-subtitle" class="text-on-surface-variant">Live hotels near your destination</p>
+          </div>
+          <div id="hotel-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </section>
+
+        <!-- BUDGET PLAN -->
+        <section id="budget-plan-section" class="hidden mt-10 bg-surface-container-lowest rounded-2xl p-6 lg:p-8 shadow-md border border-slate-200/80">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-secondary text-3xl">account_balance_wallet</span>
+                <h2 class="font-headline-md text-2xl font-bold tracking-tight text-on-surface">BUDGET PLAN</h2>
+                <span class="text-[11px] font-semibold tracking-wider uppercase px-2 py-0.5 rounded-full bg-teal-50 text-secondary border border-teal-200">DB Live Powered</span>
+              </div>
+              <p class="text-sm text-on-surface-variant">Real-time estimated expenses calculated directly from PostgreSQL tourism records</p>
+            </div>
+            
+            <!-- Trip Quick Param Controls -->
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center gap-1.5 bg-surface-container-low px-3 py-1.5 rounded-xl border border-slate-200">
+                <span class="material-symbols-outlined text-sm text-slate-500">calendar_today</span>
+                <span class="text-xs text-slate-500 font-medium">Days:</span>
+                <input id="budget-days" type="number" min="1" max="30" value="3" onchange="calculateBudgetFromApi()" class="w-10 bg-transparent text-xs font-bold text-slate-800 text-center focus:outline-none">
+              </div>
+              <div class="flex items-center gap-1.5 bg-surface-container-low px-3 py-1.5 rounded-xl border border-slate-200">
+                <span class="material-symbols-outlined text-sm text-slate-500">group</span>
+                <span class="text-xs text-slate-500 font-medium">Travelers:</span>
+                <input id="budget-travelers" type="number" min="1" max="20" value="2" onchange="calculateBudgetFromApi()" class="w-10 bg-transparent text-xs font-bold text-slate-800 text-center focus:outline-none">
+              </div>
+              <div class="flex items-center gap-1.5 bg-surface-container-low px-3 py-1.5 rounded-xl border border-slate-200">
+                <span class="material-symbols-outlined text-sm text-slate-500">directions_car</span>
+                <span class="text-xs text-slate-500 font-medium">Transit:</span>
+                <select id="budget-transport-select" onchange="calculateBudgetFromApi()" class="bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer">
+                  <option value="Auto">Auto</option>
+                  <option value="Bus">Bus</option>
+                  <option value="Taxi">Taxi</option>
+                </select>
+              </div>
+              <button type="button" onclick="calculateBudgetFromApi()" class="px-4 py-2 bg-secondary hover:bg-secondary-dark text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5 transition active:scale-95">
+                <span id="budget-refresh-icon" class="material-symbols-outlined text-sm">refresh</span>
+                Recalculate
+              </button>
+            </div>
+          </div>
+
+          <!-- Trip Info Bar -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 my-5 py-3 px-4 bg-surface-container-low/60 rounded-xl border border-slate-100 text-xs">
+            <div>
+              <span class="text-slate-400 uppercase font-semibold text-[10px] tracking-wider block">Destination</span>
+              <span id="budget-meta-destination" class="font-bold text-slate-800 text-sm">Loading...</span>
+            </div>
+            <div>
+              <span class="text-slate-400 uppercase font-semibold text-[10px] tracking-wider block">Trip Duration</span>
+              <span id="budget-meta-duration" class="font-bold text-slate-800 text-sm">3 Days / 2 Nights</span>
+            </div>
+            <div>
+              <span class="text-slate-400 uppercase font-semibold text-[10px] tracking-wider block">Travelers</span>
+              <span id="budget-meta-travelers" class="font-bold text-slate-800 text-sm">2 Travelers</span>
+            </div>
+          </div>
+
+          <!-- Loading State Spinner -->
+          <div id="budget-loading-state" class="py-12 flex flex-col items-center justify-center gap-3">
+            <div class="w-8 h-8 border-3 border-secondary border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-xs text-slate-500 font-medium">Fetching realistic database pricing for transportation, accommodation, and food...</p>
+          </div>
+
+          <!-- Error State -->
+          <div id="budget-error-state" class="hidden my-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-red-500 text-lg">error</span>
+              <span id="budget-error-message">Unable to calculate budget. Please try again.</span>
+            </div>
+            <button type="button" onclick="calculateBudgetFromApi()" class="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-800 font-semibold rounded-lg transition">Retry</button>
+          </div>
+
+          <!-- Budget Cards Container -->
+          <div id="budget-content-container" class="hidden space-y-6">
+            <!-- 3 Category Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-6">
+              
+              <!-- 🚗 Transportation Card -->
+              <div class="bg-surface-container-lowest rounded-2xl p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="w-9 h-9 rounded-xl bg-teal-50 text-secondary flex items-center justify-center font-bold text-lg">🚗</span>
+                      <div>
+                        <h4 class="font-bold text-sm text-slate-800">Transportation</h4>
+                        <span id="budget-card-transport-type" class="text-[11px] text-teal-600 font-medium">Auto Transit</span>
+                      </div>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium">Estimated</span>
+                  </div>
+                  <p id="budget-card-transport-detail" class="text-xs text-slate-500 mt-2 line-clamp-2">Base fare + estimated distance fare from PostgreSQL</p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-baseline justify-between">
+                  <span class="text-xs text-slate-400">Total Transit:</span>
+                  <span id="budget-transport-amount" class="text-xl font-extrabold text-slate-900">₹0</span>
+                </div>
+              </div>
+
+              <!-- 🏨 Accommodation Card -->
+              <div class="bg-surface-container-lowest rounded-2xl p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-lg">🏨</span>
+                      <div>
+                        <h4 class="font-bold text-sm text-slate-800">Accommodation</h4>
+                        <span id="budget-card-hotel-name" class="text-[11px] text-indigo-600 font-medium truncate block max-w-[150px]">Hotel City Center</span>
+                      </div>
+                    </div>
+                    <span id="budget-card-nights-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium">2 Nights</span>
+                  </div>
+                  <p id="budget-card-hotel-detail" class="text-xs text-slate-500 mt-2 line-clamp-2">Realistic PostgreSQL hotel rates</p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-baseline justify-between">
+                  <span class="text-xs text-slate-400">Total Stay:</span>
+                  <span id="budget-hotel-amount" class="text-xl font-extrabold text-slate-900">₹0</span>
+                </div>
+              </div>
+
+              <!-- 🍛 Food Card -->
+              <div class="bg-surface-container-lowest rounded-2xl p-5 border border-slate-200/90 shadow-xs flex flex-col justify-between hover:border-teal-300 transition-colors">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                      <span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-lg">🍛</span>
+                      <div>
+                        <h4 class="font-bold text-sm text-slate-800">Food & Dining</h4>
+                        <span id="budget-card-food-name" class="text-[11px] text-amber-600 font-medium truncate block max-w-[150px]">Local Eatery</span>
+                      </div>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-medium">3 Meals / Day</span>
+                  </div>
+                  <p id="budget-card-food-detail" class="text-xs text-slate-500 mt-2 line-clamp-2">Authentic dining & meal estimates</p>
+                </div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex items-baseline justify-between">
+                  <span class="text-xs text-slate-400">Total Food:</span>
+                  <span id="budget-food-amount" class="text-xl font-extrabold text-slate-900">₹0</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Grand Totals Banner -->
+            <div class="bg-gradient-to-r from-slate-900 via-primary-container to-slate-900 text-white rounded-2xl p-6 shadow-md flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl">
+                  💰
+                </div>
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-teal-300 font-semibold block">TOTAL TRIP COST</span>
+                  <span id="budget-total-amount" class="text-3xl lg:text-4xl font-extrabold text-white tracking-tight">₹0</span>
+                </div>
+              </div>
+
+              <div class="h-10 w-[1px] bg-white/20 hidden sm:block"></div>
+
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl">
+                  👤
+                </div>
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-slate-300 font-semibold block">PER PERSON</span>
+                  <span id="budget-per-person-amount" class="text-2xl lg:text-3xl font-bold text-teal-200 tracking-tight">₹0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ITINERARY -->
+        <section id="itinerary-section" class="hidden mt-10">
+          <div class="mb-6">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="material-symbols-outlined text-secondary text-3xl">event_note</span>
+              <h2 class="font-headline-md text-2xl font-semibold">Your Personalized Itinerary</h2>
+            </div>
+            <p id="itinerary-subtitle" class="text-on-surface-variant">Your trip plan</p>
+          </div>
+          <div id="itinerary-list" class="space-y-5"></div>
+        </section>
+
+        <!-- TRIP SUMMARY -->
+        <section id="trip-summary" class="hidden mt-10 bg-primary-container text-white rounded-xl p-6">
+          <h2 class="text-2xl font-semibold mb-4">Trip Information</h2>
+          <div id="trip-summary-content" class="space-y-2"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING OVERLAY -->
+  <div id="loading-overlay" class="fixed inset-0 bg-surface/95 backdrop-blur-md z-[100] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="relative w-28 h-28 mb-8">
+      <svg class="absolute inset-0 w-full h-full animate-spin-slow" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" class="text-surface-variant" stroke-width="3"/>
+        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" class="text-secondary" stroke-width="5" stroke-dasharray="100" stroke-linecap="round"/>
+      </svg>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <span class="material-symbols-outlined text-5xl text-secondary">travel_explore</span>
+      </div>
+    </div>
+    <h2 class="text-2xl font-semibold mb-2">Creating Your Trip...</h2>
+    <p id="loading-text" class="text-on-surface-variant text-center max-w-md">Getting destination information...</p>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="bg-primary-container text-white py-12 mt-16">
+  <div class="max-w-[1280px] mx-auto px-4 lg:px-16">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <h3 class="text-2xl font-bold mb-4">TravelBuddy</h3>
+        <p class="text-white/70">AI-powered smart tourism and personalized travel planning.</p>
+      </div>
+      <div><h4 class="font-semibold mb-4">Company</h4><p>About Us</p><p>Careers</p></div>
+      <div><h4 class="font-semibold mb-4">Support</h4><p>Help Center</p><p>Safety Tips</p></div>
+      <div><h4 class="font-semibold mb-4">TravelBuddy</h4><p>Personalized Trips</p><p>Live Hotel Recommendations</p></div>
+    </div>
+    <div class="border-t border-white/20 mt-10 pt-6 text-sm text-white/60">
+      © 2026 TravelBuddy Technologies. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ===================== API CONFIGURATION ===================== */
+const BACKEND_URL = "http://localhost:8081";
+const TOURIST_PLACES_API = BACKEND_URL + "/api/tourist-places";
+const LIVE_HOTELS_API = BACKEND_URL + "/api/live/hotels";
+
+/* ===================== GLOBAL VARIABLES ===================== */
+let currentStep = 1;
+const totalSteps = 4;
+let selectedTraveler = "Couple";
+let selectedPace = "Balanced";
+let selectedHotel = null;
+let selectedDestination = null;
+let touristPlaces = [];
+let liveHotels = [];
+let planningMethod = "automatic";
+let selectedManualPlaces = [];
+
+/* ===================== ESCAPE HTML ===================== */
+function escapeHtml(value) {
+  const div = document.createElement("div");
+  div.textContent = value ?? "";
+  return div.innerHTML;
+}
+
+/* ===================== SIDEBAR ===================== */
+function updateSidebar(step) {
+  for (let i = 1; i <= totalSteps; i++) {
+    const li = document.querySelector(`li[data-step="${i}"]`);
+    const indicator = document.getElementById(`indicator-${i}`);
+    if (!li || !indicator) continue;
+    if (i < step) {
+      li.classList.remove("opacity-60");
+      indicator.className = "w-7 h-7 rounded-full bg-secondary text-white flex items-center justify-center";
+      indicator.innerHTML = '<span class="material-symbols-outlined text-sm">check</span>';
+    } else if (i === step) {
+      li.classList.remove("opacity-60");
+      indicator.className = "w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center";
+      indicator.textContent = i;
+    } else {
+      li.classList.add("opacity-60");
+      indicator.className = "w-7 h-7 rounded-full bg-surface-variant flex items-center justify-center";
+      indicator.textContent = i;
+    }
+  }
+}
+
+/* ===================== VALIDATE STEP ===================== */
+function validateStep(step) {
+  if (step === 1) {
+    const destinationInput = document.getElementById("destination-input");
+    let destination = destinationInput ? destinationInput.value.trim() : "";
+    const storedPlace = localStorage.getItem("selectedPlace");
+    if (!destination && !storedPlace) {
+      if (destinationInput) {
+        destinationInput.value = "Siddheshwar Temple, Solapur";
+        destination = destinationInput.value;
+      }
+    }
+    return true;
+  }
+  if (step === 2) {
+    const departureElement = document.getElementById("departure-date");
+    const returnElement = document.getElementById("return-date");
+    let departure = departureElement ? departureElement.value : "";
+    let returnDate = returnElement ? returnElement.value : "";
+    if (!departure || !returnDate) {
+      const today = new Date();
+      const depDate = new Date(today.getTime() + 86400000);
+      const retDate = new Date(today.getTime() + (4 * 86400000));
+      if (departureElement && !departure) {
+        departureElement.value = depDate.toISOString().split("T")[0];
+        departure = departureElement.value;
+      }
+      if (returnElement && !returnDate) {
+        returnElement.value = retDate.toISOString().split("T")[0];
+        returnDate = returnElement.value;
+      }
+    }
+    if (new Date(returnDate) < new Date(departure)) {
+      alert("Return date cannot be before departure date.");
+      return false;
+    }
+  }
+  return true;
+}
+
+/* ===================== NEXT / PREVIOUS STEP ===================== */
+function nextStep(step) {
+  console.log("Next button clicked:", currentStep, "→", step);
+  if (!validateStep(currentStep)) {
+    console.log("Step validation failed:", currentStep);
+    return;
+  }
+  const oldStep = document.getElementById(`step-${currentStep}`);
+  const newStep = document.getElementById(`step-${step}`);
+  if (!oldStep) { console.error(`step-${currentStep} not found`); return; }
+  if (!newStep) { console.error(`step-${step} not found`); return; }
+  oldStep.classList.add("hidden");
+  newStep.classList.remove("hidden");
+  currentStep = step;
+  updateSidebar(currentStep);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (step === 4) {
+    if (!Array.isArray(touristPlaces) || touristPlaces.length === 0) {
+      loadTouristPlaces();
+    }
+  }
+}
+
+function prevStep(step) {
+  const oldStep = document.getElementById(`step-${currentStep}`);
+  const newStep = document.getElementById(`step-${step}`);
+  if (!oldStep || !newStep) return;
+  oldStep.classList.add("hidden");
+  newStep.classList.remove("hidden");
+  currentStep = step;
+  updateSidebar(currentStep);
+}
+
+/* ===================== TRAVELER ===================== */
+function selectTraveler(button, traveler) {
+  selectedTraveler = traveler;
+  document.querySelectorAll(".traveler-option").forEach(btn => {
+    btn.classList.remove("bg-primary-container", "text-white");
+    btn.classList.add("bg-surface-variant");
+  });
+  button.classList.remove("bg-surface-variant");
+  button.classList.add("bg-primary-container", "text-white");
+
+  const travelerInput = document.getElementById("budget-travelers");
+  if (travelerInput) {
+    if (traveler === "Solo") travelerInput.value = 1;
+    else if (traveler === "Couple") travelerInput.value = 2;
+    else if (traveler === "Family") travelerInput.value = 4;
+    else if (traveler === "Friends") travelerInput.value = 4;
+  }
+}
+
+/* ===================== BUDGET SLIDER ===================== */
+const budgetSlider = document.getElementById("budget-slider");
+const budgetValue = document.getElementById("budget-value");
+if (budgetSlider) {
+  budgetSlider.addEventListener("input", function () {
+    budgetValue.textContent = "₹" + Number(this.value).toLocaleString("en-IN");
+  });
+}
+
+/* ===================== PACE ===================== */
+function setPace(pace) {
+  selectedPace = pace;
+  document.querySelectorAll(".pace-button").forEach(b => b.classList.remove("active"));
+  const activeButton = [...document.querySelectorAll(".pace-button")]
+    .find(b => b.textContent.trim() === pace);
+  if (activeButton) activeButton.classList.add("active");
+}
+
+/* ===================== INTERESTS ===================== */
+document.querySelectorAll(".interest-chip").forEach(button => {
+  button.addEventListener("click", function () {
+    this.classList.toggle("selected");
+  });
+});
+
+function getSelectedInterests() {
+  return [...document.querySelectorAll(".interest-chip.selected")].map(b => b.textContent.trim());
+}
+
+/* ===================== TRIP DAYS ===================== */
+function calculateTripDays() {
+  const d = document.getElementById("departure-date")?.value;
+  const r = document.getElementById("return-date")?.value;
+  if (!d || !r) return 1;
+  return Math.max(Math.round((new Date(r) - new Date(d)) / 86400000) + 1, 1);
+}
+
+/* ===================== LOAD SELECTED DESTINATION ===================== */
+function loadSelectedDestination() {
+  const storedPlace = localStorage.getItem("selectedPlace");
+  if (!storedPlace) {
+    console.log("No selectedPlace found.");
+    return;
+  }
+  try {
+    const place = JSON.parse(storedPlace);
+    selectedDestination = place;
+    console.log("Selected destination from localStorage:", place);
+    const input = document.getElementById("destination-input");
+    if (input) input.value = place.placeName || place.name || "";
+  } catch (error) {
+    console.error("Error reading selectedPlace:", error);
+    localStorage.removeItem("selectedPlace");
+  }
+}
+
+// If the user types a different destination, forget the cached one
+document.getElementById("destination-input").addEventListener("input", () => {
+  selectedDestination = null;
+});
+
+/* ===================== GET FRESH DESTINATION ===================== */
+async function getFreshDestination() {
+  if (!touristPlaces.length) await loadTouristPlaces();
+
+  // Typed destination: find it in the database list
+  if (!selectedDestination) {
+    const inputEl = document.getElementById("destination-input");
+    const typed = (inputEl ? inputEl.value : "").trim().toLowerCase();
+    
+    if (typed) {
+      selectedDestination = touristPlaces.find(p =>
+        (p.placeName || "").toLowerCase().includes(typed) ||
+        (p.location || "").toLowerCase().includes(typed)
+      );
+    }
+    
+    if (!selectedDestination && touristPlaces.length > 0) {
+      selectedDestination = touristPlaces.find(p => (p.placeName || "").toLowerCase().includes("siddheshwar")) || touristPlaces[0];
+    }
+    
+    if (!selectedDestination) {
+      throw new Error("No destination found. Please verify backend connection.");
+    }
+  }
+
+  const placeId = selectedDestination.placeId ?? selectedDestination.id;
+  if (!placeId) throw new Error("Destination ID is missing.");
+
+  console.log("Fetching destination from database:", placeId);
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const response = await fetch(`${TOURIST_PLACES_API}/${placeId}`, {
+      method: "GET",
+      signal: controller.signal
+    });
+    console.log("Destination API response:", response.status);
+    if (!response.ok) throw new Error(`Destination API returned HTTP ${response.status}`);
+
+    const place = await response.json();
+    console.log("Fresh destination:", place);
+
+    if (place.latitude === null || place.latitude === undefined ||
+        place.longitude === null || place.longitude === undefined) {
+      throw new Error("Destination latitude or longitude is missing.");
+    }
+
+    selectedDestination = place;
+    return {
+      placeId: place.placeId,
+      name: place.placeName,
+      location: place.location,
+      latitude: Number(place.latitude),
+      longitude: Number(place.longitude)
+    };
+  } catch (error) {
+    console.error("Error loading destination:", error);
+    if (error.name === "AbortError") {
+      throw new Error("Destination API is not responding. Check whether Spring Boot is running on port 8081.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/* ===================== TOURIST PLACES ===================== */
+async function loadTouristPlaces() {
+  try {
+    const res = await fetch(TOURIST_PLACES_API);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    touristPlaces = Array.isArray(data) ? data : (data.content || []);
+
+    // Populate datalist suggestions
+    const datalist = document.getElementById("destination-suggestions");
+    if (datalist && Array.isArray(touristPlaces)) {
+      datalist.innerHTML = touristPlaces
+        .map(p => `<option value="${escapeHtml(p.placeName || p.name)}">${escapeHtml(p.location || 'Solapur')}</option>`)
+        .join("");
+    }
+  } catch (e) {
+    console.error("loadTouristPlaces failed:", e);
+    touristPlaces = [];
+  }
+  renderManualPlaces();
+  return touristPlaces;
+}
+
+function distanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371, rad = x => x * Math.PI / 180;
+  const h = Math.sin(rad(lat2 - lat1) / 2) ** 2 +
+    Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(rad(lon2 - lon1) / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+// Places within 50 km of the destination (falls back to all places)
+function nearbyPlaces() {
+  const d = selectedDestination;
+  if (!d || d.latitude == null) return touristPlaces;
+  const list = touristPlaces.filter(p =>
+    p.latitude != null && p.longitude != null &&
+    distanceKm(+d.latitude, +d.longitude, +p.latitude, +p.longitude) <= 50);
+  return list.length ? list : touristPlaces;
+}
+
+function renderManualPlaces() {
+  const box = document.getElementById("manual-place-list");
+  if (!box) return;
+  const places = nearbyPlaces();
+  box.innerHTML = places.length ? "" : "<p>No tourist places found.</p>";
+  places.forEach(p => {
+    const id = p.placeId ?? p.id;
+    const selected = selectedManualPlaces.includes(id);
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "text-left border-2 rounded-xl p-4 " +
+      (selected ? "border-secondary" : "border-outline-variant");
+    b.innerHTML = `<b>${escapeHtml(p.placeName || p.name)}</b>
+      <p class="text-sm text-on-surface-variant">${escapeHtml(p.category || "")}</p>`;
+    b.onclick = () => {
+      const i = selectedManualPlaces.indexOf(id);
+      if (i >= 0) selectedManualPlaces.splice(i, 1); else selectedManualPlaces.push(id);
+      b.classList.toggle("border-secondary", i < 0);
+      b.classList.toggle("border-outline-variant", i >= 0);
+      document.getElementById("selected-place-count").textContent =
+        selectedManualPlaces.length + " selected";
+    };
+    box.appendChild(b);
+  });
+}
+
+function setPlanningMethod(method) {
+  planningMethod = method;
+  document.getElementById("auto-plan-option").classList.toggle("border-secondary", method === "automatic");
+  document.getElementById("auto-plan-option").classList.toggle("border-outline-variant", method !== "automatic");
+  document.getElementById("manual-plan-option").classList.toggle("border-secondary", method === "manual");
+  document.getElementById("manual-plan-option").classList.toggle("border-outline-variant", method !== "manual");
+  document.getElementById("manual-place-selection").classList.toggle("hidden", method !== "manual");
+  if (method === "manual") renderManualPlaces();
+}
+
+// Manual: the places the user ticked. Automatic: places matching interests.
+function getPlacesForItinerary() {
+  const all = nearbyPlaces();
+  if (planningMethod === "manual") {
+    return all.filter(p => selectedManualPlaces.includes(p.placeId ?? p.id));
+  }
+  const interests = getSelectedInterests().map(i => i.toLowerCase().split(/[ &]/)[0]);
+  const matched = all.filter(p =>
+    interests.some(i => (p.category || "").toLowerCase().includes(i)));
+  return (matched.length ? matched : all).slice(0, calculateTripDays() * 3);
+}
+
+/* ===================== CREATE ITINERARY ===================== */
+function createItinerary(destination) {
+  const itinerarySection = document.getElementById("itinerary-section");
+  const itineraryList = document.getElementById("itinerary-list");
+  const subtitle = document.getElementById("itinerary-subtitle");
+
+  const days = calculateTripDays();
+  const places = getPlacesForItinerary();
+  console.log("FINAL PLACES FOR ITINERARY:", places);
+
+  itineraryList.innerHTML = "";
+  subtitle.textContent = `${days} day trip to ${destination.name}`;
+
+  if (!Array.isArray(places) || places.length === 0) {
+    itineraryList.innerHTML = `
+      <div class="bg-surface-container-low rounded-xl p-8 text-center">
+        <span class="material-symbols-outlined text-5xl text-secondary">map</span>
+        <h3 class="text-xl font-semibold mt-4">No Tourist Places Selected</h3>
+        <p class="text-on-surface-variant mt-2">
+          ${planningMethod === "manual"
+            ? "Please select at least one tourist place."
+            : "No suitable tourist places were found."}
+        </p>
+      </div>`;
+    itinerarySection.classList.remove("hidden");
+    return;
+  }
+
+  let placeIndex = 0;
+
+  for (let day = 1; day <= days; day++) {
+    const dayPlaces = [];
+
+    if (placeIndex < places.length) {
+      dayPlaces.push({ period: "MORNING", time: "09:00 AM", place: places[placeIndex] });
+      placeIndex++;
+    }
+    if (placeIndex < places.length) {
+      dayPlaces.push({ period: "AFTERNOON", time: "01:00 PM", place: places[placeIndex] });
+      placeIndex++;
+    }
+    if (placeIndex < places.length) {
+      dayPlaces.push({ period: "EVENING", time: "05:00 PM", place: places[placeIndex] });
+      placeIndex++;
+    }
+
+    const card = document.createElement("div");
+    card.className = "itinerary-card bg-surface-container-lowest rounded-xl p-6 shadow-md";
+
+    let placesHTML = "";
+    dayPlaces.forEach(item => {
+      const place = item.place;
+      const placeName = place.placeName || place.name || "Tourist Place";
+      const category = place.category || "Sightseeing";
+      placesHTML += `
+        <div class="bg-surface-container-low rounded-lg p-4">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-sm text-secondary font-semibold">${item.period}</p>
+              <p class="text-xs text-on-surface-variant mt-1">${item.time}</p>
+              <h4 class="font-semibold text-lg mt-2">${escapeHtml(placeName)}</h4>
+              <p class="text-sm text-on-surface-variant mt-1">${escapeHtml(category)}</p>
+            </div>
+          </div>
+        </div>`;
+    });
+
+    card.innerHTML = `
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center font-bold">${day}</div>
+        <div>
+          <h3 class="text-xl font-semibold">Day ${day}</h3>
+          <p class="text-sm text-on-surface-variant">Explore ${escapeHtml(destination.name)}</p>
+        </div>
+      </div>
+      <div class="space-y-4">${placesHTML}</div>`;
+
+    itineraryList.appendChild(card);
+
+    if (placeIndex >= places.length) break;
+  }
+
+  itinerarySection.classList.remove("hidden");
+  console.log("Itinerary generated successfully.");
+}
+
+/* ===================== GET LIVE HOTELS ===================== */
+async function getLiveHotels(destination) {
+  const url = LIVE_HOTELS_API +
+    "?latitude=" + encodeURIComponent(destination.latitude) +
+    "&longitude=" + encodeURIComponent(destination.longitude);
+
+  console.log("Calling live hotel API:", url);
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    let errorText = "";
+    try { errorText = await response.text(); } catch (error) { errorText = ""; }
+    console.error("Hotel API error:", response.status, errorText);
+    throw new Error(`Hotel API returned HTTP ${response.status}.`);
+  }
+
+  const data = await response.json();
+  console.log("Foursquare hotel response:", data);
+  return data;
+}
+
+/* ===================== DISPLAY HOTELS ===================== */
+function displayHotels(data, destinationName) {
+  const hotelSection = document.getElementById("hotel-recommendations");
+  const hotelList = document.getElementById("hotel-list");
+  const subtitle = document.getElementById("hotel-subtitle");
+
+  hotelList.innerHTML = "";
+  hotelSection.classList.remove("hidden");
+  subtitle.textContent = `Live hotel recommendations near ${destinationName}`;
+
+  const hotels = Array.isArray(data?.results) ? data.results : [];
+  liveHotels = hotels;
+  window.liveHotels = hotels;
+
+  if (hotels.length === 0) {
+    hotelList.innerHTML = `
+      <div class="col-span-full bg-surface-container-low rounded-xl p-8 text-center">
+        <span class="material-symbols-outlined text-5xl text-on-surface-variant">hotel</span>
+        <h3 class="text-xl font-semibold mt-4">No Hotels Found</h3>
+        <p class="text-on-surface-variant mt-2">No live hotel results were returned near this destination.</p>
+      </div>`;
+    return;
+  }
+
+  hotels.slice(0, 20).forEach((hotel, index) => {
+    const name = hotel.name || "Hotel";
+    const address = hotel.location?.formatted_address ||
+      hotel.location?.address || hotel.location?.locality || "Address not available";
+    const distance = hotel.distance !== undefined && hotel.distance !== null
+      ? (Number(hotel.distance) / 1000).toFixed(1) + " km"
+      : "Distance unavailable";
+    const rating = hotel.rating !== undefined && hotel.rating !== null
+      ? Number(hotel.rating).toFixed(1) + "/10"
+      : "Not available";
+    const categories = Array.isArray(hotel.categories)
+      ? hotel.categories.map(c => c.name).filter(Boolean).slice(0, 2).join(", ")
+      : "Hotel";
+
+    const card = document.createElement("div");
+    card.className = "hotel-card bg-surface-container-lowest rounded-xl overflow-hidden shadow-md border border-outline-variant";
+    card.innerHTML = `
+      <div class="h-44 bg-surface-container flex items-center justify-center">
+        <span class="material-symbols-outlined text-7xl text-secondary">hotel</span>
+      </div>
+      <div class="p-5">
+        <div class="flex justify-between items-start gap-3">
+          <h3 class="text-xl font-semibold">${escapeHtml(name)}</h3>
+          <span class="text-xs bg-secondary/10 text-secondary px-2 py-1 rounded-full">LIVE</span>
+        </div>
+        <p class="text-sm text-on-surface-variant mt-2">${escapeHtml(categories)}</p>
+        <div class="flex items-center gap-2 mt-4">
+          <span class="material-symbols-outlined text-[20px]">star</span>
+          <span>${escapeHtml(rating)}</span>
+        </div>
+        <div class="flex items-start gap-2 mt-3">
+          <span class="material-symbols-outlined text-[20px]">location_on</span>
+          <span class="text-sm text-on-surface-variant">${escapeHtml(address)}</span>
+        </div>
+        <div class="flex items-center gap-2 mt-3">
+          <span class="material-symbols-outlined text-[20px]">near_me</span>
+          <span class="text-sm text-secondary font-semibold">${escapeHtml(distance)} away</span>
+        </div>
+        <button type="button" onclick="selectHotel(${index})"
+          class="hotel-select-button w-full mt-5 bg-secondary text-white py-3 px-4 rounded-lg font-semibold">
+          Select Hotel
+        </button>
+      </div>`;
+    hotelList.appendChild(card);
+  });
+}
+
+/* ===================== SELECT HOTEL ===================== */
+function selectHotel(index) {
+  const hotel = liveHotels[index];
+  if (!hotel) {
+    alert("Hotel information is not available.");
+    return;
+  }
+
+  selectedHotel = hotel;
+  localStorage.setItem("selectedHotel", JSON.stringify(hotel));
+
+  // keep the saved trip in sync with the chosen hotel
+  try {
+    const storedTrip = localStorage.getItem("tripPlan");
+    if (storedTrip) {
+      const trip = JSON.parse(storedTrip);
+      trip.selectedHotel = hotel;
+      localStorage.setItem("tripPlan", JSON.stringify(trip));
+    }
+  } catch (e) { console.error(e); }
+
+  document.querySelectorAll(".hotel-select-button").forEach(button => {
+    button.textContent = "Select Hotel";
+    button.classList.remove("bg-primary");
+    button.classList.add("bg-secondary");
+  });
+
+  const buttons = document.querySelectorAll(".hotel-select-button");
+  if (buttons[index]) {
+    buttons[index].textContent = "✓ Hotel Selected";
+    buttons[index].classList.remove("bg-secondary");
+    buttons[index].classList.add("bg-primary");
+  }
+
+  const budgetSection = document.getElementById("budget-plan-section");
+  if (budgetSection) budgetSection.classList.remove("hidden");
+
+  updateTripSummary();
+  alert("Hotel selected: " + (hotel.name || "Selected hotel"));
+}
+
+/* ===================== BUDGET MODULE (POSTGRESQL-BACKED) ===================== */
+async function calculateBudgetFromApi() {
+  const loadingEl = document.getElementById("budget-loading-state");
+  const errorEl = document.getElementById("budget-error-state");
+  const contentEl = document.getElementById("budget-content-container");
+  const refreshIcon = document.getElementById("budget-refresh-icon");
+
+  if (refreshIcon) refreshIcon.classList.add("animate-spin");
+  if (loadingEl) loadingEl.classList.remove("hidden");
+  if (errorEl) errorEl.classList.add("hidden");
+  if (contentEl) contentEl.classList.add("hidden");
+
+  try {
+    // 1. Get destination and placeId
+    let placeId = selectedDestination?.placeId || selectedDestination?.id;
+    let placeName = selectedDestination?.name || selectedDestination?.placeName;
+
+    if (!placeId) {
+      const stored = localStorage.getItem("selectedPlace");
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          placeId = parsed.placeId || parsed.id;
+          placeName = placeName || parsed.placeName || parsed.name;
+        } catch (e) {}
+      }
+    }
+
+    if (!placeId && touristPlaces.length > 0) {
+      const typed = document.getElementById("destination-input")?.value?.trim()?.toLowerCase();
+      const match = typed ? touristPlaces.find(p => (p.placeName || "").toLowerCase().includes(typed)) : null;
+      if (match) {
+        placeId = match.placeId;
+        placeName = match.placeName;
+      } else {
+        placeId = touristPlaces[0].placeId;
+        placeName = touristPlaces[0].placeName;
+      }
+    }
+
+    // Default to placeId 1 if still null
+    if (!placeId) placeId = 1;
+
+    // 2. Get days and travelers
+    let days = Number(document.getElementById("budget-days")?.value) || calculateTripDays() || 3;
+    let travelers = Number(document.getElementById("budget-travelers")?.value) || 2;
+    if (days < 1) days = 1;
+    if (travelers < 1) travelers = 1;
+
+    // Sync inputs if present
+    const daysInput = document.getElementById("budget-days");
+    const travelersInput = document.getElementById("budget-travelers");
+    const transportSelect = document.getElementById("budget-transport-select");
+    if (daysInput) daysInput.value = days;
+    if (travelersInput) travelersInput.value = travelers;
+    const transportType = transportSelect ? transportSelect.value : "Auto";
+
+    // 3. Call Spring Boot Budget API (PostgreSQL-backed)
+    let apiUrl = `http://localhost:8081/api/budget/${placeId}?days=${days}&travelers=${travelers}`;
+    if (transportType) {
+      apiUrl += `&transportType=${encodeURIComponent(transportType)}`;
+    }
+
+    const response = await fetch(apiUrl, {
+      cache: "no-store",
+      headers: { "Accept": "application/json" }
+    });
+
+    if (!response.ok) {
+      throw new Error(`API returned HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Budget plan received from PostgreSQL:", data);
+
+    // 4. Update Meta info
+    const metaDest = document.getElementById("budget-meta-destination");
+    const metaDur = document.getElementById("budget-meta-duration");
+    const metaTrav = document.getElementById("budget-meta-travelers");
+    if (metaDest) metaDest.textContent = data.destination || placeName || "Destination";
+    const nights = Math.max(0, data.days - 1);
+    if (metaDur) metaDur.textContent = `${data.days} Day${data.days > 1 ? 's' : ''} / ${nights} Night${nights > 1 ? 's' : ''}`;
+    if (metaTrav) metaTrav.textContent = `${data.travelers} Traveler${data.travelers > 1 ? 's' : ''}`;
+
+    // 5. Update Transportation Card
+    const transAmount = document.getElementById("budget-transport-amount");
+    const transType = document.getElementById("budget-card-transport-type");
+    const transDetail = document.getElementById("budget-card-transport-detail");
+    if (transAmount) transAmount.textContent = "₹" + Math.round(data.transportationCost).toLocaleString("en-IN");
+    if (transType && data.transportation) {
+      transType.textContent = `${data.transportation.type || 'Auto'} Transit`;
+      if (transportSelect && data.transportation.type) {
+        transportSelect.value = data.transportation.type;
+      }
+    }
+    if (transDetail && data.transportation) {
+      transDetail.textContent = `Base ₹${data.transportation.baseFare || 30} + ~${data.transportation.estimatedDistanceKm || 10}km (@₹${data.transportation.farePerKm || 15}/km)`;
+    }
+
+    // 6. Update Accommodation Card
+    const hotelAmount = document.getElementById("budget-hotel-amount");
+    const hotelName = document.getElementById("budget-card-hotel-name");
+    const hotelNightsBadge = document.getElementById("budget-card-nights-badge");
+    const hotelDetail = document.getElementById("budget-card-hotel-detail");
+    if (hotelAmount) hotelAmount.textContent = "₹" + Math.round(data.accommodationCost).toLocaleString("en-IN");
+    if (hotelName && data.accommodation) {
+      hotelName.textContent = data.accommodation.hotelName || "Hotel City Center";
+    }
+    if (hotelNightsBadge && data.accommodation) {
+      hotelNightsBadge.textContent = `${data.accommodation.nights} Night${data.accommodation.nights !== 1 ? 's' : ''}`;
+    }
+    if (hotelDetail && data.accommodation) {
+      hotelDetail.textContent = `₹${Math.round(data.accommodation.pricePerNight).toLocaleString("en-IN")}/night (${data.accommodation.nights} nights)`;
+    }
+
+    // 7. Update Food Card
+    const foodAmount = document.getElementById("budget-food-amount");
+    const foodName = document.getElementById("budget-card-food-name");
+    const foodDetail = document.getElementById("budget-card-food-detail");
+    if (foodAmount) foodAmount.textContent = "₹" + Math.round(data.foodCost).toLocaleString("en-IN");
+    if (foodName && data.food) {
+      foodName.textContent = data.food.restaurantName || "Kamath Govinda Restaurant";
+    }
+    if (foodDetail && data.food) {
+      foodDetail.textContent = `~₹${Math.round(data.food.estimatedPerMeal)}/meal · ${data.food.mealsPerDay || 3} meals/day for ${data.travelers} person(s)`;
+    }
+
+    // 8. Update Totals
+    const totalAmount = document.getElementById("budget-total-amount");
+    const perPersonAmount = document.getElementById("budget-per-person-amount");
+    if (totalAmount) totalAmount.textContent = "₹" + Math.round(data.totalBudget).toLocaleString("en-IN");
+    if (perPersonAmount) perPersonAmount.textContent = "₹" + Math.round(data.perPerson).toLocaleString("en-IN");
+
+    // 9. Cache in localStorage & update trip plan
+    const tripBudget = {
+      total: data.totalBudget,
+      perPerson: data.perPerson,
+      transportationCost: data.transportationCost,
+      accommodationCost: data.accommodationCost,
+      foodCost: data.foodCost,
+      days: data.days,
+      travelers: data.travelers,
+      destination: data.destination
+    };
+    localStorage.setItem("tripBudget", JSON.stringify(tripBudget));
+
+    const storedTrip = localStorage.getItem("tripPlan");
+    if (storedTrip) {
+      try {
+        const trip = JSON.parse(storedTrip);
+        trip.budgetPlan = tripBudget;
+        localStorage.setItem("tripPlan", JSON.stringify(trip));
+      } catch (e) {}
+    }
+
+    if (loadingEl) loadingEl.classList.add("hidden");
+    if (contentEl) contentEl.classList.remove("hidden");
+    updateTripSummary();
+
+  } catch (err) {
+    console.error("Budget calculation failed:", err);
+    if (loadingEl) loadingEl.classList.add("hidden");
+    if (errorEl) {
+      errorEl.classList.remove("hidden");
+      const errorMsg = document.getElementById("budget-error-message");
+      if (errorMsg) errorMsg.textContent = "Unable to calculate budget. Please try again.";
+    }
+  } finally {
+    if (refreshIcon) {
+      setTimeout(() => refreshIcon.classList.remove("animate-spin"), 400);
+    }
+  }
+}
+
+// Backwards compatibility alias
+function calculateBudget() {
+  return calculateBudgetFromApi();
+}
+
+/* ===================== SAVE TRIP ===================== */
+function saveTrip(destination) {
+  const storedBudget = localStorage.getItem("tripBudget");
+  let budgetPlan = null;
+  if (storedBudget) {
+    try { budgetPlan = JSON.parse(storedBudget); } catch (error) { budgetPlan = null; }
+  }
+
+  const tripData = {
+    destination: {
+      placeId: destination.placeId,
+      name: destination.name,
+      location: destination.location,
+      latitude: destination.latitude,
+      longitude: destination.longitude
+    },
+    departure: document.getElementById("departure-date").value,
+    returnDate: document.getElementById("return-date").value,
+    traveler: selectedTraveler,
+    budget: Number(document.getElementById("budget-slider").value),
+    pace: selectedPace,
+    interests: getSelectedInterests(),
+    planningMethod: planningMethod,
+    selectedHotel: selectedHotel,
+    budgetPlan: budgetPlan
+  };
+
+  localStorage.setItem("tripPlan", JSON.stringify(tripData));
+  console.log("Trip saved:", tripData);
+}
+
+/* ===================== UPDATE SUMMARY ===================== */
+function updateTripSummary() {
+  const summary = document.getElementById("trip-summary");
+  const content = document.getElementById("trip-summary-content");
+  const storedTrip = localStorage.getItem("tripPlan");
+  if (!storedTrip) return;
+
+  let trip;
+  try { trip = JSON.parse(storedTrip); } catch (error) { return; }
+
+  const hotelName = selectedHotel?.name || trip.selectedHotel?.name || "No hotel selected";
+  const days = calculateTripDays();
+  const budgetPlan = trip.budgetPlan;
+
+  content.innerHTML = `
+    <p><strong>Destination:</strong> ${escapeHtml(trip.destination?.name || "Not available")}</p>
+    <p><strong>Location:</strong> ${escapeHtml(trip.destination?.location || "Not available")}</p>
+    <p><strong>Trip Duration:</strong> ${days} day(s)</p>
+    <p><strong>Traveler:</strong> ${escapeHtml(trip.traveler || "Not available")}</p>
+    <p><strong>Budget:</strong> ₹${Number(trip.budget || 0).toLocaleString("en-IN")} per person</p>
+    <p><strong>Travel Pace:</strong> ${escapeHtml(trip.pace || "Balanced")}</p>
+    <p><strong>Selected Hotel:</strong> ${escapeHtml(hotelName)}</p>
+    ${budgetPlan ? `
+      <p><strong>Total Estimated Trip Cost:</strong> ₹${Number(budgetPlan.total || 0).toLocaleString("en-IN")}</p>
+      <p><strong>Estimated Cost Per Person:</strong> ₹${Number(budgetPlan.perPerson || 0).toLocaleString("en-IN")}</p>
+    ` : ""}`;
+
+  summary.classList.remove("hidden");
+}
+
+/* ===================== MAIN - GENERATE ITINERARY ===================== */
+async function generateItinerary() {
+  const overlay = document.getElementById("loading-overlay");
+  const loadingText = document.getElementById("loading-text");
+  const hotelSection = document.getElementById("hotel-recommendations");
+  const budgetSection = document.getElementById("budget-plan-section");
+  const itinerarySection = document.getElementById("itinerary-section");
+  const summary = document.getElementById("trip-summary");
+
+  try {
+    overlay.classList.remove("opacity-0", "pointer-events-none");
+    hotelSection?.classList.add("hidden");
+    budgetSection?.classList.add("hidden");
+    itinerarySection?.classList.add("hidden");
+    summary?.classList.add("hidden");
+
+    // 1. Check form
+    if (!validateStep(4)) {
+      throw new Error("Please complete all required information.");
+    }
+
+    // 2. Get destination (with coordinates) from database
+    loadingText.textContent = "Getting destination coordinates from database...";
+    const destination = await getFreshDestination();
+    console.log("Destination received:", destination);
+
+    // 3. Save basic trip
+    saveTrip(destination);
+
+    // 4. Live hotels (a hotel failure should not block the itinerary)
+    loadingText.textContent = "Searching live hotels near your destination...";
+    try {
+      const hotelData = await getLiveHotels(destination);
+      displayHotels(hotelData, destination.name);
+    } catch (hotelError) {
+      console.error("Hotels unavailable:", hotelError);
+      displayHotels({ results: [] }, destination.name);
+    }
+
+    // 5. Tourist places + itinerary
+    loadingText.textContent = "Creating your personalized itinerary...";
+    await loadTouristPlaces();
+    createItinerary(destination);
+
+    // 6. Save again, calculate PostgreSQL-backed budget, and show summary
+    saveTrip(destination);
+    try {
+      await calculateBudgetFromApi();
+    } catch (bErr) {
+      console.warn("Budget calculation notice:", bErr);
+    }
+    updateTripSummary();
+
+    // 7. Show results
+    hotelSection?.classList.remove("hidden");
+    budgetSection?.classList.remove("hidden");
+    itinerarySection?.classList.remove("hidden");
+    summary?.classList.remove("hidden");
+
+    setTimeout(() => {
+      hotelSection?.scrollIntoView({ behavior: "smooth" });
+    }, 300);
+  } catch (error) {
+    console.error("GENERATE ITINERARY ERROR:", error);
+    alert("Unable to generate itinerary.\n\n" + error.message);
+  } finally {
+    overlay.classList.add("opacity-0", "pointer-events-none");
+  }
+}
+
+/* ===================== PAGE LOAD ===================== */
+document.addEventListener("DOMContentLoaded", function () {
+  updateSidebar(1);
+  loadSelectedDestination();
+  loadTouristPlaces();
+
+  // Pre-set departure & return dates if empty
+  const departureElement = document.getElementById("departure-date");
+  const returnElement = document.getElementById("return-date");
+  if (departureElement && !departureElement.value) {
+    const depDate = new Date(Date.now() + 86400000);
+    departureElement.value = depDate.toISOString().split("T")[0];
+  }
+  if (returnElement && !returnElement.value) {
+    const retDate = new Date(Date.now() + (4 * 86400000));
+    returnElement.value = retDate.toISOString().split("T")[0];
+  }
+
+  // Pre-fill destination if empty
+  const destInput = document.getElementById("destination-input");
+  if (destInput && !destInput.value && !localStorage.getItem("selectedPlace")) {
+    destInput.value = "Siddheshwar Temple, Solapur";
+  }
+
+  const savedBudget = localStorage.getItem("tripBudget");
+  if (savedBudget) {
+    try {
+      const budget = JSON.parse(savedBudget);
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      if (budget.travelers) set("budget-travelers", budget.travelers);
+      if (budget.days) set("budget-days", budget.days);
+    } catch (error) {
+      console.error("Unable to load saved budget:", error);
+    }
+  }
+});
+
+/* ===================== EXPORT GLOBALS ===================== */
+window.nextStep = nextStep;
+window.prevStep = prevStep;
+window.selectTraveler = selectTraveler;
+window.setPace = setPace;
+window.setPlanningMethod = setPlanningMethod;
+window.generateItinerary = generateItinerary;
+window.selectHotel = selectHotel;
+window.calculateBudget = calculateBudget;
+window.calculateBudgetFromApi = calculateBudgetFromApi;
+window.selectQuickDestination = function(destName) {
+  const input = document.getElementById("destination-input");
+  if (input) {
+    input.value = destName;
+    if (touristPlaces && touristPlaces.length) {
+      selectedDestination = touristPlaces.find(p => (p.placeName || "").toLowerCase().includes(destName.toLowerCase())) || null;
+    }
+  }
+};
+</script>
+
+<!-- Multilingual Support (i18n) -->
+<script src="../translations.js"></script>
+<script src="../i18n.js"></script>
+
+<!-- Navigation -->
+<script src="../navigation.js"></script>
+
+</body>
+</html>
