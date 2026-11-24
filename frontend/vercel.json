@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/smarttour_home_2/code.html" },
+    { "source": "/home", "destination": "/smarttour_home_2/code.html" },
+    { "source": "/login", "destination": "/login_smarttour/code.html" },
+    { "source": "/register", "destination": "/register_smarttour/code.html" },
+    { "source": "/explore", "destination": "/explore_destinations/explore_destinations.html" },
+    { "source": "/community", "destination": "/community_feed/code.html" },
+    { "source": "/plan-trip", "destination": "/plan_my_trip/code.html" }
+  ]
+}
